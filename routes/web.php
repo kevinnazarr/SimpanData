@@ -24,9 +24,13 @@ use App\Http\Controllers\Admin\ArsipController as AdminArsipController;
 Route::get('/', [IndexController::class, 'index'])->name('index');
 Route::get('/auth', fn() => view('auth.auth'))->name('auth');
 
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:5,1')
+    ->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:3,1')
+    ->name('register');
 
 Route::get('/privacy-policy', function () {
     return view('legal.privacy-policy');

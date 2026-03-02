@@ -61,6 +61,12 @@ window.pulihkan = function (id, nama) {
         cancelButtonColor: '#6b7280',
         confirmButtonText: '<i class="bx bx-undo"></i> Ya, Pulihkan',
         cancelButtonText: 'Batal',
+        customClass: {
+            popup: 'rounded-2xl shadow-xl',
+            confirmButton: 'rounded-lg font-semibold',
+            cancelButton: 'rounded-lg font-semibold',
+        },
+        buttonsStyling: true,
     }).then(result => {
         if (!result.isConfirmed) return;
 
@@ -74,22 +80,22 @@ window.pulihkan = function (id, nama) {
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                Swal.fire({ icon: 'success', title: 'Berhasil!', text: data.message, timer: 2000, showConfirmButton: false })
-                    .then(() => fetchTable());
+                showSuccessToast(data.message);
+                fetchTable();
             } else {
-                Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+                showErrorToast(data.message);
             }
         })
-        .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi bermasalah.' }));
+        .catch(() => showErrorToast('Koneksi bermasalah. Coba lagi.'));
     });
 };
 
 window.hapusPermanent = function (id, nama) {
     Swal.fire({
         title: 'Hapus Permanen?',
-        html: `<div class="text-left">
-                <p>Seluruh data <strong>${nama}</strong> akan dihapus permanen dan <span class="text-red-600 font-semibold">tidak dapat dikembalikan</span>.</p>
-                <p class="mt-2 text-sm text-gray-500">Termasuk: absensi, laporan, feedback, dan penilaian.</p>
+        html: `<div class="text-left text-sm text-gray-600">
+                <p class="mb-2">Seluruh data <strong class="text-gray-800">${nama}</strong> akan dihapus permanen dan <span class="font-semibold text-red-600">tidak dapat dikembalikan</span>.</p>
+                <p class="text-gray-500">Termasuk: absensi, laporan, feedback, dan penilaian.</p>
                </div>`,
         icon: 'warning',
         showCancelButton: true,
@@ -97,6 +103,12 @@ window.hapusPermanent = function (id, nama) {
         cancelButtonColor: '#6b7280',
         confirmButtonText: '<i class="bx bx-trash"></i> Ya, Hapus Permanen',
         cancelButtonText: 'Batal',
+        customClass: {
+            popup: 'rounded-2xl shadow-xl',
+            confirmButton: 'rounded-lg font-semibold',
+            cancelButton: 'rounded-lg font-semibold',
+        },
+        buttonsStyling: true,
     }).then(result => {
         if (!result.isConfirmed) return;
 
@@ -110,12 +122,43 @@ window.hapusPermanent = function (id, nama) {
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                Swal.fire({ icon: 'success', title: 'Terhapus!', text: data.message, timer: 2000, showConfirmButton: false })
-                    .then(() => fetchTable());
+                showSuccessToast(data.message);
+                fetchTable();
             } else {
-                Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+                showErrorToast(data.message);
             }
         })
-        .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi bermasalah.' }));
+        .catch(() => showErrorToast('Koneksi bermasalah. Coba lagi.'));
     });
 };
+
+function showSuccessToast(message) {
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        background: '#f0f9ff',
+        iconColor: '#10b981',
+    });
+}
+
+function showErrorToast(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+        background: '#fef2f2',
+        iconColor: '#ef4444',
+    });
+}
+

@@ -80,7 +80,7 @@ class DashboardController extends Controller
             }
 
             $feedbacks = Feedback::select('id', 'peserta_id', 'pesan', 'created_at')
-                ->with(['peserta:id,nama'])
+                ->with(['peserta:id,nama,foto'])
                 ->where('pengirim', 'Peserta')
                 ->latest()
                 ->limit(20)

@@ -507,9 +507,15 @@
                         <div
                             class="flex-shrink-0 w-full max-w-sm p-6 transition-all duration-300 bg-white border cursor-pointer rounded-2xl shadow-custom border-border hover:scale-105 hover:shadow-xl hover:z-10 hover:border-primary/30">
                             <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark">
-                                    {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                <div class="flex-shrink-0">
+                                    @if($feedback->peserta && $feedback->peserta->foto)
+                                        <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
+                                             class="object-cover w-12 h-12 rounded-full shadow-sm border border-slate-100">
+                                    @else
+                                        <div class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark shadow-sm">
+                                            {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div>
                                     <h4 class="m-0 font-bold text-text-primary">
@@ -536,9 +542,15 @@
                         <div
                             class="flex-shrink-0 w-full max-w-sm p-6 transition-all duration-300 bg-white border cursor-pointer rounded-2xl shadow-custom border-border hover:scale-105 hover:shadow-xl hover:z-10 hover:border-primary/30">
                             <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark">
-                                    {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                <div class="flex-shrink-0">
+                                    @if($feedback->peserta && $feedback->peserta->foto)
+                                        <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
+                                             class="object-cover w-12 h-12 rounded-full shadow-sm border border-slate-100">
+                                    @else
+                                        <div class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark shadow-sm">
+                                            {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div>
                                     <h4 class="m-0 font-bold text-text-primary">
@@ -571,9 +583,15 @@
                         <div
                             class="flex-shrink-0 w-full max-w-sm p-6 transition-all duration-300 bg-white border cursor-pointer rounded-2xl shadow-custom border-border hover:scale-105 hover:shadow-xl hover:z-10 hover:border-primary/30">
                             <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark">
-                                    {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                <div class="flex-shrink-0">
+                                    @if($feedback->peserta && $feedback->peserta->foto)
+                                        <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
+                                             class="object-cover w-12 h-12 rounded-full shadow-sm border border-slate-100">
+                                    @else
+                                        <div class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark shadow-sm">
+                                            {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div>
                                     <h4 class="m-0 font-bold text-text-primary">
@@ -600,9 +618,15 @@
                         <div
                             class="flex-shrink-0 w-full max-w-sm p-6 transition-all duration-300 bg-white border cursor-pointer rounded-2xl shadow-custom border-border hover:scale-105 hover:shadow-xl hover:z-10 hover:border-primary/30">
                             <div class="flex items-center gap-4 mb-4">
-                                <div
-                                    class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark">
-                                    {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                <div class="flex-shrink-0">
+                                    @if($feedback->peserta && $feedback->peserta->foto)
+                                        <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
+                                             class="object-cover w-12 h-12 rounded-full shadow-sm border border-slate-100">
+                                    @else
+                                        <div class="flex items-center justify-center w-12 h-12 font-bold text-white rounded-full bg-gradient-to-br from-primary to-primary-dark shadow-sm">
+                                            {{ $feedback->peserta ? strtoupper(substr($feedback->peserta->nama, 0, 1)) : 'U' }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div>
                                     <h4 class="m-0 font-bold text-text-primary">

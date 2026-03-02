@@ -52,7 +52,7 @@ class IndexController extends Controller
                 ->latest('tanggal_laporan')
                 ->first();
 
-            $feedbacks = Feedback::with('peserta:id,nama,jenis_kegiatan')
+            $feedbacks = Feedback::with('peserta:id,nama,jenis_kegiatan,foto')
                 ->where('tampilkan', true)
                 ->where('pengirim', 'Peserta')
                 ->latest()
