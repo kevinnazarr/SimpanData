@@ -311,4 +311,10 @@ class PesertaController extends Controller
             ], 500);
         }
     }
+
+    public function printIdCard($id)
+    {
+        $peserta = Peserta::findOrFail($id);
+        return view('admin.peserta.print-id-card', compact('peserta'));
+    }
 }

@@ -86,10 +86,16 @@
                         </div>
                     </div>
 
-                    <button id="btnEditProfile"
-                        class="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm active:scale-[0.98]">
-                        <i class='text-base bx bx-edit-alt'></i> Edit Profil
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('peserta.profil.print') }}" target="_blank"
+                            class="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-primary-dark transition-all shadow-sm active:scale-[0.98]">
+                            <i class='text-base bx bx-printer'></i> Cetak ID Card
+                        </a>
+                        <button id="btnEditProfile"
+                            class="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm active:scale-[0.98]">
+                            <i class='text-base bx bx-edit-alt'></i> Edit Profil
+                        </button>
+                    </div>
                 </div>
                 <i
                     class='absolute transition-colors opacity-50 bx bx-user -right-8 -bottom-8 text-9xl text-slate-50 group-hover:text-slate-100'></i>
