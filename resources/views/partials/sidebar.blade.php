@@ -81,6 +81,13 @@
                 </a>
                 <span class="tooltip">Penilaian</span>
             </li>
+            <li>
+                <a href="{{ route('admin.arsip.index') }}" class="{{ request()->routeIs('admin.arsip.*') ? 'active' : '' }}">
+                    <i class='bx bx-archive'></i>
+                    <span class="links_name">Arsip</span>
+                </a>
+                <span class="tooltip">Arsip</span>
+            </li>
         @elseif($user->isPeserta())
             <li>
                 <a href="{{ route('peserta.dashboard') }}" class="{{ request()->routeIs('peserta.dashboard') ? 'active' : '' }}">

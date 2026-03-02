@@ -14,7 +14,7 @@ class PesertaController extends Controller
 {
     public function index(Request $request)
     {
-        $baseQuery = Peserta::with('user')->latest();
+        $baseQuery = Peserta::with('user')->where('status', '!=', 'Arsip')->latest();
 
         if ($request->filled('search')) {
             $search = $request->search;

@@ -24,6 +24,8 @@ export default defineConfig({
                 'resources/css/admin/laporan-show.css',
                 'resources/css/admin/penilaian.css',
                 'resources/css/admin/grid-cards.css',
+                'resources/css/admin/arsip.css',
+                'resources/js/admin/arsip.js',
                 'resources/js/index.js',
                 'resources/js/landing.js',
                 'resources/css/landing.css',
