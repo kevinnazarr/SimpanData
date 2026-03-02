@@ -116,25 +116,25 @@ class AuthController extends Controller
         OtpCode::updateOrCreate(
             ['email' => $email],
             [
-                'code' => $otp,
+                'code'       => Hash::make((string) $otp),
                 'expired_at' => Carbon::now()->addMinutes(5),
             ]
         );
 
         try {
-            Mail::to($email)->send(new ResetPasswordOtpMail($otp, $email));
+            Mail::to($email)->queue(new ResetPasswordOtpMail($otp, $email));
 
             Log::info('Reset password OTP sent to: ' . $email);
 
             return response()->json([
-                'status' => true,
+                'status'  => true,
                 'message' => 'Kode OTP berhasil dikirim ke email',
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to send reset password OTP email to ' . $email . ': ' . $e->getMessage());
 
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Gagal mengirim email OTP. Silakan coba lagi.',
             ], 500);
         }
@@ -184,7 +184,7 @@ class AuthController extends Controller
         OtpCode::updateOrCreate(
             ['email' => $request->email],
             [
-                'code' => $otp,
+                'code'       => Hash::make((string) $otp),
                 'expired_at' => Carbon::now()->addMinutes(5),
             ]
         );
@@ -195,14 +195,14 @@ class AuthController extends Controller
             Log::info('Registration OTP sent to: ' . $request->email);
 
             return response()->json([
-                'status' => true,
+                'status'  => true,
                 'message' => 'Kode OTP berhasil dikirim ke email',
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to send registration OTP email to ' . $request->email . ': ' . $e->getMessage());
 
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Gagal mengirim email OTP. Silakan coba lagi.',
             ], 500);
         }
@@ -224,13 +224,13 @@ class AuthController extends Controller
         OtpCode::updateOrCreate(
             ['email' => $email],
             [
-                'code' => $otp,
+                'code'       => Hash::make((string) $otp),
                 'expired_at' => Carbon::now()->addMinutes(5),
             ]
         );
 
         try {
-            Mail::to($email)->send(new ResetPasswordOtpMail($otp, $email));
+            Mail::to($email)->queue(new ResetPasswordOtpMail($otp, $email));
 
             Log::info('Reset password OTP resent to: ' . $email);
 
@@ -255,18 +255,16 @@ class AuthController extends Controller
             'otp'   => 'required|digits:6',
         ]);
 
-        $otp = OtpCode::where('email', $request->email)
-            ->where('code', $request->otp)
-            ->first();
+        $otpRecord = OtpCode::where('email', $request->email)->first();
 
-        if (!$otp || $otp->isExpired()) {
+        if (!$otpRecord || $otpRecord->isExpired() || !Hash::check((string) $request->otp, $otpRecord->code)) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'OTP tidak valid atau sudah kedaluwarsa',
             ], 422);
         }
 
-        $otp->delete();
+        $otpRecord->delete();
 
         session(['otp_verified_email' => $request->email]);
 
@@ -343,17 +341,15 @@ class AuthController extends Controller
                 ->with('error', 'Sesi habis, silakan ulangi proses');
         }
 
-        $otp = OtpCode::where('email', $email)
-            ->where('code', $request->otp)
-            ->first();
+        $otpRecord = OtpCode::where('email', $email)->first();
 
-        if (!$otp || $otp->isExpired()) {
+        if (!$otpRecord || $otpRecord->isExpired() || !Hash::check((string) $request->otp, $otpRecord->code)) {
             return back()->withErrors([
                 'otp' => 'OTP tidak valid atau sudah kedaluwarsa',
             ]);
         }
 
-        $otp->delete();
+        $otpRecord->delete();
 
         session([
             'reset_verified' => true,

@@ -61,8 +61,22 @@ function getLocation() {
             },
             (error) => {
                 console.error("Error getting location:", error);
+                let message = "Gagal mendeteksi lokasi";
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        message = "Izin lokasi ditolak";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = "Lokasi tidak tersedia";
+                        break;
+                    case error.TIMEOUT:
+                        message = "Waktu deteksi habis";
+                        break;
+                }
+
                 if (locationStatus) {
-                    locationStatus.textContent = "Gagal mendeteksi lokasi";
+                    locationStatus.textContent = message;
                     locationStatus.classList.add("text-red-600");
                 }
 

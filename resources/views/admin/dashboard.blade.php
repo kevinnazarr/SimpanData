@@ -205,9 +205,15 @@
                 class="flex flex-col flex-1 p-0 space-y-3 md:space-y-4 overflow-y-auto min-h-0 max-h-[400px] feedback-scroll">
                 @forelse ($feedbacks as $feedback)
                     <div class="flex gap-3 p-4 border border-slate-100 rounded-2xl hover:bg-slate-50/50 transition-colors duration-200 group">
-                        <div
-                            class="flex items-center justify-center flex-shrink-0 w-12 h-12 font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                            {{ strtoupper(substr($feedback->peserta->nama, 0, 1)) }}
+                        <div class="flex-shrink-0">
+                            @if($feedback->peserta->foto)
+                                <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
+                                     class="object-cover w-12 h-12 shadow-sm rounded-xl border border-slate-100">
+                            @else
+                                <div class="flex items-center justify-center w-12 h-12 font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                                    {{ strtoupper(substr($feedback->peserta->nama, 0, 1)) }}
+                                </div>
+                            @endif
                         </div>
 
                         <div class="flex-1">
