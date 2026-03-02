@@ -28,6 +28,9 @@ class LaporanController extends Controller
                 $q->where('asal_sekolah_universitas', $sekolah);
             });
         }
+        if ($status) {
+            $baseStatsQuery->where('status', $status);
+        }
 
         $totalReports = (clone $baseStatsQuery)->count();
         $pendingReports = (clone $baseStatsQuery)->where('status', 'Dikirim')->count();
@@ -58,7 +61,7 @@ class LaporanController extends Controller
             ->orderBy('asal_sekolah_universitas')
             ->get();
 
-        return view('admin.laporan.index', compact(
+        return view('admin.laporan.Laporan-harian', compact(
             'laporans',
             'sekolahs',
             'status',
@@ -74,39 +77,72 @@ class LaporanController extends Controller
     public function show($id)
     {
         $laporan = Laporan::with('peserta')->findOrFail($id);
-
-        return view('admin.laporan.show', compact('laporan'));
+        return view('admin.laporan.laporan-harian-show', compact('laporan'));
     }
 
-    public function updateStatus(Request $request, $id)
+    public function approve($id)
+    {
+        $laporan = Laporan::findOrFail($id);
+
+        if ($laporan->status !== 'Dikirim' && $laporan->status !== 'Revisi') {
+            return redirect()->back()->with('error', 'Hanya laporan dengan status "Dikirim" atau "Revisi" yang dapat disetujui.');
+        }
+
+        $laporan->update([
+            'status' => 'Disetujui',
+            'catatan_admin' => null // Clear notes if approved
+        ]);
+
+        return redirect()->back()->with('success', 'Laporan berhasil disetujui.');
+    }
+
+    public function revisi(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Disetujui,Revisi',
+            'catatan_admin' => 'required|string',
+        ], [
+            'catatan_admin.required' => 'Catatan revisi harus diisi.',
         ]);
 
         $laporan = Laporan::findOrFail($id);
 
-        if ($laporan->status !== 'Dikirim') {
-            return redirect()->back()->with('error', 'Hanya laporan dengan status "Dikirim" yang dapat disetujui atau direvisi.');
+        if ($laporan->status === 'Disetujui') {
+            return redirect()->back()->with('error', 'Laporan yang sudah disetujui tidak dapat direvisi.');
         }
 
         $laporan->update([
-            'status' => $request->status
+            'status' => 'Revisi',
+            'catatan_admin' => $request->catatan_admin
         ]);
 
-        $message = $request->status == 'Disetujui'
-            ? 'Laporan berhasil disetujui.'
-            : 'Laporan ditandai untuk revisi.';
-
-        return redirect()->back()->with('success', $message);
+        return redirect()->back()->with('success', 'Laporan ditandai untuk revisi dengan catatan.');
     }
 
     public function laporanAkhirIndex(Request $request)
     {
         $status = $request->status;
         $sekolah = $request->asal_sekolah_universitas;
+        $tanggal = $request->tanggal;
 
         $query = LaporanAkhir::with('peserta');
+
+        $baseStatsQuery = LaporanAkhir::query();
+        if ($tanggal) {
+            $baseStatsQuery->whereDate('updated_at', $tanggal);
+        }
+        if ($sekolah) {
+            $baseStatsQuery->whereHas('peserta', function ($q) use ($sekolah) {
+                $q->where('asal_sekolah_universitas', $sekolah);
+            });
+        }
+        if ($status) {
+            $baseStatsQuery->where('status', $status);
+        }
+
+        $totalReports = (clone $baseStatsQuery)->count();
+        $pendingReports = (clone $baseStatsQuery)->where('status', 'Dikirim')->count();
+        $approvedReports = (clone $baseStatsQuery)->where('status', 'Disetujui')->count();
+        $revisedReports = (clone $baseStatsQuery)->where('status', 'Revisi')->count();
 
         if ($status) {
             $query->where('status', $status);
@@ -116,6 +152,10 @@ class LaporanController extends Controller
             $query->whereHas('peserta', function ($q) use ($sekolah) {
                 $q->where('asal_sekolah_universitas', $sekolah);
             });
+        }
+
+        if ($tanggal) {
+            $query->whereDate('updated_at', $tanggal);
         }
 
         $laporans = $query->latest()
@@ -128,7 +168,17 @@ class LaporanController extends Controller
             ->orderBy('asal_sekolah_universitas')
             ->get();
 
-        return view('admin.laporan.laporan-akhir-index', compact('laporans', 'sekolahs', 'status', 'sekolah'));
+        return view('admin.laporan.laporan-akhir', compact(
+            'laporans', 
+            'sekolahs', 
+            'status', 
+            'sekolah',
+            'tanggal',
+            'totalReports',
+            'pendingReports',
+            'approvedReports',
+            'revisedReports'
+        ));
     }
 
     public function laporanAkhirShow($id)
@@ -137,28 +187,39 @@ class LaporanController extends Controller
         return view('admin.laporan.laporan-akhir-show', compact('laporan'));
     }
 
-    public function laporanAkhirUpdateStatus(Request $request, $id)
+    public function laporanAkhirApprove($id)
+    {
+        $laporan = LaporanAkhir::findOrFail($id);
+        
+        if ($laporan->status !== 'Dikirim' && $laporan->status !== 'Revisi') {
+            return redirect()->back()->with('error', 'Hanya laporan dengan status "Dikirim" atau "Revisi" yang dapat disetujui.');
+        }
+
+        $laporan->update([
+            'status' => 'Disetujui',
+            'catatan_admin' => null
+        ]);
+
+        return redirect()->route('admin.laporan.akhir.index')->with('success', 'Laporan akhir berhasil disetujui.');
+    }
+
+    public function laporanAkhirRevisi(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Disetujui,Revisi',
-            'catatan_admin' => 'nullable|string',
+            'catatan_admin' => 'required|string',
         ]);
 
         $laporan = LaporanAkhir::findOrFail($id);
 
-        if ($laporan->status !== 'Dikirim') {
-            return redirect()->back()->with('error', 'Hanya laporan dengan status "Dikirim" yang dapat diproses.');
+        if ($laporan->status !== 'Dikirim' && $laporan->status !== 'Revisi') {
+            return redirect()->back()->with('error', 'Hanya laporan dengan status "Dikirim" atau "Revisi" yang dapat direvisi.');
         }
 
         $laporan->update([
-            'status' => $request->status,
+            'status' => 'Revisi',
             'catatan_admin' => $request->catatan_admin
         ]);
 
-        $message = $request->status == 'Disetujui'
-            ? 'Laporan akhir berhasil disetujui.'
-            : 'Laporan akhir ditandai untuk revisi dengan catatan.';
-
-        return redirect()->route('admin.laporan.akhir.index')->with('success', $message);
+        return redirect()->route('admin.laporan.akhir.index')->with('success', 'Catatan revisi berhasil dikirim ke peserta.');
     }
 }

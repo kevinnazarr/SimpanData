@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <div class="flex flex-col justify-between gap-4 p-6 md:flex-row md:items-center card shadow-soft animate-fade-in">
+        <div class="flex flex-col justify-between gap-4 p-6 md:flex-row md:items-center card shadow-soft animate-fade-in no-print">
             <div class="flex items-center space-x-4">
                 <div class="flex items-center justify-center w-12 h-12 text-2xl text-indigo-600 rounded-xl bg-indigo-50">
                     <i class='bx bx-award'></i>
@@ -15,18 +15,26 @@
                 </div>
             </div>
 
-            @if($peserta && $peserta->penilaian)
-                <div class="px-4 py-2 border border-emerald-100 bg-emerald-50 rounded-xl animate-fade-in" style="animation-delay: 200ms">
-                    <p class="text-xs font-bold uppercase text-emerald-600">Status Evaluasi</p>
-                    <p class="text-sm font-extrabold text-emerald-900">Selesai Dinilai</p>
-                </div>
-            @else
-                <div class="px-4 py-2 border border-amber-100 bg-amber-50 rounded-xl animate-fade-in" style="animation-delay: 200ms">
-                    <p class="text-xs font-bold uppercase text-amber-600">Status Evaluasi</p>
-                    <p class="text-sm font-extrabold text-amber-900">Sedang Diproses</p>
-                </div>
-            @endif
+            <div class="flex items-center gap-3">
+                @if($peserta && $peserta->penilaian)
+                    <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition-all bg-indigo-600 shadow-sm rounded-xl hover:bg-indigo-700 hover:shadow-md">
+                        <i class='text-lg bx bx-printer'></i>
+                        <span>Print</span>
+                    </button>
+                    <div class="hidden px-4 py-2 border md:block border-emerald-100 bg-emerald-50 rounded-xl animate-fade-in" style="animation-delay: 200ms">
+                        <p class="text-xs font-bold uppercase text-emerald-600">Status Evaluasi</p>
+                        <p class="text-sm font-extrabold text-emerald-900">Selesai Dinilai</p>
+                    </div>
+                @else
+                    <div class="px-4 py-2 border border-amber-100 bg-amber-50 rounded-xl animate-fade-in" style="animation-delay: 200ms">
+                        <p class="text-xs font-bold uppercase text-amber-600">Status Evaluasi</p>
+                        <p class="text-sm font-extrabold text-amber-900">Sedang Diproses</p>
+                    </div>
+                @endif
+            </div>
         </div>
+
+        <div id="printable-area" class="space-y-6">
 
         @if($peserta && $peserta->penilaian)
             @php $n = $peserta->penilaian; @endphp
@@ -77,7 +85,7 @@
                     </div>
                 </div>
 
-                <div class="p-6 lg:col-span-12 card shadow-soft border-primary animate-fade-in-up" style="animation-delay: 400ms">
+                <div class="p-6 lg:col-span-12 card shadow-soft border-primary animate-fade-in-up no-print" style="animation-delay: 400ms">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="flex items-center justify-center w-10 h-10 text-xl rounded-lg text-primary bg-primary/5">
                             <i class='bx bx-comment-dots'></i>
@@ -121,9 +129,10 @@
                 </p>
             </div>
         @endif
+        </div>
     </div>
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/peserta/penilaian.css') }}">
+    @vite(['resources/css/peserta/penilaian.css'])
 @endpush

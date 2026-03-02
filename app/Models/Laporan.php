@@ -17,6 +17,7 @@ class Laporan extends Model
         'file_path',
         'tanggal_laporan',
         'status',
+        'catatan_admin',
     ];
     protected $casts = [
         'tanggal_laporan' => 'date',

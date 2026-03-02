@@ -10,17 +10,27 @@ return new class extends Migration
     {
         Schema::create('laporan', function (Blueprint $table) {
             $table->id();
+
             $table->foreignId('peserta_id')
                 ->constrained('peserta')
                 ->cascadeOnDelete();
+
             $table->string('judul');
             $table->text('deskripsi');
             $table->string('file_path')->nullable();
             $table->date('tanggal_laporan');
+
             $table->enum('status', ['Draft', 'Dikirim', 'Disetujui', 'Revisi'])
                 ->default('Draft');
+
+            $table->text('catatan_admin')->nullable();
+
             $table->timestamps();
+
             $table->unique(['peserta_id', 'tanggal_laporan']);
+
+            $table->index('status');
+            $table->index('tanggal_laporan');
         });
     }
 

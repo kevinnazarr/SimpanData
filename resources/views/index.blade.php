@@ -89,7 +89,7 @@
     </script>
 
 
-    <link rel="stylesheet" href="{{ asset('css/landing.css') }}">
+    @vite(['resources/css/landing.css'])
     <style>
         .no-scrollbar::-webkit-scrollbar {
             display: none;

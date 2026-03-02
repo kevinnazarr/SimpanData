@@ -95,18 +95,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     navLinks.forEach((link) => {
         link.addEventListener("click", function (e) {
-            // Dropdown toggle logic
             if (this.classList.contains("dropdown-toggle")) {
                 e.preventDefault();
+                e.stopPropagation();
                 const parent = this.parentElement;
                 parent.classList.toggle("show");
+                
+                dropdownItems.forEach((otherItem) => {
+                    if (otherItem !== parent) {
+                        otherItem.classList.remove("show");
+                    }
+                });
                 return;
             }
 
             navLinks.forEach((l) => l.classList.remove("active"));
             this.classList.add("active");
 
-            // Handle submenu links
             const submenu = this.closest(".submenu");
             if (submenu) {
                 const parentToggle = submenu.parentElement.querySelector(".dropdown-toggle");
@@ -127,17 +132,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Close other dropdowns when one is opened
-    const dropdownItems = document.querySelectorAll(".dropdown-item");
-    dropdownItems.forEach((item) => {
-        item.querySelector(".dropdown-toggle").addEventListener("click", () => {
-            dropdownItems.forEach((otherItem) => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove("show");
-                }
-            });
-        });
-    });
+    // Removed the separate document/sidebar listener that closes dropdowns on outside click
+    // to satisfy the requirement: "pertahankan agar tetap terbuka meskipun saya mengklik 
+    // area lain di halaman (cegah penutupan otomatis saat outside click)."
+
 
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener("click", () => {

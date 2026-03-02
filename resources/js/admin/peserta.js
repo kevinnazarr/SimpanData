@@ -237,6 +237,7 @@ window.openCreateModal = function() {
 
     modal.classList.remove('hidden');
     modal.classList.add('modal-enter');
+    document.getElementById('createModalOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
     toggleBlur(true);
 
@@ -284,6 +285,7 @@ window.closeCreateModal = function(e) {
         const modal = document.getElementById('createModal');
         modal.classList.remove('modal-enter');
         modal.classList.add('hidden');
+        document.getElementById('createModalOverlay').classList.add('hidden');
         document.body.style.overflow = '';
         document.getElementById('createModalContent').innerHTML = '';
         toggleBlur(false);
@@ -357,6 +359,7 @@ window.openEditModal = function(id) {
 
     modal.classList.remove('hidden');
     modal.classList.add('modal-enter');
+    document.getElementById('editModalOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
     toggleBlur(true);
 
@@ -404,6 +407,7 @@ window.closeEditModal = function(e) {
         const modal = document.getElementById('editModal');
         modal.classList.remove('modal-enter');
         modal.classList.add('hidden');
+        document.getElementById('editModalOverlay').classList.add('hidden');
         document.body.style.overflow = '';
         document.getElementById('editModalContent').innerHTML = '';
         currentEditId = null;
@@ -478,6 +482,7 @@ window.openShowModal = function(id) {
 
     modal.classList.remove('hidden');
     modal.classList.add('modal-enter');
+    document.getElementById('showModalOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
     toggleBlur(true);
 
@@ -524,6 +529,7 @@ window.closeShowModal = function(e) {
         const modal = document.getElementById('showModal');
         modal.classList.remove('modal-enter');
         modal.classList.add('hidden');
+        document.getElementById('showModalOverlay').classList.add('hidden');
         document.body.style.overflow = '';
         document.getElementById('showModalContent').innerHTML = '';
         toggleBlur(false);
@@ -545,6 +551,7 @@ window.openDeleteModal = function(id, name, jenis) {
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('modal-enter');
+        document.getElementById('deleteModalOverlay').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         toggleBlur(true);
     }
@@ -561,6 +568,7 @@ window.closeDeleteModal = function(e) {
         if (modal) {
             modal.classList.remove('modal-enter');
             modal.classList.add('hidden');
+            document.getElementById('deleteModalOverlay').classList.add('hidden');
             document.body.style.overflow = '';
             currentDeleteId = null;
             toggleBlur(false);

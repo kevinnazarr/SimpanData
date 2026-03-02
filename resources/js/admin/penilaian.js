@@ -115,6 +115,7 @@ function openPenilaianModal(pesertaId, nama, sekolah, jurusan, foto) {
     document.getElementById('catatan').value = '';
     calculateNilaiAkhir();
 
+    document.getElementById('penilaianModalOverlay')?.classList.remove('hidden');
     document.getElementById('penilaianModal').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 }
@@ -151,6 +152,7 @@ function openEditModal(pesertaId) {
             document.getElementById('catatan').value = penilaian.catatan || '';
             calculateNilaiAkhir();
 
+            document.getElementById('penilaianModalOverlay')?.classList.remove('hidden');
             document.getElementById('penilaianModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         })
@@ -161,6 +163,7 @@ function openEditModal(pesertaId) {
 
 function closePenilaianModal() {
     document.getElementById('penilaianModal').classList.add('hidden');
+    document.getElementById('penilaianModalOverlay')?.classList.add('hidden');
     document.body.style.overflow = '';
 }
 
@@ -230,6 +233,7 @@ function openDetailModal(pesertaId) {
                 </div>
             `;
 
+            document.getElementById('penilaianModalOverlay')?.classList.remove('hidden');
             document.getElementById('detailModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         })
@@ -240,6 +244,7 @@ function openDetailModal(pesertaId) {
 
 function closeDetailModal() {
     document.getElementById('detailModal').classList.add('hidden');
+    document.getElementById('penilaianModalOverlay')?.classList.add('hidden');
     document.body.style.overflow = '';
 }
 

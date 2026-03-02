@@ -1,0 +1,14 @@
+/* Feedback Star Rating Styles */
+.group\/rating:hover label {
+    color: #d1d5db !important;
+}
+
+.group\/rating label:hover,
+.group\/rating label:hover ~ label {
+    color: #facc15 !important;
+}
+
+.group\/rating:not(:hover) input:checked ~ label,
+.group\/rating:not(:hover) input:checked + label {
+    color: #facc15;
+}

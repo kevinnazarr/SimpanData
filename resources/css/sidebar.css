@@ -223,10 +223,6 @@
     visibility: visible;
 }
 
-.sidebar:not(.open) .dropdown-item:hover .tooltip {
-    opacity: 0 !important;
-    visibility: hidden !important;
-}
 
 .sidebar.open .nav-list li .tooltip {
     display: none;
@@ -582,7 +578,6 @@
     border-radius: 0 0 12px 12px;
 }
 
-.sidebar.open .dropdown-item:hover .submenu,
 .dropdown-item.show .submenu {
     max-height: 200px;
 }
@@ -614,9 +609,10 @@
     z-index: 1200;
 }
 
-.sidebar:not(.open) .dropdown-item:hover .submenu {
+.sidebar:not(.open) .dropdown-item.show .submenu {
     opacity: 1;
     visibility: visible;
+    max-height: none;
 }
 
 .sidebar:not(.open) .submenu li a {

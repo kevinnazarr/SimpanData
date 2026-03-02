@@ -67,10 +67,11 @@ class AuthController extends Controller
         if (!$user || $user->role === 'admin') {
             return response()->json([
                 'status' => false,
-                'message' => 'Email tidak dapat digunakan untuk reset password',
+                'message' => 'Email tidak terdaftar',
             ], 404);
         }
 
+        session()->forget('reset_verified');
         session(['reset_email' => $user->email]);
 
         return response()->json([
@@ -101,12 +102,13 @@ class AuthController extends Controller
         if ($user && $user->role === 'admin') {
             return response()->json([
                 'status' => false,
-                'message' => 'Reset password admin hanya bisa dilakukan oleh super admin',
+                'message' => 'Reset password admin hanya bisa dilakukan oleh admin',
             ], 403);
         }
 
         $email = $request->email;
 
+        session()->forget('reset_verified');
         session(['reset_email' => $email]);
 
         $otp = random_int(100000, 999999);
@@ -141,7 +143,7 @@ class AuthController extends Controller
     public function checkUsername(Request $request)
     {
         $exists = User::where('username', $request->username)->exists();
-        
+
         return response()->json([
             'available' => !$exists,
             'message' => $exists ? 'Username sudah digunakan' : 'Username tersedia'
@@ -151,7 +153,7 @@ class AuthController extends Controller
     public function checkEmailAvailability(Request $request)
     {
         $exists = User::where('email', $request->email)->exists();
-        
+
         return response()->json([
             'available' => !$exists,
             'message' => $exists ? 'Email sudah terdaftar' : 'Email tersedia'
@@ -279,7 +281,7 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required|string|min:3|unique:user,username',
             'email'    => 'required|email|unique:user,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         if (session('otp_verified_email') !== $request->email) {
@@ -370,7 +372,7 @@ class AuthController extends Controller
         }
 
         $request->validate([
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         $email = session('reset_email');

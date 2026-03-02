@@ -104,6 +104,7 @@ function bindActionButtons() {
 
 window.openCreateModal = function() {
     const modal = document.getElementById('createModal');
+    const overlay = document.getElementById('createModalOverlay');
     const content = document.getElementById('createModalContent');
     const config = window.partnerConfig || {};
 
@@ -117,15 +118,12 @@ window.openCreateModal = function() {
         </div>
     `;
 
+    overlay?.classList.remove('hidden');
     modal.classList.remove('hidden');
-    modal.classList.add('modal-enter');
     document.body.style.overflow = 'hidden';
-    toggleBlur(true);
 
     fetch(config.createUrl, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => {
         if (!response.ok) throw new Error('Network response was not ok');
@@ -162,12 +160,11 @@ window.closeCreateModal = function(e) {
     }
 
     preventMultipleCalls(() => {
-        const modal = document.getElementById('createModal');
-        modal.classList.remove('modal-enter');
-        modal.classList.add('hidden');
+        document.getElementById('createModal')?.classList.add('hidden');
+        document.getElementById('createModalOverlay')?.classList.add('hidden');
         document.body.style.overflow = '';
-        document.getElementById('createModalContent').innerHTML = '';
-        toggleBlur(false);
+        const content = document.getElementById('createModalContent');
+        if (content) content.innerHTML = '';
     });
 };
 
@@ -232,13 +229,9 @@ window.openDeleteModal = function(id, name) {
     const nameEl = document.getElementById('deletePartnerName');
     if (nameEl) nameEl.textContent = name;
 
-    const modal = document.getElementById('deleteModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('modal-enter');
-        document.body.style.overflow = 'hidden';
-        toggleBlur(true);
-    }
+    document.getElementById('deleteModalOverlay')?.classList.remove('hidden');
+    document.getElementById('deleteModal')?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
 };
 
 window.closeDeleteModal = function(e) {
@@ -248,14 +241,10 @@ window.closeDeleteModal = function(e) {
     }
 
     preventMultipleCalls(() => {
-        const modal = document.getElementById('deleteModal');
-        if (modal) {
-            modal.classList.remove('modal-enter');
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            currentDeleteId = null;
-            toggleBlur(false);
-        }
+        document.getElementById('deleteModal')?.classList.add('hidden');
+        document.getElementById('deleteModalOverlay')?.classList.add('hidden');
+        document.body.style.overflow = '';
+        currentDeleteId = null;
     });
 };
 

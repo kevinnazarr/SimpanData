@@ -100,7 +100,7 @@ class PesertaController extends Controller
         $validated = $request->validate([
             'username' => 'required|string|unique:user,username|max:255',
             'email' => 'required|email|unique:user,email|max:255',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
             'nama' => 'required|string|max:255',
             'asal_sekolah_universitas' => 'required|string|max:255',
             'jurusan' => 'required|string|max:255',
@@ -116,7 +116,6 @@ class PesertaController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create user
             $user = User::create([
                 'username' => $validated['username'],
                 'email' => $validated['email'],
@@ -192,7 +191,7 @@ class PesertaController extends Controller
         $validated = $request->validate([
             'username' => 'required|string|unique:user,username,' . $peserta->user_id,
             'email' => 'required|email|unique:user,email,' . $peserta->user_id,
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:8',
             'nama' => 'required|string|max:255',
             'asal_sekolah_universitas' => 'required|string|max:255',
             'jurusan' => 'required|string|max:255',
@@ -265,7 +264,6 @@ class PesertaController extends Controller
         DB::beginTransaction();
 
         try {
-            // Delete Laporan files and records
             foreach ($peserta->laporans as $laporan) {
                 if ($laporan->file_path && Storage::disk('public')->exists($laporan->file_path)) {
                     Storage::disk('public')->delete($laporan->file_path);
@@ -273,18 +271,14 @@ class PesertaController extends Controller
                 $laporan->delete();
             }
 
-            // Delete Absensi
             $peserta->absensis()->delete();
 
-            // Delete Feedback
             $peserta->feedbacks()->delete();
             
-            // Delete Penilaian
             if ($peserta->penilaian) {
                 $peserta->penilaian->delete();
             }
 
-            // Delete Arsip
             if ($peserta->arsip) {
                 $peserta->arsip->delete();
             }

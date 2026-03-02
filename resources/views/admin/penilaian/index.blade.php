@@ -172,10 +172,11 @@
 @endsection
 
 @push('modals')
-<div id="penilaianModal" class="fixed inset-0 z-50 hidden">
-    <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 backdrop-blur-sm" onclick="closePenilaianModal()"></div>
-    <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+{{-- Overlay bersama untuk kedua modal penilaian --}}
+<div id="penilaianModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-500/75"></div>
+
+<div id="penilaianModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[35] overflow-y-auto">
+    <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
             <div class="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
                 <div class="flex items-center justify-between p-6 border-b border-gray-200">
                     <div>
@@ -371,16 +372,13 @@
                         </button>
                     </div>
                 </form>
-            </div>
         </div>
     </div>
 </div>
 
-<div id="detailModal" class="fixed inset-0 z-50 hidden">
-    <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 backdrop-blur-sm" onclick="closeDetailModal()"></div>
-    <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-            <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+<div id="detailModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[35] overflow-y-auto">
+    <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+        <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
                 <div class="flex items-center justify-between p-6 border-b border-gray-200">
                     <div>
                         <h3 class="text-2xl font-bold text-gray-800">Detail Penilaian</h3>
@@ -406,19 +404,13 @@
                         <span>Edit Nilai</span>
                     </button>
                 </div>
-            </div>
         </div>
     </div>
 </div>
 @endpush
 
 @push('styles')
-<style>
-    /* Range Slider Styling */
-    input[type="range"] {
-        background: #e5e7eb;
-    }
-</style>
+@vite('resources/css/admin/penilaian.css')
 @endpush
 
 @section('scripts')

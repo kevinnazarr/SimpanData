@@ -1,14 +1,24 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Peserta')
+@section('title', 'Laporan Harian Peserta')
 
 @section('content')
     <div class="space-y-6">
+        <div class="flex items-center gap-4 p-4 border-l-4 rounded-r-xl bg-blue-50 border-blue-500 animate-fade-in text-blue-800 shadow-sm">
+            <div class="flex items-center justify-center w-10 h-10 text-xl text-blue-600 rounded-lg bg-blue-100/50">
+                <i class='bx bx-info-circle'></i>
+            </div>
+            <div>
+                <p class="text-base font-bold">Informasi</p>
+                <p class="text-sm opacity-90">Laporan harian ini bersifat <strong>tidak wajib</strong> dan hanya bertujuan untuk membantu peserta dalam menyusun laporan akhir.</p>
+            </div>
+        </div>
+
         <div class="mb-4 md:mb-6 card">
             <div
                 class="flex flex-col gap-4 p-4 border-b border-gray-200 md:p-5 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h2 class="text-base font-semibold text-gray-800 md:text-lg">Statistik Laporan</h2>
+                    <h2 class="text-base font-semibold text-gray-800 md:text-lg">Statistik Laporan Harian</h2>
                     <p class="text-sm text-gray-600">Pantau progres verifikasi laporan harian peserta.</p>
                 </div>
                 <div class="flex gap-2">
@@ -168,101 +178,76 @@
             </div>
         @endif
 
-        <div class="overflow-hidden card shadow-soft">
-            <div class="overflow-x-auto no-scrollbar">
+        <div class="card">
+            <div class="overflow-x-auto">
                 <table class="min-w-full text-sm text-left">
                     <thead>
                         <tr class="text-gray-600 border-b bg-gray-50/50">
-                            <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[11px]">No</th>
-                            <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[11px]">Peserta</th>
-                            <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[11px]">Tanggal</th>
-                            <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[11px]">Laporan</th>
-                            <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[11px] text-center">Status</th>
-                            <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[11px] text-right">Aksi</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">No</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Nama Peserta</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Tanggal</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Laporan</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px] text-center">Status</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px] text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y">
                         @forelse($laporans as $index => $laporan)
-                            <tr class="transition-colors border-b hover:bg-gray-50/70 border-gray-50 last:border-0">
-                                <td class="px-6 py-4 font-medium text-gray-500">
-                                    {{ $index + $laporans->firstItem() }}
-                                </td>
-                                <td class="px-6 py-4">
+                            <tr class="transition-colors hover:bg-gray-50/50">
+                                <td class="px-4 py-3 text-gray-500">{{ $index + $laporans->firstItem() }}</td>
+                                <td class="px-4 py-3 font-medium text-gray-900">
                                     <div class="flex items-center gap-3">
-                                        <div
-                                            class="flex items-center justify-center flex-shrink-0 w-10 h-10 font-bold text-white rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-soft">
-                                            {{ strtoupper(substr($laporan->peserta->nama, 0, 1)) }}
-                                        </div>
+                                        @if($laporan->peserta->foto && Storage::disk('public')->exists($laporan->peserta->foto))
+                                            <img src="{{ asset('storage/' . $laporan->peserta->foto) }}"
+                                                alt="{{ $laporan->peserta->nama }}"
+                                                class="flex-shrink-0 object-cover w-8 h-8 rounded-lg shadow-soft">
+                                        @else
+                                            <div class="flex items-center justify-center flex-shrink-0 w-8 h-8 font-bold text-white rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-soft text-[10px]">
+                                                {{ strtoupper(substr($laporan->peserta->nama, 0, 1)) }}
+                                            </div>
+                                        @endif
                                         <div>
-                                            <div class="text-sm font-bold leading-tight text-gray-900">
-                                                {{ $laporan->peserta->nama }}</div>
-                                            <div class="text-xs text-gray-500 mt-0.5 line-clamp-1 italic">
-                                                {{ $laporan->peserta->asal_sekolah_universitas }}</div>
+                                            <div class="text-sm font-bold leading-tight text-gray-900">{{ $laporan->peserta->nama }}</div>
+                                            <div class="text-[10px] text-gray-500 mt-0.5 italic line-clamp-1">{{ $laporan->peserta->asal_sekolah_universitas }}</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="text-sm font-medium text-gray-800">{{ \Carbon\Carbon::parse($laporan->tanggal_laporan)->translatedFormat('d F Y') }}</span>
-                                        <span
-                                            class="text-xs text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($laporan->tanggal_laporan)->diffForHumans() }}</span>
-                                    </div>
+                                <td class="px-4 py-3 text-gray-600 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-800">{{ \Carbon\Carbon::parse($laporan->tanggal_laporan)->translatedFormat('d F Y') }}</div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($laporan->tanggal_laporan)->diffForHumans() }}</div>
                                 </td>
-                                <td class="max-w-xs px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-800 line-clamp-1">{{ $laporan->judul }}
-                                    </div>
-                                    <div class="mt-1 text-xs text-gray-500 truncate">
-                                        {{ Str::limit($laporan->deskripsi, 50) }}</div>
+                                <td class="max-w-xs px-4 py-3">
+                                    <div class="text-sm font-medium text-gray-800 line-clamp-1">{{ $laporan->judul }}</div>
+                                    <div class="text-[10px] text-gray-500 mt-0.5 line-clamp-1">{{ Str::limit($laporan->deskripsi, 50) }}</div>
                                 </td>
-                                <td class="px-6 py-4 text-center">
+                                <td class="px-4 py-3 text-center">
                                     @php
                                         $statusClasses = [
-                                            'Draft' => 'bg-gray-100 text-gray-600',
-                                            'Dikirim' => 'bg-blue-100 text-blue-600 shadow-sm shadow-blue-100',
-                                            'Disetujui' =>
-                                                'bg-emerald-100 text-emerald-600 shadow-sm shadow-emerald-100',
-                                            'Revisi' => 'bg-amber-100 text-amber-600 shadow-sm shadow-amber-100',
+                                            'Draft'     => 'bg-gray-100 text-gray-600',
+                                            'Dikirim'   => 'bg-blue-100 text-blue-700',
+                                            'Disetujui' => 'bg-emerald-100 text-emerald-700',
+                                            'Revisi'    => 'bg-amber-100 text-amber-700',
                                         ];
                                     @endphp
-                                    <span
-                                        class="px-3 py-1.5 rounded-lg text-xs font-bold {{ $statusClasses[$laporan->status] ?? 'bg-gray-100 text-gray-600' }}">
+                                    <span class="px-2.5 py-1 rounded-lg text-xs font-medium {{ $statusClasses[$laporan->status] ?? 'bg-gray-100 text-gray-600' }}">
                                         {{ $laporan->status }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-1">
-                                        <button onclick="openDetailModal({{ json_encode($laporan->load('peserta')) }})"
-                                            class="p-2 text-indigo-600 transition-all duration-200 hover:bg-indigo-50 rounded-xl"
-                                            title="Lihat Detail">
-                                            <i class='text-xl bx bx-show-alt'></i>
-                                        </button>
-                                        @if (in_array($laporan->status, ['Dikirim', 'Revisi']))
-                                            <button type="button"
-                                                onclick="confirmApprove('{{ route('admin.laporan.update-status', $laporan->id) }}')"
-                                                class="p-2 transition-all duration-200 text-emerald-600 hover:bg-emerald-50 rounded-xl"
-                                                title="Setujui">
-                                                <i class='text-xl bx bx-check-circle'></i>
-                                            </button>
-                                            <button type="button"
-                                                onclick="confirmRevise('{{ route('admin.laporan.update-status', $laporan->id) }}')"
-                                                class="p-2 transition-all duration-200 text-amber-600 hover:bg-amber-50 rounded-xl"
-                                                title="Revisi">
-                                                <i class='text-xl bx bx-error-circle'></i>
-                                            </button>
-                                        @endif
-                                    </div>
+                                <td class="px-4 py-3 text-center">
+                                    <a href="{{ route('admin.laporan.harian.show', $laporan->id) }}"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 group">
+                                        <i class='text-sm bx bx-show'></i>
+                                        <span>Detail</span>
+                                        <i class='text-sm bx bx-chevron-right transition-transform duration-200 group-hover:translate-x-0.5'></i>
+                                    </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-16 text-center text-gray-500">
-                                    <div class="flex flex-col items-center justify-center space-y-3">
-                                        <div
-                                            class="flex items-center justify-center w-16 h-16 border-4 border-white rounded-full bg-gray-50 shadow-soft">
-                                            <i class='text-3xl text-gray-300 bx bx-clipboard'></i>
-                                        </div>
-                                        <p class="font-medium">Tidak ada laporan ditemukan.</p>
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i class='mb-2 text-4xl text-gray-300 bx bx-clipboard'></i>
+                                        <p>Tidak ada laporan ditemukan.</p>
                                         <p class="text-xs text-gray-400">Coba ubah filter atau rentang tanggal Anda.</p>
                                     </div>
                                 </td>
@@ -273,7 +258,7 @@
             </div>
 
             @if ($laporans->hasPages())
-                <div class="px-6 py-5 border-t border-gray-100 bg-gray-50/50">
+                <div class="px-4 py-4 border-t border-gray-100 md:px-5">
                     {{ $laporans->onEachSide(1)->links() }}
                 </div>
             @endif

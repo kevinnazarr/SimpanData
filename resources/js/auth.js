@@ -64,7 +64,7 @@ function setupOtpInputs() {
 
     otpInputs.forEach((input, index) => {
         input.className =
-            'w-10 h-10 text-lg font-bold text-center transition-all duration-200 border-2 border-gray-300 rounded-lg otp-input focus:border-secondary focus:ring-2 focus:ring-secondary-light';
+            'w-10 h-10 text-lg font-bold text-center transition-all duration-200 border-2 border-gray-300 rounded-lg otp-input focus:border-primary focus:ring-2 focus:ring-primary-light';
         input.inputMode = 'numeric';
         input.type = 'text';
 
@@ -79,6 +79,14 @@ function setupOtpInputs() {
         });
 
         input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const otp = collectOtp();
+                if (otp.length === 6) {
+                    verifyOtpManual();
+                }
+                return;
+            }
+
             if (e.key === 'Backspace' && !input.value && otpInputs[index - 1]) {
                 e.preventDefault();
                 otpInputs[index - 1].focus();
@@ -128,21 +136,21 @@ window.collectOtp = function() {
 window.checkUsernameAvailability = async function() {
     const username = document.getElementById('username').value;
     const statusDiv = document.getElementById('usernameStatus');
-    
+
     if (!username) {
         statusDiv.innerHTML = '';
         usernameValid = false;
         updateSendOtpButton();
         return;
     }
-    
+
     if (username.length < 3) {
         statusDiv.innerHTML = '<span class="text-red-600"><i class="mr-1 fas fa-times"></i>Username minimal 3 karakter</span>';
         usernameValid = false;
         updateSendOtpButton();
         return;
     }
-    
+
     try {
         const response = await fetch(window.routes.checkUsername, {
             method: 'POST',
@@ -153,9 +161,9 @@ window.checkUsernameAvailability = async function() {
             },
             body: JSON.stringify({ username })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.available) {
             statusDiv.innerHTML = '<span class="text-green-600"><i class="mr-1 fas fa-check"></i>Username tersedia</span>';
             usernameValid = true;
@@ -168,21 +176,21 @@ window.checkUsernameAvailability = async function() {
         statusDiv.innerHTML = '<span class="text-gray-500"><i class="mr-1 fas fa-exclamation-triangle"></i>Tidak dapat memeriksa username</span>';
         usernameValid = false;
     }
-    
+
     updateSendOtpButton();
 }
 
 window.checkEmailAvailability = async function() {
     const email = document.getElementById('emailInput').value;
     const statusDiv = document.getElementById('emailStatus');
-    
+
     if (!email) {
         statusDiv.innerHTML = '';
         emailValid = false;
         updateSendOtpButton();
         return;
     }
-    
+
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
         statusDiv.innerHTML = '<span class="text-red-600"><i class="mr-1 fas fa-times"></i>Format email tidak valid</span>';
@@ -190,7 +198,7 @@ window.checkEmailAvailability = async function() {
         updateSendOtpButton();
         return;
     }
-    
+
     try {
         const response = await fetch(window.routes.checkEmailAvailability, {
             method: 'POST',
@@ -201,9 +209,9 @@ window.checkEmailAvailability = async function() {
             },
             body: JSON.stringify({ email })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.available) {
             statusDiv.innerHTML = '<span class="text-green-600"><i class="mr-1 fas fa-check"></i>Email tersedia</span>';
             emailValid = true;
@@ -216,7 +224,7 @@ window.checkEmailAvailability = async function() {
         statusDiv.innerHTML = '<span class="text-gray-500"><i class="mr-1 fas fa-exclamation-triangle"></i>Tidak dapat memeriksa email</span>';
         emailValid = false;
     }
-    
+
     updateSendOtpButton();
 }
 
@@ -233,7 +241,7 @@ window.sendOtp = async function() {
     const sendOtpBtn = document.getElementById('sendOtpBtn');
 
     if (!usernameValid || !emailValid) {
-        showToast('Pastikan username dan email valid dan tersedia', 'error');
+        showToast('Pastikan username dan email valid tersedia', 'error');
         return;
     }
 
@@ -257,7 +265,7 @@ window.sendOtp = async function() {
                 "X-CSRF-TOKEN": getCsrfToken(),
                 "Accept": "application/json"
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 email: email,
                 username: username
             })
@@ -302,7 +310,7 @@ window.verifyOtpManual = async function() {
 
     verifyBtn.disabled = true;
     verifyBtn.innerHTML = '<div class="mx-auto spinner"></div>';
-    verifyBtn.classList.remove('bg-secondary', 'hover:bg-secondary/90');
+    verifyBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
     verifyBtn.classList.add('bg-gray-400');
 
     try {
@@ -357,7 +365,7 @@ window.verifyOtpManual = async function() {
         if (!emailVerified) {
             verifyBtn.innerHTML = originalText;
             verifyBtn.disabled = false;
-            verifyBtn.classList.add('bg-secondary', 'hover:bg-secondary/90');
+            verifyBtn.classList.add('bg-primary', 'hover:bg-primary/90');
             verifyBtn.classList.remove('bg-gray-400');
         }
     }
@@ -365,10 +373,11 @@ window.verifyOtpManual = async function() {
 
 window.resendOtp = async function() {
     const email = document.getElementById('emailInput').value;
+    const username = document.getElementById('username').value;
     const resendBtn = document.getElementById('resendOtpBtn');
 
-    if (!email) {
-        showToast('Email wajib diisi', 'error');
+    if (!email || !username) {
+        showToast('Email dan username wajib diisi', 'error');
         return;
     }
 
@@ -388,7 +397,10 @@ window.resendOtp = async function() {
                 "X-CSRF-TOKEN": getCsrfToken(),
                 "Accept": "application/json"
             },
-            body: JSON.stringify({ email: email })
+            body: JSON.stringify({
+                email: email,
+                username: username
+            })
         });
 
         const data = await response.json();
@@ -406,9 +418,9 @@ window.resendOtp = async function() {
 
             const verifyBtn = document.getElementById('verifyOtpBtn');
             verifyBtn.disabled = true;
-            verifyBtn.innerHTML = 'Verifikasi';
+            verifyBtn.innerHTML = 'Verifikasi Email';
             verifyBtn.classList.remove('bg-green-500', 'cursor-default');
-            verifyBtn.classList.add('bg-secondary', 'hover:bg-secondary/90');
+            verifyBtn.classList.add('bg-primary', 'hover:bg-primary/90');
 
             document.getElementById('otpStatus').innerHTML = '';
 
@@ -429,22 +441,23 @@ window.resendOtp = async function() {
 
 function startResendTimer() {
     const resendBtn = document.getElementById('resendOtpBtn');
-    let countdown = 30;
+    const countdownText = document.getElementById('countdownText');
+    let countdown = 60;
 
     resendBtn.disabled = true;
-    resendBtn.innerHTML = `<i class="mr-1 fas fa-clock"></i>${countdown}s`;
+    countdownText.innerHTML = `Kirim ulang OTP dalam ${countdown} detik`;
     resendBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
     if (resendTimer) clearInterval(resendTimer);
 
     resendTimer = setInterval(() => {
         countdown--;
-        resendBtn.innerHTML = `<i class="mr-1 fas fa-clock"></i>${countdown}s`;
+        countdownText.innerHTML = `Kirim ulang OTP dalam ${countdown} detik`;
 
         if (countdown <= 0) {
             clearInterval(resendTimer);
             resendBtn.disabled = false;
-            resendBtn.innerHTML = '<i class="mr-1 fas fa-redo"></i>Ulangi';
+            countdownText.innerHTML = 'Tidak menerima kode?';
             resendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
     }, 1000);
@@ -482,7 +495,7 @@ window.checkPasswordMatch = function() {
         return;
     }
 
-    if (password === confirm && password.length >= 6) {
+    if (password === confirm && password.length >= 8) {
         matchDiv.innerHTML = '<span class="text-green-600"><i class="mr-1 fas fa-check"></i>Password cocok</span>';
 
         registerBtn.disabled = !emailVerified;
@@ -565,8 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (firstInput && !firstInput.value) {
         setTimeout(() => firstInput.focus(), 300);
     }
-    
-    // Add debounced validation for username
+
     const usernameInput = document.getElementById('username');
     if (usernameInput) {
         usernameInput.addEventListener('input', function() {
@@ -575,9 +587,16 @@ document.addEventListener('DOMContentLoaded', function() {
             statusDiv.innerHTML = '<span class="text-gray-500"><i class="mr-1 fas fa-spinner fa-spin"></i>Memeriksa...</span>';
             usernameTimeout = setTimeout(checkUsernameAvailability, 500);
         });
+
+        usernameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const emailInput = document.getElementById('emailInput');
+                if (emailInput) emailInput.focus();
+            }
+        });
     }
-    
-    // Add debounced validation for email
+
     const emailInput = document.getElementById('emailInput');
     if (emailInput) {
         emailInput.addEventListener('input', function() {
@@ -585,6 +604,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const statusDiv = document.getElementById('emailStatus');
             statusDiv.innerHTML = '<span class="text-gray-500"><i class="mr-1 fas fa-spinner fa-spin"></i>Memeriksa...</span>';
             emailTimeout = setTimeout(checkEmailAvailability, 500);
+        });
+
+        emailInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendOtp();
+            }
         });
     }
 });

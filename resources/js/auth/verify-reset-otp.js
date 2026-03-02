@@ -46,6 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const otp = collectOtp();
+                    if (otp && otp.length === 6) {
+                        otpForm.dispatchEvent(new Event('submit'));
+                    }
+                    return;
+                }
+
                 if (e.key === 'Backspace' && !input.value && inputs[index - 1]) {
                     e.preventDefault();
                     inputs[index - 1].focus();

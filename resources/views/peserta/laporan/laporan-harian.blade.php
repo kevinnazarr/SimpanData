@@ -4,6 +4,16 @@
 
 @section('content')
     <div class="space-y-6">
+        <div class="flex items-center gap-4 p-4 text-blue-800 border-l-4 border-blue-500 shadow-sm rounded-r-xl bg-blue-50 animate-fade-in">
+            <div class="flex items-center justify-center w-10 h-10 text-xl text-blue-600 rounded-lg bg-blue-100/50">
+                <i class='bx bx-info-circle'></i>
+            </div>
+            <div>
+                <p class="text-base font-bold">Informasi Penting</p>
+                <p class="text-sm opacity-90">Laporan harian ini bersifat <strong>tidak wajib</strong> dan hanya bertujuan untuk membantu Anda dalam menyusun laporan akhir secara bertahap.</p>
+            </div>
+        </div>
+
         <div class="flex flex-col justify-between gap-4 p-6 md:flex-row md:items-center card shadow-soft animate-fade-in">
             <div class="flex items-center space-x-4">
                 <div
@@ -11,9 +21,16 @@
                     <i class='bx bx-file-blank'></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Laporan Harian</h1>
-                    <p class="text-sm font-medium text-slate-500">Laporkan kegiatan yang Anda lakukan hari ini,
-                        {{ date('l, j F Y') }}</p>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+                        {{ isset($todayReport) && $todayReport->status == 'Revisi' ? 'Edit Laporan' : 'Laporan Harian' }}
+                    </h1>
+                    <p class="text-sm font-medium text-slate-500">
+                        @if(isset($todayReport) && $todayReport->tanggal_laporan != date('Y-m-d'))
+                            Memperbaiki laporan untuk tanggal {{ \Carbon\Carbon::parse($todayReport->tanggal_laporan)->translatedFormat('l, j F Y') }}
+                        @else
+                            Laporkan kegiatan yang Anda lakukan hari ini, {{ \Carbon\Carbon::now()->translatedFormat('l, j F Y') }}
+                        @endif
+                    </p>
                 </div>
             </div>
 
@@ -24,7 +41,11 @@
                     Status Laporan</p>
                 <p class="text-sm font-extrabold {{ isset($todayReport) ? 'text-green-900' : 'text-orange-900' }}">
                     @if (isset($todayReport))
-                        {{ $todayReport->status }}
+                        @if($todayReport->tanggal_laporan != date('Y-m-d'))
+                            {{ $todayReport->status }} ({{ \Carbon\Carbon::parse($todayReport->tanggal_laporan)->format('d/m/Y') }})
+                        @else
+                            {{ $todayReport->status }}
+                        @endif
                     @else
                         Belum Lapor
                     @endif
@@ -70,10 +91,11 @@
                                 <p class="text-sm">Silakan periksa catatan revisi dan perbaiki laporan Anda.</p>
                             </div>
                         </div>
-                        <a href="{{ route('peserta.laporan.edit', $rev->id) }}"
+                        <button type="button"
+                            onclick="showRevisionModal('{{ str_replace(["\r", "\n"], ['\r', '\n'], addslashes($rev->catatan_admin ?? '')) }}')"
                             class="px-4 py-2 text-xs font-bold transition rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 whitespace-nowrap">
-                            Edit Laporan
-                        </a>
+                            Lihat Pesan dari Admin
+                        </button>
                     </div>
                 @endif
             @endforeach
@@ -110,7 +132,8 @@
             @if (isset($todayReport))
                 @method('PUT')
             @endif
-            <input type="hidden" name="tanggal_laporan" value="{{ date('Y-m-d') }}">
+            <input type="hidden" name="status" id="status-field" value="Dikirim">
+            <input type="hidden" name="tanggal_laporan" value="{{ $todayReport->tanggal_laporan ?? date('Y-m-d') }}">
 
             <div class="p-6 card shadow-soft md:p-8 animate-fade-in-up" style="animation-delay: 100ms">
                 <div class="flex items-center gap-3 pb-5 mb-8 border-b border-slate-100">
@@ -141,7 +164,7 @@
                         </label>
                         <textarea id="deskripsi" name="deskripsi" rows="8"
                             class="w-full px-4 py-3 transition-colors border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 {{ $errors->has('deskripsi') ? 'border-red-500' : 'border-gray-300' }}"
-                            placeholder="Jelaskan secara detail kegiatan yang Anda lakukan hari ini...&#10;&#10;Contoh:&#10;- Menganalisis kebutuhan fitur login&#10;- Membuat database migration untuk tabel users&#10;- Implementasi controller dan view login&#10;- Testing fitur login"
+                            placeholder="Jelaskan secara detail kegiatan yang Anda lakukan hari ini..."
                             required>{{ old('deskripsi', $todayReport->deskripsi ?? '') }}</textarea>
                         @error('deskripsi')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -154,7 +177,7 @@
                         </label>
                         <div class="relative">
                             <input type="file" id="file" name="file"
-                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip"
+                                accept="application/pdf"
                                 class="w-full px-4 py-3 transition-colors border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 {{ $errors->has('file') ? 'border-red-500' : 'border-gray-300' }}">
                             @error('file')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -169,40 +192,7 @@
                                 </a>
                             </div>
                         @endif
-                        <p class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Format: PDF, DOC,
-                            DOCX, JPG, PNG, ZIP (Maks. 5MB)</p>
-                    </div>
-
-                    <div>
-                        <label class="block mb-3 text-xs font-bold tracking-widest uppercase text-slate-500">Status
-                            Laporan</label>
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <label
-                                class="relative flex items-center p-4 transition-all duration-200 border-2 border-gray-200 cursor-pointer rounded-2xl hover:border-purple-300 hover:bg-purple-50/30 group">
-                                <input type="radio" name="status" value="Draft"
-                                    class="w-5 h-5 text-purple-600 focus:ring-purple-500"
-                                    {{ old('status', $todayReport->status ?? 'Draft') == 'Draft' ? 'checked' : '' }}>
-                                <div class="ml-4">
-                                    <span class="text-base font-bold text-slate-800">Draft</span>
-                                    <p class="text-xs font-medium text-slate-500">Simpan sebagai draft</p>
-                                </div>
-                                <i
-                                    class='absolute text-xl transition-opacity opacity-0 bx bx-check-circle text-purple-600 right-4 group-has-[:checked]:opacity-100'></i>
-                            </label>
-
-                            <label
-                                class="relative flex items-center p-4 transition-all duration-200 border-2 border-green-200 cursor-pointer rounded-2xl hover:border-green-400 hover:bg-green-50/50 group">
-                                <input type="radio" name="status" value="Dikirim"
-                                    class="w-5 h-5 text-green-600 focus:ring-green-500"
-                                    {{ in_array(old('status', $todayReport->status ?? ''), ['Dikirim', 'Revisi']) ? 'checked' : '' }}>
-                                <div class="ml-4">
-                                    <span class="text-base font-bold text-slate-800">Kirim</span>
-                                    <p class="text-xs font-medium text-slate-500">Kirim untuk review</p>
-                                </div>
-                                <i
-                                    class='absolute text-xl transition-opacity opacity-0 bx bx-check-circle text-green-600 right-4 group-has-[:checked]:opacity-100'></i>
-                            </label>
-                        </div>
+                        <p class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Format: PDF | Maksimal 5MB</p>
                     </div>
 
                     <div class="flex justify-end gap-3 pt-6 border-t border-slate-100">
@@ -215,11 +205,11 @@
                                 </div>
                             </a>
                         @endif
-                        <button type="submit"
+                        <button type="submit" name="status" value="Dikirim"
                             class="px-8 py-3 text-sm font-extrabold text-white transition-all duration-200 bg-purple-600 rounded-xl hover:bg-purple-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                             <div class="flex items-center gap-2">
-                                <i class='text-lg bx bx-save'></i>
-                                <span>{{ isset($todayReport) ? 'Update Laporan' : 'Simpan Laporan' }}</span>
+                                <i class='text-lg bx bx-send'></i>
+                                <span>{{ isset($todayReport) ? 'Update & Kirim' : 'Kirim Laporan' }}</span>
                             </div>
                         </button>
                     </div>
@@ -228,77 +218,97 @@
         </form>
         @endif
 
-        @if (isset($recentReports) && $recentReports->count() > 0)
-            <div class="p-6 card shadow-soft md:p-8 animate-fade-in-up" style="animation-delay: 200ms">
-                <div class="flex items-center gap-3 pb-5 mb-6 border-b border-slate-100">
-                    <div class="flex items-center justify-center w-10 h-10 text-xl text-blue-600 rounded-lg bg-blue-50">
+        <div id="history-section" class="overflow-hidden card shadow-soft animate-fade-in-up" style="animation-delay: 200ms">
+            <div class="flex flex-col gap-4 p-6 border-b border-slate-100 bg-slate-50/50 md:flex-row md:items-center md:justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-10 h-10 text-xl text-green-600 rounded-lg bg-green-50">
                         <i class='bx bx-history'></i>
                     </div>
-                    <h4 class="text-lg font-bold uppercase text-slate-800">Riwayat Laporan</h4>
+                    <h4 class="text-lg font-bold text-slate-800">History Laporan</h4>
+                    <span class="px-3 py-1 text-xs font-bold text-green-700 bg-green-100 border border-green-200 rounded-full">
+                        {{ $approvedHistory->total() }} Laporan
+                    </span>
                 </div>
 
-                <div class="space-y-4">
-                    @foreach ($recentReports as $report)
-                        <div
-                            class="p-4 transition-all duration-200 border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <h3 class="text-base font-bold text-slate-900">{{ $report->judul }}</h3>
-                                        <span
-                                            class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full
-                                        {{ $report->status == 'Disetujui' ? 'bg-green-100 text-green-800' : '' }}
-                                        {{ $report->status == 'Dikirim' ? 'bg-blue-100 text-blue-800' : '' }}
-                                        {{ $report->status == 'Draft' ? 'bg-gray-100 text-gray-800' : '' }}
-                                        {{ $report->status == 'Revisi' ? 'bg-yellow-100 text-yellow-800' : '' }}">
-                                            {{ $report->status }}
-                                        </span>
-                                    </div>
-                                    <p class="mb-2 text-sm text-slate-600 line-clamp-2">
-                                        {{ Str::limit($report->deskripsi, 150) }}</p>
-                                    <div class="flex items-center gap-4 text-xs font-medium text-slate-500">
-                                        <span class="flex items-center gap-1">
-                                            <i class='bx bx-calendar'></i>
-                                            {{ \Carbon\Carbon::parse($report->tanggal_laporan)->format('d M Y') }}
-                                        </span>
-                                        @if ($report->file_path)
-                                            <span class="flex items-center gap-1">
-                                                <i class='bx bx-paperclip'></i>
-                                                Ada lampiran
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="flex gap-2 ml-4">
-                                    <a href="{{ route('peserta.laporan.show', $report->id) }}"
-                                        class="flex items-center justify-center text-blue-600 transition-colors rounded-lg w-9 h-9 bg-blue-50 hover:bg-blue-100"
-                                        title="Lihat Detail">
-                                        <i class='text-xl bx bx-show'></i>
-                                    </a>
-                                    @if ($report->status == 'Draft' || $report->status == 'Revisi')
-                                        <a href="{{ route('peserta.laporan.edit', $report->id) }}"
-                                            class="flex items-center justify-center text-purple-600 transition-colors rounded-lg w-9 h-9 bg-purple-50 hover:bg-purple-100"
-                                            title="Edit">
-                                            <i class='text-xl bx bx-edit'></i>
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                @if (isset($hasMoreReports) && $hasMoreReports)
-                    <div class="mt-8 text-center">
-                        <a href="{{ route('peserta.laporan.index') }}"
-                            class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-purple-700 transition-all duration-200 border-2 border-purple-300 rounded-xl hover:bg-purple-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                            <i class='text-lg bx bx-list-ul'></i>
-                            <span>Lihat Semua Laporan</span>
-                        </a>
+                <form action="{{ route('peserta.laporan.index') }}" method="GET" class="relative w-full md:w-64 history-search-form">
+                    <input type="text" name="search" id="history-search-input" value="{{ request('search') }}"
+                        placeholder="Cari laporan..."
+                        autocomplete="off"
+                        class="w-full py-2 pl-10 pr-4 text-sm transition-all border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white/80">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <i class='text-lg bx bx-search'></i>
                     </div>
-                @endif
+                    <div id="search-spinner" class="absolute inset-y-0 right-0 items-center hidden pr-3 text-slate-400">
+                        <i class='bx bx-loader-alt animate-spin'></i>
+                    </div>
+                    @if(request('search'))
+                        <a href="{{ route('peserta.laporan.index') }}" class="absolute inset-y-0 right-0 flex items-center pr-3 history-clear-btn text-slate-400 hover:text-slate-600">
+                            <i class='text-lg bx bx-x'></i>
+                        </a>
+                    @endif
+                </form>
             </div>
-        @endif
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left">
+                    <thead>
+                        <tr class="text-gray-600 border-b bg-gray-50/50">
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">No</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Tanggal</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Judul Laporan</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px] text-center">Status</th>
+                            <th class="px-4 py-3 font-semibold uppercase tracking-wider text-[11px] text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        @forelse ($approvedHistory as $index => $history)
+                            <tr class="transition-colors hover:bg-gray-50/50">
+                                <td class="px-4 py-3 text-gray-500">{{ $index + $approvedHistory->firstItem() }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-gray-900">{{ \Carbon\Carbon::parse($history->tanggal_laporan)->translatedFormat('d F Y') }}</span>
+                                        <span class="text-[10px] text-gray-500 font-medium uppercase">{{ \Carbon\Carbon::parse($history->tanggal_laporan)->translatedFormat('l') }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <p class="font-medium text-gray-700 line-clamp-1">{{ $history->judul }}</p>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-700">
+                                        {{ $history->status }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <a href="{{ route('peserta.laporan.show', $history->id) }}"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 group">
+                                        <i class='bx bx-show'></i>
+                                        <span>Detail</span>
+                                        <i class='bx bx-chevron-right transition-transform duration-200 group-hover:translate-x-0.5'></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center gap-3">
+                                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300">
+                                            <i class='text-3xl bx bx-file-blank'></i>
+                                        </div>
+                                        <p class="text-sm font-medium text-slate-400">Belum ada history laporan yang disetujui</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if($approvedHistory->hasPages())
+                <div class="p-6 border-t border-slate-100 bg-slate-50/30">
+                    {{ $approvedHistory->appends(['history_page' => $approvedHistory->currentPage()])->links() }}
+                </div>
+            @endif
+        </div>
     </div>
 @endsection
 
@@ -306,3 +316,32 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @vite('resources/js/peserta/laporan.js')
 @endsection
+
+@push('modals')
+<div id="revisionModal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+    <div class="w-full max-w-lg overflow-hidden bg-white shadow-2xl rounded-2xl animate-fade-in-up">
+        <div class="flex items-center justify-between p-6 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-50 text-amber-600">
+                    <i class='text-xl bx bx-message-rounded-dots'></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Pesan dari Admin</h3>
+            </div>
+            <button onclick="closeRevisionModal()" class="transition-colors text-slate-400 hover:text-slate-600">
+                <i class='text-2xl bx bx-x'></i>
+            </button>
+        </div>
+        <div class="p-8">
+            <div class="p-4 border rounded-xl bg-slate-50 border-slate-100">
+                <p id="revisionNoteContent" class="leading-relaxed whitespace-pre-wrap text-slate-700"></p>
+            </div>
+        </div>
+        <div class="flex justify-end p-6 bg-slate-50">
+            <button onclick="closeRevisionModal()"
+                class="px-6 py-2 text-sm font-bold text-white transition-all bg-purple-600 rounded-lg hover:bg-purple-700">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+@endpush

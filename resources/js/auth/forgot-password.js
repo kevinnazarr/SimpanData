@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let emailValid = false;
 
+    let emailTimeout;
+
     if (emailInput && !emailInput.value) {
         setTimeout(() => emailInput.focus(), 300);
     }
@@ -36,17 +38,26 @@ document.addEventListener('DOMContentLoaded', function() {
         validateEmail();
     }
 
-    emailInput.addEventListener('blur', validateEmail);
-
-    async function validateEmail() {
+    emailInput.addEventListener('input', function() {
+        clearTimeout(emailTimeout);
+        
         const email = emailInput.value.trim();
-
+        
         if (!email) {
             updateEmailStatus('invalid', '');
             emailValid = false;
             updateSubmitButton();
             return;
         }
+
+        updateEmailStatus('checking', '<i class="mr-1 fas fa-spinner fa-spin"></i>Memeriksa email...');
+        emailTimeout = setTimeout(validateEmail, 500);
+    });
+
+    async function validateEmail() {
+        const email = emailInput.value.trim();
+
+        if (!email) return;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -55,8 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSubmitButton();
             return;
         }
-
-        updateEmailStatus('checking', 'Memeriksa email...');
 
         try {
             const response = await fetch(window.routes.checkEmail, {
@@ -72,22 +81,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (data.status) {
-                updateEmailStatus('valid', '✓ Email terdaftar');
+                updateEmailStatus('valid', '<i class="mr-1 fas fa-check"></i>Email terdaftar');
                 emailValid = true;
                 updateSubmitButton();
-                showToast('Email terdaftar, OTP siap dikirim', 'success');
             } else {
-                updateEmailStatus('invalid', '✗ ' + data.message);
+                updateEmailStatus('invalid', '<i class="mr-1 fas fa-times"></i>' + data.message);
                 emailValid = false;
                 updateSubmitButton();
-                showToast(data.message, 'error');
             }
         } catch (error) {
             console.error('Error:', error);
             updateEmailStatus('invalid', 'Gagal memeriksa email');
             emailValid = false;
             updateSubmitButton();
-            showToast('Gagal memeriksa email. Coba lagi.', 'error');
         }
     }
 
@@ -182,10 +188,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    emailInput.addEventListener('keydown', (e) => {
+    emailInput.addEventListener('keydown', async (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            validateEmail();
+            
+            if (!emailValid) {
+                await validateEmail();
+            }
+            
+            if (emailValid) {
+                forgotForm.dispatchEvent(new Event('submit'));
+            }
         }
     });
 });

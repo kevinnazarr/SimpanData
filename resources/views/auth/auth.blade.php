@@ -162,37 +162,36 @@
                     </div>
 
                     <div>
-                        <div class="flex justify-center gap-2 mb-4">
-                            <input class="otp-input otp-ready" maxlength="1">
-                            <input class="otp-input otp-ready" maxlength="1">
-                            <input class="otp-input otp-ready" maxlength="1">
-                            <input class="otp-input otp-ready" maxlength="1">
-                            <input class="otp-input otp-ready" maxlength="1">
-                            <input class="otp-input otp-ready" maxlength="1">
+                        <div class="flex justify-center gap-2 mb-6">
+                            <input class="otp-input" maxlength="1">
+                            <input class="otp-input" maxlength="1">
+                            <input class="otp-input" maxlength="1">
+                            <input class="otp-input" maxlength="1">
+                            <input class="otp-input" maxlength="1">
+                            <input class="otp-input" maxlength="1">
                         </div>
 
                         <input type="hidden" name="otp" id="otpHidden">
 
                         <div id="otpStatus" class="text-center text-sm mb-3 min-h-[20px]"></div>
 
-                        <div class="flex gap-2">
-                            <button type="button" onclick="verifyOtpManual()" id="verifyOtpBtn"
-                                class="flex-1 py-3 font-medium text-white transition-shadow duration-200 rounded-lg shadow-sm bg-secondary hover:bg-secondary/90 active:bg-secondary/80 btn-transition focus:outline-none focus:ring-2 focus:ring-secondary-light hover:shadow">
-                                Verifikasi
-                            </button>
+                        <button type="button" onclick="verifyOtpManual()" id="verifyOtpBtn"
+                            disabled
+                            class="w-full py-3 font-medium text-white transition-shadow duration-200 rounded-lg shadow-sm bg-primary hover:bg-primary/90 active:bg-primary/80 btn-transition focus:outline-none focus:ring-2 focus:ring-primary-light hover:shadow disabled:opacity-50 disabled:cursor-not-allowed">
+                            Verifikasi Email
+                        </button>
 
+                        <div class="pt-4 text-center">
+                            <div class="mb-2">
+                                <span id="countdownText" class="text-sm text-gray-600">Kirim ulang OTP dalam 60 detik</span>
+                            </div>
                             <button type="button" onclick="resendOtp()" id="resendOtpBtn"
-                                class="px-4 py-3 text-sm font-medium border rounded-lg border-secondary text-secondary hover:bg-secondary/5 btn-transition">
-                                <i class="mr-1 fas fa-redo"></i>Ulangi
+                                disabled
+                                class="px-4 py-2 text-sm border rounded-lg text-primary border-primary hover:bg-primary/5 btn-transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                Kirim ulang OTP
                             </button>
                         </div>
                     </div>
-
-                    <button type="button" onclick="showStep(1)"
-                        class="flex items-center text-sm font-medium transition-colors text-primary hover:text-primary/80">
-                        <i class="mr-2 fas fa-arrow-left"></i>
-                        Kembali ke Data Diri
-                    </button>
                 </div>
 
                 <div id="step3" class="hidden space-y-5">
@@ -243,11 +242,6 @@
                         Buat Akun Sekarang
                     </button>
 
-                    <button type="button" onclick="showStep(2)"
-                        class="flex items-center text-sm font-medium transition-colors text-primary hover:text-primary/80">
-                        <i class="mr-2 fas fa-arrow-left"></i>
-                        Kembali ke Verifikasi
-                    </button>
                 </div>
 
                 <div class="pt-4 text-center border-t border-gray-100">

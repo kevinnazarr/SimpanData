@@ -63,13 +63,9 @@
                                     <i class='bx bxs-star'></i>
                                 </label>
                             </div>
-                            <style>
-                                .group\/rating:hover label { color: #d1d5db !important; }
-                                .group\/rating label:hover,
-                                .group\/rating label:hover ~ label { color: #facc15 !important; }
-                                .group\/rating:not(:hover) input:checked ~ label,
-                                .group\/rating:not(:hover) input:checked + label { color: #facc15; }
-                            </style>
+                            @push('styles')
+                                @vite('resources/css/peserta/feedback.css')
+                            @endpush
                         </div>
 
                         <div>
@@ -186,26 +182,5 @@
 @endsection
 
 @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const textarea = document.getElementById('pesanFeedback');
-            const charCount = document.getElementById('charCount');
-
-            if (textarea && charCount) {
-                charCount.textContent = textarea.value.length;
-
-                textarea.addEventListener('input', function() {
-                    charCount.textContent = this.value.length;
-
-                    if (this.value.length >= 950) {
-                        charCount.classList.add('text-red-500');
-                        charCount.classList.remove('text-slate-400');
-                    } else {
-                        charCount.classList.remove('text-red-500');
-                        charCount.classList.add('text-slate-400');
-                    }
-                });
-            }
-        });
-    </script>
+    @vite('resources/js/peserta/feedback.js')
 @endsection

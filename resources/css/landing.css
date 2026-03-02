@@ -109,7 +109,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('../storage/background/Background_index.jpg'); /* Adjusted path assuming relative to css file, likely needs absolute or asset helper if processed. But since it's raw CSS file linked from public, relative path '../' goes to public, then 'storage/...' */ 
+    background-image: url('/storage/app/public/background/Background_index.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

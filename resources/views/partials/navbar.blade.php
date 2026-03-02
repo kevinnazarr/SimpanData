@@ -20,6 +20,82 @@
         </div>
 
         <div class="flex items-center gap-2 sm:gap-4">
+            @php
+                $notifs = $navbarNotifications ?? ['harian' => collect(), 'akhir' => null, 'total_count' => 0];
+            @endphp
+            @if(Auth::user()->role === 'peserta')
+            <div class="relative" id="notificationDropdownContainer">
+                <button id="notificationDropdownBtn"
+                    class="relative flex items-center justify-center w-10 h-10 transition-all rounded-xl hover:bg-slate-100 text-slate-600 hover:text-primary active:scale-95 group">
+                    <i class='text-2xl bx bx-bell'></i>
+                    @if($notifs['total_count'] > 0)
+                        <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full animate-pulse"></span>
+                    @endif
+                </button>
+
+                <div id="notificationDropdown"
+                    class="fixed sm:absolute left-4 sm:left-auto right-4 sm:right-0 w-auto sm:w-80 top-[4.5rem] sm:top-full mt-2 origin-top-right bg-white border border-gray-100 shadow-2xl rounded-2xl ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible transform scale-95 transition-all duration-200 z-50">
+                    <div class="p-4 border-b border-gray-50">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-slate-800">Notifikasi</h3>
+                            @if($notifs['total_count'] > 0)
+                                <span class="px-2 py-0.5 text-[10px] font-bold text-red-600 bg-red-50 rounded-full border border-red-100">
+                                    {{ $notifs['total_count'] }} Perlu Revisi
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 p-2">
+                        @if($notifs['total_count'] > 0)
+                            <div class="space-y-1">
+                                @if($notifs['akhir'])
+                                    <a href="{{ route('peserta.laporan.akhir') }}" class="flex flex-col p-3 transition-colors rounded-xl hover:bg-red-50 group border border-transparent hover:border-red-100 bg-red-50/30">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <div class="flex items-center justify-center w-8 h-8 text-red-600 bg-white rounded-lg shadow-sm border border-red-100">
+                                                <i class='bx bxs-file-pdf'></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-xs font-bold text-slate-800 truncate">Revisi Laporan Akhir</p>
+                                                <p class="text-[10px] text-slate-400">Baru saja</p>
+                                            </div>
+                                        </div>
+                                        <div class="p-2 text-[11px] leading-relaxed text-red-700 bg-white/50 rounded-lg italic max-h-24 overflow-y-auto scrollbar-thin">
+                                            {{ $notifs['akhir']->catatan_admin }}
+                                        </div>
+                                    </a>
+                                @endif
+
+                                @foreach($notifs['harian'] as $notif)
+                                    <a href="{{ route('peserta.laporan.edit', $notif->id) }}" class="flex flex-col p-3 transition-colors rounded-xl hover:bg-amber-50 group border border-transparent hover:border-amber-100 bg-amber-50/30">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <div class="flex items-center justify-center w-8 h-8 text-amber-600 bg-white rounded-lg shadow-sm border border-amber-100">
+                                                <i class='bx bx-revision'></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-xs font-bold text-slate-800 truncate">Revisi: {{ $notif->judul }}</p>
+                                                <p class="text-[10px] text-slate-400">{{ \Carbon\Carbon::parse($notif->tanggal_laporan)->format('d M Y') }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="p-2 text-[11px] leading-relaxed text-amber-700 bg-white/50 rounded-lg italic max-h-24 overflow-y-auto scrollbar-thin">
+                                            {{ $notif->catatan_admin }}
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="flex flex-col items-center justify-center py-10 px-4 text-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100 text-slate-300">
+                                    <i class='text-3xl bx bx-bell-off'></i>
+                                </div>
+                                <h4 class="text-xs font-bold text-slate-800 mb-1">Sudah Beres!</h4>
+                                <p class="text-[10px] text-slate-500">Tidak ada laporan yang perlu direvisi saat ini.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <div class="relative" id="profileDropdownContainer">
                 @php
                     /** @var \App\Models\User $user */
@@ -94,12 +170,48 @@
             dateElement.textContent = today.toLocaleDateString('id-ID', options);
         }
 
+        const notificationBtn = document.getElementById('notificationDropdownBtn');
+        const notificationMenu = document.getElementById('notificationDropdown');
+
+        if (notificationBtn && notificationMenu) {
+            notificationBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close profile dropdown if open
+                if (typeof closeDropdown === 'function') closeDropdown();
+                
+                const isOpen = !notificationMenu.classList.contains('invisible');
+                if (isOpen) {
+                    closeNotificationDropdown();
+                } else {
+                    openNotificationDropdown();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!notificationMenu.contains(e.target) && !notificationBtn.contains(e.target)) {
+                    closeNotificationDropdown();
+                }
+            });
+
+            function openNotificationDropdown() {
+                notificationMenu.classList.remove('invisible', 'opacity-0', 'scale-95');
+                notificationMenu.classList.add('visible', 'opacity-100', 'scale-100');
+            }
+
+            function closeNotificationDropdown() {
+                notificationMenu.classList.add('invisible', 'opacity-0', 'scale-95');
+                notificationMenu.classList.remove('visible', 'opacity-100', 'scale-100');
+            }
+        }
+
         const dropdownBtn = document.getElementById('profileDropdownBtn');
         const dropdownMenu = document.getElementById('profileDropdown');
 
         if (dropdownBtn && dropdownMenu) {
             dropdownBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                if (typeof closeNotificationDropdown === 'function') closeNotificationDropdown();
+                
                 const isOpen = !dropdownMenu.classList.contains('invisible');
 
                 if (isOpen) {

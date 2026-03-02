@@ -172,39 +172,42 @@
 @endsection
 
 @push('modals')
-<div id="showModal" class="fixed inset-0 z-50 hidden">
-    <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 backdrop-blur-sm" onclick="closeShowModal(event)"></div>
-        <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-            <div class="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-                <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                    <div>
-                        <h3 class="text-2xl font-bold text-gray-800">Detail Akun</h3>
-                        <p class="mt-1 text-gray-600">Informasi lengkap akun peserta</p>
+<div id="showModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-500/75" onclick="closeShowModal(event)"></div>
+
+<div id="showModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[35] overflow-y-auto">
+    <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+        <div class="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Detail Akun</h3>
+                    <p class="mt-1 text-gray-600">Informasi lengkap akun peserta</p>
+                </div>
+                <button onclick="closeShowModal(event)"
+                        class="p-2 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
+                    <i class='text-2xl bx bx-x'></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="showModalContent">
+                    <div class="py-12 text-center">
+                        <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
+                        <p class="mt-3 text-gray-600">Memuat data...</p>
                     </div>
-                    <button onclick="closeShowModal(event)"
-                            class="p-2 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
-                        <i class='text-2xl bx bx-x'></i>
-                    </button>
                 </div>
-                <div class="p-6">
-                    <div id="showModalContent">
-                        <div class="py-12 text-center">
-                            <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
-                            <p class="mt-3 text-gray-600">Memuat data...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
-                    <button onclick="closeShowModal(event)"
-                            class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                        Tutup
-                    </button>
-                </div>
+            </div>
+            <div class="flex justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
+                <button onclick="closeShowModal(event)"
+                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
 </div>
+@endpush
+
+@push('styles')
+    @vite('resources/css/admin/grid-cards.css')
 @endpush
 
 @section('scripts')

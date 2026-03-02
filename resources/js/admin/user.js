@@ -244,6 +244,7 @@ window.openShowModal = function(id) {
 
     modal.classList.remove('hidden');
     modal.classList.add('modal-enter');
+    document.getElementById('showModalOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 
     fetch(`${config.baseUrl}/${id}`, {
@@ -289,6 +290,7 @@ window.closeShowModal = function(e) {
         const modal = document.getElementById('showModal');
         modal.classList.remove('modal-enter');
         modal.classList.add('hidden');
+        document.getElementById('showModalOverlay').classList.add('hidden');
         document.body.style.overflow = '';
         document.getElementById('showModalContent').innerHTML = '';
     });

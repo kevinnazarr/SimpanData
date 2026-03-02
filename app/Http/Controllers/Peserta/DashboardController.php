@@ -35,7 +35,8 @@ class DashboardController extends Controller
                 ->where('jenis_absen', 'Masuk')
                 ->count();
 
-            $totalLaporan = \App\Models\Laporan::where('peserta_id', $peserta->id)->count();
+            $totalLaporan = \App\Models\Laporan::where('peserta_id', $peserta->id)->count() + 
+                            \App\Models\LaporanAkhir::where('peserta_id', $peserta->id)->count();
 
             $absensiHariIni = \App\Models\Absensi::where('peserta_id', $peserta->id)
                 ->whereDate('waktu_absen', \Carbon\Carbon::today())

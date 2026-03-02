@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class LaporanController extends Controller
 {
-    public function index()
+    public function index($editId = null)
     {
         $user = Auth::user();
         $peserta = Peserta::where('user_id', $user->id)->first();
@@ -23,26 +23,57 @@ class LaporanController extends Controller
                 ->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        $todayReport = Laporan::where('peserta_id', $peserta->id)
-            ->where('tanggal_laporan', date('Y-m-d'))
-            ->first();
+        if ($editId) {
+            $todayReport = Laporan::where('id', $editId)
+                ->where('peserta_id', $peserta->id)
+                ->firstOrFail();
+
+            if ($todayReport->status == 'Disetujui') {
+                return redirect()->route('peserta.laporan.index')
+                    ->with('error', 'Laporan yang sudah disetujui tidak dapat diedit.');
+            }
+        } else {
+            $todayReport = Laporan::where('peserta_id', $peserta->id)
+                ->where('tanggal_laporan', date('Y-m-d'))
+                ->first();
+        }
 
         $recentReports = Laporan::where('peserta_id', $peserta->id)
             ->where('tanggal_laporan', '!=', date('Y-m-d'))
             ->orderBy('tanggal_laporan', 'desc')
-            ->limit(5)
-            ->get();
-
-        $hasMoreReports = Laporan::where('peserta_id', $peserta->id)
-            ->where('tanggal_laporan', '!=', date('Y-m-d'))
-            ->count() > 5;
+            ->paginate(5, ['*'], 'daily_page');
 
         $pendingRevisions = Laporan::where('peserta_id', $peserta->id)
             ->where('status', 'Revisi')
             ->orderBy('tanggal_laporan', 'desc')
             ->get();
 
-        return view('peserta.laporan.laporan', compact('user', 'peserta', 'todayReport', 'recentReports', 'hasMoreReports', 'pendingRevisions'));
+        $allReports = Laporan::where('peserta_id', $peserta->id)
+            ->orderBy('tanggal_laporan', 'desc')
+            ->get();
+
+        $search = request('search');
+
+        $approvedHistory = Laporan::where('peserta_id', $peserta->id)
+            ->where('status', 'Disetujui')
+            ->when($search, function($query, $search) {
+                return $query->where(function($q) use ($search) {
+                    $q->where('judul', 'like', "%{$search}%")
+                      ->orWhere('deskripsi', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('tanggal_laporan', 'desc')
+            ->paginate(5, ['*'], 'history_page')
+            ->appends(request()->query());
+
+        $stats = [
+            'total'     => $allReports->count(),
+            'dikirim'   => $allReports->where('status', 'Dikirim')->count(),
+            'disetujui' => $allReports->where('status', 'Disetujui')->count(),
+            'revisi'    => $allReports->where('status', 'Revisi')->count(),
+        ];
+
+        return view('peserta.laporan.laporan-harian', compact('user', 'peserta', 'todayReport', 'recentReports', 'pendingRevisions', 'allReports', 'stats', 'approvedHistory'));
     }
 
     public function store(Request $request)
@@ -55,21 +86,23 @@ class LaporanController extends Controller
                 ->with('error', 'Data peserta tidak ditemukan.');
         }
 
+        if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            return back()->with('error', 'Upload gagal. File melebihi batas server 10MB.');
+        }
+
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,zip|max:5120',
+            'file' => 'nullable|file|mimes:pdf|mimetypes:application/pdf|max:5120',
             'tanggal_laporan' => 'required|date',
-            'status' => 'required|in:Draft,Dikirim',
         ], [
             'judul.required' => 'Judul laporan harus diisi.',
             'judul.max' => 'Judul laporan maksimal 255 karakter.',
             'deskripsi.required' => 'Deskripsi kegiatan harus diisi.',
-            'file.mimes' => 'File harus berformat: PDF, DOC, DOCX, JPG, PNG, atau ZIP.',
+            'file.mimes' => 'File harus berformat PDF.',
+            'file.mimetypes' => 'File harus berupa dokumen PDF yang valid.',
             'file.max' => 'Ukuran file maksimal 5MB.',
             'tanggal_laporan.required' => 'Tanggal laporan harus diisi.',
-            'status.required' => 'Status laporan harus dipilih.',
-            'status.in' => 'Status laporan tidak valid.',
         ]);
 
         if ($validator->fails()) {
@@ -91,25 +124,20 @@ class LaporanController extends Controller
         $filePath = null;
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $fileName = time() . '_' . $peserta->id . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('laporan', $fileName, 'public');
+            $filePath = $file->store('laporan', 'public');
         }
 
-        $laporan = Laporan::create([
+        Laporan::create([
             'peserta_id' => $peserta->id,
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,
             'file_path' => $filePath,
             'tanggal_laporan' => $request->tanggal_laporan,
-            'status' => $request->status,
+            'status' => 'Dikirim',
         ]);
 
-        $message = $request->status == 'Draft'
-            ? 'Laporan berhasil disimpan sebagai draft.'
-            : 'Laporan berhasil dikirim untuk review.';
-
         return redirect()->route('peserta.laporan.index')
-            ->with('success', $message);
+            ->with('success', 'Laporan berhasil dikirim untuk review.');
     }
 
     public function show(string $id)
@@ -126,29 +154,12 @@ class LaporanController extends Controller
             ->where('peserta_id', $peserta->id)
             ->firstOrFail();
 
-        return view('peserta.laporan.laporan-show', compact('user', 'peserta', 'laporan'));
+        return view('peserta.laporan.laporan-harian-show', compact('user', 'peserta', 'laporan'));
     }
 
     public function edit(string $id)
     {
-        $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
-
-        if (!$peserta) {
-            return redirect()->route('peserta.dashboard')
-                ->with('error', 'Data peserta tidak ditemukan.');
-        }
-
-        $laporan = Laporan::where('id', $id)
-            ->where('peserta_id', $peserta->id)
-            ->firstOrFail();
-
-        if ($laporan->status == 'Disetujui') {
-            return redirect()->route('peserta.laporan.show', $id)
-                ->with('error', 'Laporan yang sudah disetujui tidak dapat diedit.');
-        }
-
-        return view('peserta.laporan.laporan-edit', compact('user', 'peserta', 'laporan'));
+        return $this->index($id);
     }
 
     public function update(Request $request, string $id)
@@ -169,19 +180,21 @@ class LaporanController extends Controller
             return redirect()->route('peserta.laporan.show', $id)
                 ->with('error', 'Laporan yang sudah disetujui tidak dapat diedit.');
         }
+        if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            return back()->with('error', 'Upload gagal. File melebihi batas server 10MB.');
+        }
+
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,zip|max:5120', // 5MB
-            'status' => 'required|in:Draft,Dikirim',
+            'file' => 'nullable|file|mimes:pdf|mimetypes:application/pdf|max:5120', // 5MB
         ], [
             'judul.required' => 'Judul laporan harus diisi.',
             'judul.max' => 'Judul laporan maksimal 255 karakter.',
             'deskripsi.required' => 'Deskripsi kegiatan harus diisi.',
-            'file.mimes' => 'File harus berformat: PDF, DOC, DOCX, JPG, PNG, atau ZIP.',
+            'file.mimes' => 'File harus berformat PDF.',
+            'file.mimetypes' => 'File harus berupa dokumen PDF yang valid.',
             'file.max' => 'Ukuran file maksimal 5MB.',
-            'status.required' => 'Status laporan harus dipilih.',
-            'status.in' => 'Status laporan tidak valid.',
         ]);
 
         if ($validator->fails()) {
@@ -197,23 +210,18 @@ class LaporanController extends Controller
             }
 
             $file = $request->file('file');
-            $fileName = time() . '_' . $peserta->id . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('laporan', $fileName, 'public');
+            $filePath = $file->store('laporan', 'public');
         }
 
         $laporan->update([
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,
             'file_path' => $filePath,
-            'status' => $request->status,
+            'status' => 'Dikirim',
         ]);
 
-        $message = $request->status == 'Draft'
-            ? 'Laporan berhasil diupdate sebagai draft.'
-            : 'Laporan berhasil dikirim untuk review.';
-
         return redirect()->route('peserta.laporan.index')
-            ->with('success', $message);
+            ->with('success', 'Laporan berhasil diperbarui.');
     }
 
     public function destroy(string $id)
@@ -230,10 +238,12 @@ class LaporanController extends Controller
             ->where('peserta_id', $peserta->id)
             ->firstOrFail();
 
-        if ($laporan->status != 'Draft') {
+        // Prevent deletion of approved/sent reports
+        if ($laporan->status == 'Disetujui') {
             return redirect()->back()
-                ->with('error', 'Hanya laporan dengan status Draft yang dapat dihapus.');
+                ->with('error', 'Laporan yang sudah disetujui tidak dapat dihapus.');
         }
+
         if ($laporan->file_path && Storage::disk('public')->exists($laporan->file_path)) {
             Storage::disk('public')->delete($laporan->file_path);
         }
@@ -254,9 +264,32 @@ class LaporanController extends Controller
                 ->with('error', 'Data peserta tidak ditemukan.');
         }
 
-        $laporanAkhir = LaporanAkhir::where('peserta_id', $peserta->id)->first();
+        $laporanAkhir = LaporanAkhir::where('peserta_id', $peserta->id)
+            ->latest()
+            ->first();
 
-        return view('peserta.laporan.laporan-akhir', compact('user', 'peserta', 'laporanAkhir'));
+        $search = request('search');
+
+        $historyLaporanAkhir = LaporanAkhir::where('peserta_id', $peserta->id)
+            ->when($search, function($query, $search) {
+                return $query->where('judul', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(5, ['*'], 'final_page')
+            ->appends(request()->query());
+
+        $allLaporanAkhir = LaporanAkhir::where('peserta_id', $peserta->id)
+            ->latest()
+            ->get();
+
+        $statsAkhir = [
+            'total'     => $allLaporanAkhir->count(),
+            'dikirim'   => $allLaporanAkhir->where('status', 'Dikirim')->count(),
+            'disetujui' => $allLaporanAkhir->where('status', 'Disetujui')->count(),
+            'revisi'    => $allLaporanAkhir->where('status', 'Revisi')->count(),
+        ];
+
+        return view('peserta.laporan.laporan-akhir', compact('user', 'peserta', 'laporanAkhir', 'historyLaporanAkhir', 'allLaporanAkhir', 'statsAkhir'));
     }
 
     public function laporanAkhirStore(Request $request)
@@ -268,44 +301,36 @@ class LaporanController extends Controller
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
         }
 
+        if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            return back()->with('error', 'Upload gagal. File melebihi batas server 10MB.');
+        }
+
         $validator = Validator::make($request->all(), [
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,zip|max:10240', // Final reports usually require a file
-            'status' => 'required|in:Draft,Dikirim',
+            'file' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:10240',
         ], [
-            'judul.required' => 'Judul laporan akhir harus diisi.',
-            'judul.max' => 'Judul laporan akhir maksimal 255 karakter.',
-            'deskripsi.required' => 'Deskripsi laporan akhir harus diisi.',
             'file.required' => 'File laporan akhir wajib diunggah.',
-            'file.mimes' => 'File harus berformat: PDF, DOC, DOCX, XLS, XLSX, atau ZIP.',
+            'file.mimes' => 'File harus berformat PDF.',
+            'file.mimetypes' => 'File harus berupa dokumen PDF yang valid.',
             'file.max' => 'Ukuran file maksimal 10MB.',
-            'status.required' => 'Status laporan harus dipilih.',
-            'status.in' => 'Status laporan tidak valid.',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $existing = LaporanAkhir::where('peserta_id', $peserta->id)->first();
-        if ($existing) {
-            return redirect()->back()->with('error', 'Laporan akhir sudah ada.');
-        }
 
         $filePath = null;
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $fileName = 'Final_' . time() . '_' . $peserta->id . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('laporan_akhir', $fileName, 'public');
+            $filePath = $file->store('laporan_akhir', 'public');
         }
 
         LaporanAkhir::create([
             'peserta_id' => $peserta->id,
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
+            'judul' => 'Laporan Akhir ' . $peserta->nama,
+            'deskripsi' => 'Laporan Akhir PKL/Magang oleh ' . $peserta->nama,
             'file_path' => $filePath,
-            'status' => $request->status,
+            'status' => 'Dikirim',
         ]);
 
         return redirect()->route('peserta.laporan.akhir')
@@ -329,17 +354,16 @@ class LaporanController extends Controller
             return redirect()->back()->with('error', 'Laporan yang sudah disetujui tidak dapat diperbarui.');
         }
 
+        if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            return back()->with('error', 'Upload gagal. File melebihi batas server 10MB.');
+        }
+
         $validator = Validator::make($request->all(), [
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,zip|max:10240',
-            'status' => 'required|in:Draft,Dikirim',
+            'file' => 'nullable|file|mimes:pdf|mimetypes:application/pdf|max:10240',
         ], [
-            'judul.required' => 'Judul laporan akhir harus diisi.',
-            'deskripsi.required' => 'Deskripsi laporan akhir harus diisi.',
-            'file.mimes' => 'File harus berformat: PDF, DOC, DOCX, XLS, XLSX, atau ZIP.',
+            'file.mimes' => 'File harus berformat PDF.',
+            'file.mimetypes' => 'File harus berupa dokumen PDF yang valid.',
             'file.max' => 'Ukuran file maksimal 10MB.',
-            'status.required' => 'Status laporan harus dipilih.',
         ]);
 
         if ($validator->fails()) {
@@ -348,23 +372,36 @@ class LaporanController extends Controller
 
         $filePath = $laporanAkhir->file_path;
         if ($request->hasFile('file')) {
-            if ($laporanAkhir->file_path && Storage::disk('public')->exists($laporanAkhir->file_path)) {
-                Storage::disk('public')->delete($laporanAkhir->file_path);
-            }
             $file = $request->file('file');
-            $fileName = 'Final_' . time() . '_' . $peserta->id . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('laporan_akhir', $fileName, 'public');
+            $filePath = $file->store('laporan_akhir', 'public');
         }
 
         $laporanAkhir->update([
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
+            'judul' => 'Laporan Akhir ' . $peserta->nama,
+            'deskripsi' => 'Laporan Akhir PKL/Magang oleh ' . $peserta->nama,
             'file_path' => $filePath,
-            'status' => $request->status,
-            'catatan_admin' => ($request->status == 'Dikirim') ? $laporanAkhir->catatan_admin : null, // Reset notes if resent or draft? Actually better keep it until Approved.
+            'status' => 'Dikirim',
+            'catatan_admin' => null,
         ]);
 
         return redirect()->route('peserta.laporan.akhir')
             ->with('success', 'Laporan akhir berhasil diperbarui.');
+    }
+
+    public function laporanAkhirShow($id)
+    {
+        $user = Auth::user();
+        $peserta = Peserta::where('user_id', $user->id)->first();
+
+        if (!$peserta) {
+            return redirect()->route('peserta.dashboard')
+                ->with('error', 'Data peserta tidak ditemukan.');
+        }
+
+        $laporan = LaporanAkhir::where('id', $id)
+            ->where('peserta_id', $peserta->id)
+            ->firstOrFail();
+
+        return view('peserta.laporan.laporan-akhir-show', compact('user', 'peserta', 'laporan'));
     }
 }

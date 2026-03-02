@@ -115,6 +115,8 @@ Route::middleware(['auth', 'role:peserta'])->group(function () {
         ->name('peserta.laporan.akhir');
     Route::post('/peserta/laporan/laporan-akhir', [PesertaLaporanController::class, 'laporanAkhirStore'])
         ->name('peserta.laporan.akhir.store');
+    Route::get('/peserta/laporan/laporan-akhir/{id}', [PesertaLaporanController::class, 'laporanAkhirShow'])
+        ->name('peserta.laporan.akhir.show');
     Route::put('/peserta/laporan/laporan-akhir/{id}', [PesertaLaporanController::class, 'laporanAkhirUpdate'])
         ->name('peserta.laporan.akhir.update');
 
@@ -148,8 +150,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('admin.laporan.akhir.index');
     Route::get('/admin/laporan/laporan-akhir/{id}', [AdminLaporanController::class, 'laporanAkhirShow'])
         ->name('admin.laporan.akhir.show');
-    Route::patch('/admin/laporan/laporan-akhir/{id}/status', [AdminLaporanController::class, 'laporanAkhirUpdateStatus'])
-        ->name('admin.laporan.akhir.update-status');
+    Route::patch('/admin/laporan/laporan-akhir/{id}/approve', [AdminLaporanController::class, 'laporanAkhirApprove'])
+        ->name('admin.laporan.akhir.approve');
+    Route::patch('/admin/laporan/laporan-akhir/{id}/revisi', [AdminLaporanController::class, 'laporanAkhirRevisi'])
+        ->name('admin.laporan.akhir.revisi');
 
     Route::resource('admin/peserta', PesertaController::class)->names([
         'index' => 'admin.peserta.index',
@@ -188,8 +192,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/admin/penilaian/{id}', [AdminPenilaianController::class, 'update'])->name('admin.penilaian.update');
 
     Route::get('/admin/laporan', [AdminLaporanController::class, 'index'])->name('admin.laporan.index');
-    Route::get('/admin/laporan/{id}', [AdminLaporanController::class, 'show'])->name('admin.laporan.show');
-    Route::patch('/admin/laporan/{id}/status', [AdminLaporanController::class, 'updateStatus'])->name('admin.laporan.update-status');
+    Route::get('/admin/laporan/{id}', [AdminLaporanController::class, 'show'])->name('admin.laporan.harian.show'); // User naming preference
+    Route::patch('/admin/laporan/{id}/approve', [AdminLaporanController::class, 'approve'])->name('admin.laporan.harian.approve');
+    Route::patch('/admin/laporan/{id}/revisi', [AdminLaporanController::class, 'revisi'])->name('admin.laporan.harian.revisi');
 
 
     Route::get('/admin/profile', [AdminProfileController::class, 'index'])->name('admin.profile.index');

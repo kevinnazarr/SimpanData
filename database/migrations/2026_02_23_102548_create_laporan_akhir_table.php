@@ -23,9 +23,6 @@ return new class extends Migration
                 ->default('Draft');
             $table->text('catatan_admin')->nullable();
             $table->timestamps();
-            
-            // Each student only has ONE final report
-            $table->unique('peserta_id');
         });
     }
 
