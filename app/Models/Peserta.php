@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\LaporanAkhir;
 
 /**
  * @property int $id
@@ -72,6 +73,11 @@ class Peserta extends Model
     public function penilaian()
     {
         return $this->hasOne(Penilaian::class);
+    }
+
+    public function laporanAkhir()
+    {
+        return $this->hasOne(LaporanAkhir::class);
     }
 
     /**

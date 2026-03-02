@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
 use App\Http\Controllers\Admin\PenilaianController as AdminPenilaianController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\ArsipController as AdminArsipController;
 
 Route::get('/', [IndexController::class, 'index'])->name('index');
 Route::get('/auth', fn() => view('auth.auth'))->name('auth');
@@ -202,4 +203,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/admin/settings', [AdminSettingsController::class, 'index'])->name('admin.settings.index');
     Route::post('/admin/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
+
+    Route::get('/admin/arsip', [AdminArsipController::class, 'index'])->name('admin.arsip.index');
+    Route::post('/admin/arsip/{id}/pulihkan', [AdminArsipController::class, 'pulihkan'])->name('admin.arsip.pulihkan');
+    Route::delete('/admin/arsip/{id}', [AdminArsipController::class, 'destroy'])->name('admin.arsip.destroy');
 });
