@@ -93,6 +93,9 @@ Route::middleware(['auth', 'role:peserta'])->group(function () {
     Route::get('/peserta/profil', [PesertaProfilController::class, 'index'])
         ->name('peserta.profil');
 
+    Route::get('/peserta/profil/print', [PesertaProfilController::class, 'printIdCard'])
+        ->name('peserta.profil.print');
+
     Route::post('/peserta/profil', [PesertaProfilController::class, 'update'])
         ->name('peserta.profil.update');
 
@@ -164,6 +167,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/admin/absensi', [AbsensiController::class, 'index'])
         ->name('admin.absensi.index');
+
+    Route::get('/admin/peserta/{id}/print-id-card', [PesertaController::class, 'printIdCard'])
+        ->name('admin.peserta.print');
 
     Route::resource('admin/user', AdminUserController::class)->only(['index', 'show'])->names([
         'index' => 'admin.user.index',

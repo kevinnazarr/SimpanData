@@ -32,6 +32,7 @@ class DashboardController extends Controller
         if ($peserta) {
             $totalHadir = \App\Models\Absensi::where('peserta_id', $peserta->id)
                 ->where('status', 'Hadir')
+                ->where('jenis_absen', 'Masuk')
                 ->count();
 
             $totalLaporan = \App\Models\Laporan::where('peserta_id', $peserta->id)->count() + 
@@ -74,6 +75,7 @@ class DashboardController extends Controller
 
                 $passedDays = \App\Models\Absensi::where('peserta_id', $peserta->id)
                     ->where('status', 'Hadir')
+                    ->where('jenis_absen', 'Masuk')
                     ->distinct()
                     ->count(DB::raw('DATE(waktu_absen)'));
 
@@ -109,6 +111,10 @@ class DashboardController extends Controller
             $performanceScore = min($performanceScore, 100);
 
             $attendanceStats = \App\Models\Absensi::where('peserta_id', $peserta->id)
+                ->where(function($query) {
+                    $query->where('status', '!=', 'Hadir')
+                          ->orWhere('jenis_absen', 'Masuk');
+                })
                 ->selectRaw('status, COUNT(*) as count')
                 ->groupBy('status')
                 ->get()

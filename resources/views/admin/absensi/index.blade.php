@@ -334,22 +334,17 @@
             @endif
         </div>
 
-    </div>
-@endsection
-
-@push('modals')
-    <div id="locationModalOverlay" class="fixed inset-0 z-30 hidden bg-black/50"></div>
-
-    <div id="locationModal"class="fixed inset-0 z-50 flex items-center justify-center hidden">
-        <div class="relative w-full max-w-2xl mx-4 my-8 bg-white shadow-2xl rounded-2xl animate-fade-in-up max-h-[90vh] overflow-y-auto pointer-events-auto">
-            <div class="sticky top-0 z-10 flex items-center justify-between p-5 bg-white border-b border-gray-100 rounded-t-2xl">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 text-xl text-blue-600 bg-blue-50 rounded-xl">
-                        <i class='bx bx-map'></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-bold text-gray-800">Detail Absensi</h3>
-                        <p class="text-xs text-gray-500" id="modalSubtitle"></p>
+        <div id="locationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.5);">
+            <div class="relative w-full max-w-2xl mx-4 bg-white shadow-2xl rounded-2xl animate-fade-in-up">
+                <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 text-xl text-blue-600 bg-blue-50 rounded-xl">
+                            <i class='bx bx-map'></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-800">Detail Lokasi Absensi</h3>
+                            <p class="text-xs text-gray-500" id="modalSubtitle"></p>
+                        </div>
                     </div>
                 </div>
                 <button onclick="closeLocationModal()" class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">

@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 responsive: true,
                 maintainAspectRatio: false,
                 layout: {
-                    padding: { top: 15, bottom: 15, left: 35, right: 35 },
+                    padding: { top: 20, bottom: 20, left: 55, right: 55 },
                 },
                 plugins: {
                     legend: { display: false },

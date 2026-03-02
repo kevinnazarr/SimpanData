@@ -15,6 +15,15 @@ class ProfilController extends Controller
         return view('peserta.profil', compact('user', 'peserta'));
     }
 
+    public function printIdCard()
+    {
+        $peserta = Auth::user()->peserta;
+        if (!$peserta) {
+            return redirect()->route('peserta.profil')->with('error', 'Data diri belum lengkap.');
+        }
+        return view('admin.peserta.print-id-card', compact('peserta'));
+    }
+
     public function update(Request $request)
     {
         $user = Auth::user();

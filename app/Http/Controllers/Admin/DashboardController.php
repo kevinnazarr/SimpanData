@@ -29,6 +29,10 @@ class DashboardController extends Controller
 
             $today = Carbon::today();
             $attendanceStats = Absensi::whereDate('waktu_absen', $today)
+                ->where(function($query) {
+                    $query->where('status', '!=', 'Hadir')
+                          ->orWhere('jenis_absen', 'Masuk');
+                })
                 ->selectRaw('status, COUNT(*) as count')
                 ->groupBy('status')
                 ->get()
