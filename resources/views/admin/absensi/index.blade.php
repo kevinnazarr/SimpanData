@@ -334,74 +334,76 @@
             @endif
         </div>
 
-        <div id="locationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.5);">
-            <div class="relative w-full max-w-2xl mx-4 bg-white shadow-2xl rounded-2xl animate-fade-in-up">
-                <div class="flex items-center justify-between p-5 border-b border-gray-100">
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center justify-center w-10 h-10 text-xl text-blue-600 bg-blue-50 rounded-xl">
-                            <i class='bx bx-map'></i>
+        @push('modals')
+            <div id="locationModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.5);">
+                <div class="relative w-full max-w-2xl mx-4 bg-white shadow-2xl rounded-2xl animate-fade-in-up">
+                    <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center justify-center w-10 h-10 text-xl text-blue-600 bg-blue-50 rounded-xl">
+                                <i class='bx bx-map'></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-gray-800">Detail Lokasi Absensi</h3>
+                                <p class="text-xs text-gray-500" id="modalSubtitle"></p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-base font-bold text-gray-800">Detail Lokasi Absensi</h3>
-                            <p class="text-xs text-gray-500" id="modalSubtitle"></p>
+                        <button type="button" onclick="closeLocationModal()"
+                            class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
+                            <i class='text-xl bx bx-x'></i>
+                        </button>
+                    </div>
+
+                    <div class="p-5 space-y-4">
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <div class="p-3 rounded-xl bg-gray-50">
+                                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Nama</p>
+                                <p class="text-sm font-bold text-gray-800 truncate" id="modalNama"></p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-gray-50">
+                                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Jenis</p>
+                                <p class="text-sm font-bold text-gray-800" id="modalJenis"></p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-gray-50">
+                                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Status</p>
+                                <p class="text-sm font-bold text-gray-800" id="modalStatus"></p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-gray-50">
+                                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Mode</p>
+                                <p class="text-sm font-bold text-gray-800" id="modalMode"></p>
+                            </div>
+                        </div>
+
+                        <div id="modalCatatanWrapper" class="hidden">
+                            <div class="flex items-start gap-2 p-3 border border-amber-100 rounded-xl bg-amber-50/50">
+                                <i class='mt-0.5 text-amber-500 bx bx-note'></i>
+                                <div>
+                                    <p class="text-[10px] font-semibold uppercase tracking-wider text-amber-400 mb-0.5">Catatan</p>
+                                    <p class="text-xs font-medium leading-relaxed text-gray-700" id="modalCatatan"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="mapContainer" class="w-full overflow-hidden border border-gray-200 rounded-xl" style="height:320px;"></div>
+
+                        <div class="flex items-start gap-2 p-3 border border-blue-100 rounded-xl bg-blue-50/50">
+                            <i class='mt-0.5 text-blue-500 bx bx-current-location'></i>
+                            <div>
+                                <p class="text-[10px] font-semibold uppercase tracking-wider text-blue-400 mb-0.5">Alamat</p>
+                                <p class="text-xs font-medium leading-relaxed text-gray-700" id="modalAddress">Memuat alamat...</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <i class='bx bx-time-five'></i>
+                            <span id="modalWaktu"></span>
+                            <span class="mx-1">&bull;</span>
+                            <span id="modalCoords"></span>
                         </div>
                     </div>
                 </div>
-                <button onclick="closeLocationModal()" class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
-                    <i class='text-xl bx bx-x'></i>
-                </button>
             </div>
-
-            <div class="p-5 space-y-4">
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div class="p-3 rounded-xl bg-gray-50">
-                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Nama</p>
-                        <p class="text-sm font-bold text-gray-800 truncate" id="modalNama"></p>
-                    </div>
-                    <div class="p-3 rounded-xl bg-gray-50">
-                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Jenis</p>
-                        <p class="text-sm font-bold text-gray-800" id="modalJenis"></p>
-                    </div>
-                    <div class="p-3 rounded-xl bg-gray-50">
-                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Status</p>
-                        <p class="text-sm font-bold text-gray-800" id="modalStatus"></p>
-                    </div>
-                    <div class="p-3 rounded-xl bg-gray-50">
-                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Mode</p>
-                        <p class="text-sm font-bold text-gray-800" id="modalMode"></p>
-                    </div>
-                </div>
-
-                <div id="modalCatatanWrapper" class="hidden">
-                    <div class="flex items-start gap-2 p-3 border border-amber-100 rounded-xl bg-amber-50/50">
-                        <i class='mt-0.5 text-amber-500 bx bx-note'></i>
-                        <div>
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-amber-400 mb-0.5">Catatan</p>
-                            <p class="text-xs font-medium leading-relaxed text-gray-700" id="modalCatatan"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="mapContainer" class="w-full overflow-hidden border border-gray-200 rounded-xl" style="height:320px;"></div>
-
-                <div class="flex items-start gap-2 p-3 border border-blue-100 rounded-xl bg-blue-50/50">
-                    <i class='mt-0.5 text-blue-500 bx bx-current-location'></i>
-                    <div>
-                        <p class="text-[10px] font-semibold uppercase tracking-wider text-blue-400 mb-0.5">Alamat</p>
-                        <p class="text-xs font-medium leading-relaxed text-gray-700" id="modalAddress">Memuat alamat...</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2 text-xs text-gray-400">
-                    <i class='bx bx-time-five'></i>
-                    <span id="modalWaktu"></span>
-                    <span class="mx-1">&bull;</span>
-                    <span id="modalCoords"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-@endpush
+        @endpush
+@endsection
 
 @section('scripts')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />

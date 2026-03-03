@@ -614,3 +614,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// once the register form actually submits, disable the submit button to
+// guard against accidental double-posts (which could trigger throttling)
+const regFormElement = document.getElementById('registerForm');
+if (regFormElement) {
+    regFormElement.addEventListener('submit', function () {
+        const btn = document.getElementById('registerBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add('opacity-50','cursor-not-allowed');
+        }
+    });
+}
+

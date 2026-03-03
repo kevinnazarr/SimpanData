@@ -183,17 +183,6 @@
                     </div>
                     <span class="text-lg font-black text-slate-900">{{ $attendanceBreakdown['Hadir'] }}</span>
                 </div>
-
-                <div class="p-4 bg-indigo-50/30 rounded-2xl border border-indigo-100/50">
-                    <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-3">Status Terkini</p>
-                    <div class="flex items-center justify-between text-xs font-bold">
-                        <span class="text-slate-500">On-time Rate</span>
-                        <span class="text-indigo-600">85%</span>
-                    </div>
-                    <div class="h-1.5 w-full bg-indigo-100 rounded-full mt-2">
-                        <div class="h-full bg-indigo-500 rounded-full" style="width: 85%"></div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
