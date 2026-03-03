@@ -126,7 +126,7 @@
                                     <i class='bx bxs-file-pdf'></i>
                                 </div>
                                 <div>
-                                    <p class="text-lg font-bold text-slate-700">Darag & Drop</p>
+                                    <p class="text-lg font-bold text-slate-700">Drag & Drop</p>
                                     <p class="text-sm text-slate-500">atau klik untuk memilih file dari komputer Anda</p>
                                 </div>
                                 <div class="px-4 py-1.5 text-[10px] font-bold tracking-widest text-purple-600 uppercase bg-purple-100 rounded-full">

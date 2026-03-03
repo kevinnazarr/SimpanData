@@ -29,7 +29,7 @@ Route::post('/login', [AuthController::class, 'login'])
     ->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/register', [AuthController::class, 'register'])
-    ->middleware('throttle:3,1')
+    ->middleware('throttle:5,1')
     ->name('register');
 
 Route::get('/privacy-policy', function () {
