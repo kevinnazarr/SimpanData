@@ -39,7 +39,7 @@
         @if($peserta && $peserta->penilaian)
             @php $n = $peserta->penilaian; @endphp
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 no-print">
                 <div class="flex flex-col items-center justify-center p-8 lg:col-span-4 card shadow-soft bg-gradient-to-br from-indigo-600 to-purple-700 animate-fade-in-up" style="animation-delay: 100ms">
                     <p class="mb-4 text-sm font-bold tracking-widest uppercase text-white/80">Nilai Akhir</p>
                     <div class="relative flex items-center justify-center w-40 h-40 mb-6 border rounded-full bg-white/10 backdrop-blur-sm border-white/20 animate-pulse-subtle">
@@ -118,8 +118,62 @@
                     </div>
                 </div>
             </div>
+
+            <div id="certificate-print" class="hidden-print-element certificate-container">
+                <div class="certificate-border">
+                    <div class="certificate-inner">
+                        <div class="certificate-watermark">
+                            <img src="{{ asset('storage/logo/Logo_GI.png') }}" alt="Watermark">
+                        </div>
+
+                        <div class="certificate-content">
+                            <div class="certificate-header">
+                                <h1>JENIS KEGIATAN : {{ strtoupper($peserta->jenis_kegiatan) }}</h1>
+                            </div>
+
+                            <div class="certificate-body">
+                                <h3 class="title-competency">DAFTAR KOMPETENSI</h3>
+                                
+                                <table class="table-competency">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-no">No</th>
+                                            <th class="col-task">Kompetensi</th>
+                                            <th class="col-score">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($aspek as $index => $a)
+                                        <tr>
+                                            <td class="col-no">{{ $index + 1 }}</td>
+                                            <td>{{ $a['label'] }}</td>
+                                            <td class="col-score">{{ $a['val'] }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="font-bold bg-slate-50">
+                                            <td colspan="2" class="text-right">Rata-rata</td>
+                                            <td class="col-score">{{ $n->nilai_akhir }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <div class="certificate-footer">
+                                <div class="signatory-block">
+                                    <p class="location-date">Yogyakarta, {{ $peserta->tanggal_selesai->translatedFormat('d F Y') }}</p>
+                                    <p class="position">Ketua Tim Penguji / Asesor</p>
+                                    <div class="signature-space"></div>
+                                    <p class="signatory-name">{{ strtoupper($n->user->username) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         @else
-            <div class="flex flex-col items-center justify-center py-20 card shadow-soft animate-fade-in">
+            <div class="flex flex-col items-center justify-center py-20 card shadow-soft animate-fade-in no-print">
                 <div class="flex items-center justify-center w-48 h-48 mb-6 rounded-full bg-slate-50">
                     <i class='bx bx-hourglass text-8xl text-slate-200 animate-pulse'></i>
                 </div>

@@ -151,11 +151,7 @@
                             </div>
                         </div>
                     @else
-                        {{-- Automaticaly set status to Hadir for Pulang state (handled via hidden input if needed or just controller logic) --}}
                         <input type="hidden" name="status" value="Hadir">
-                        {{-- Mode kerja might still be needed for Checkout or inherited from Masuk. 
-                             Typically it's the same. We can either show it again or just hide it.
-                             If we show it, it gives user flexibility. Let's keep it simple for now and hide it if already Masuk. --}}
                     @endif
 
                     <div>
