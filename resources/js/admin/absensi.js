@@ -44,7 +44,6 @@ window.openLocationModal = function(nama, waktu, jenis, status, mode, lat, lng, 
         catatanWrapper.classList.add('hidden');
     }
 
-    document.getElementById('locationModalOverlay').classList.remove('hidden');
     const modal = document.getElementById('locationModal');
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -76,7 +75,6 @@ window.openLocationModal = function(nama, waktu, jenis, status, mode, lat, lng, 
 };
 
 window.closeLocationModal = function() {
-    document.getElementById('locationModalOverlay').classList.add('hidden');
     document.getElementById('locationModal').classList.add('hidden');
     document.body.style.overflow = '';
     if (locationMap) {
@@ -87,7 +85,6 @@ window.closeLocationModal = function() {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLocationModal(); });
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('locationModalOverlay')?.addEventListener('click', closeLocationModal);
     document.getElementById('locationModal')?.addEventListener('click', e => {
         if (e.target === e.currentTarget) closeLocationModal();
     });

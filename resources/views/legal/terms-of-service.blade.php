@@ -53,10 +53,10 @@
                     class="object-contain w-9 h-9 border-2 rounded-lg border-primary">
                 <span class="text-xl font-extrabold text-text-primary">SimpanData</span>
             </a>
-            <a href="{{ url('/') }}"
+            <a href="{{ auth()->check() ? url()->previous() : url('/') }}"
                 class="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-primary transition-colors duration-200 no-underline">
                 <i class='bx bx-arrow-back'></i>
-                Kembali ke Beranda
+                {{ auth()->check() ? 'Kembali' : 'Kembali ke Beranda' }}
             </a>
         </div>
     </nav>

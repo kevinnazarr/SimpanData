@@ -335,7 +335,7 @@
         </div>
 
         @push('modals')
-            <div id="locationModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.5);">
+            <div id="locationModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background:rgba(0,0,0,0.5);">
                 <div class="relative w-full max-w-2xl mx-4 bg-white shadow-2xl rounded-2xl animate-fade-in-up">
                     <div class="flex items-center justify-between p-5 border-b border-gray-100">
                         <div class="flex items-center gap-3">
