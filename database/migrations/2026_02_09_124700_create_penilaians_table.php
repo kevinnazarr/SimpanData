@@ -11,19 +11,25 @@ return new class extends Migration
         Schema::create('penilaian', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('peserta_id')
-                ->constrained('peserta')
-                ->cascadeOnDelete();
-            $table->foreignId('user_id')
-                ->constrained('user')
-                ->cascadeOnDelete();
+            $table->string('peserta_id', 20);
+            $table->foreign('peserta_id')
+                ->references('id')
+                ->on('peserta')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+            $table->string('user_id', 20);
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('user')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
 
-            $table->unsignedTinyInteger('kedisiplinan'); // 1-100
-            $table->unsignedTinyInteger('keterampilan'); // 1-100
-            $table->unsignedTinyInteger('kerjasama'); // 1-100
-            $table->unsignedTinyInteger('inisiatif'); // 1-100
-            $table->unsignedTinyInteger('komunikasi'); // 1-100
-            $table->unsignedTinyInteger('nilai_akhir'); // Rata-rata
+            $table->unsignedTinyInteger('kedisiplinan');
+            $table->unsignedTinyInteger('keterampilan');
+            $table->unsignedTinyInteger('kerjasama');
+            $table->unsignedTinyInteger('inisiatif');
+            $table->unsignedTinyInteger('komunikasi');
+            $table->unsignedTinyInteger('nilai_akhir');
 
             $table->text('catatan')->nullable();
             $table->timestamps();

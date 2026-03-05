@@ -10,9 +10,12 @@ return new class extends Migration
     {
         Schema::create('absensi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('peserta_id')
-                ->constrained('peserta')
-                ->cascadeOnDelete();
+            $table->string('peserta_id', 20);
+            $table->foreign('peserta_id')
+                ->references('id')
+                ->on('peserta')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
             $table->enum('jenis_absen', ['Masuk', 'Pulang'])->nullable();
             $table->dateTime('waktu_absen')->nullable();
             $table->enum('mode_kerja', ['WFO', 'WFA'])

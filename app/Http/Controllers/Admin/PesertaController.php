@@ -119,6 +119,7 @@ class PesertaController extends Controller
 
         try {
             $user = User::create([
+                'id' => \App\Helpers\IdGenerator::generate('peserta', $validated['jenis_kegiatan']),
                 'username' => $validated['username'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
@@ -131,7 +132,7 @@ class PesertaController extends Controller
             }
 
             Peserta::create([
-                'user_id' => $user->id,
+                'id' => $user->id,
                 'nama' => $validated['nama'],
                 'asal_sekolah_universitas' => $validated['asal_sekolah_universitas'],
                 'jurusan' => $validated['jurusan'],
@@ -191,8 +192,8 @@ class PesertaController extends Controller
         $peserta = Peserta::with('user')->findOrFail($id);
 
         $validated = $request->validate([
-            'username' => 'required|string|unique:user,username,' . $peserta->user_id,
-            'email' => 'required|email|unique:user,email,' . $peserta->user_id,
+            'username' => 'required|string|unique:user,username,' . $peserta->id,
+            'email' => 'required|email|unique:user,email,' . $peserta->id,
             'password' => 'nullable|string|min:8',
             'nama' => 'required|string|max:255',
             'asal_sekolah_universitas' => 'required|string|max:255',

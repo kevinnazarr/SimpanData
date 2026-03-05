@@ -291,6 +291,7 @@ class AuthController extends Controller
         DB::beginTransaction();
         try {
             $user = User::create([
+                'id'       => \App\Helpers\IdGenerator::generate('peserta', 'Magang'),
                 'username' => $request->username,
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
@@ -298,7 +299,7 @@ class AuthController extends Controller
             ]);
 
             \App\Models\Peserta::create([
-                'user_id' => $user->id,
+                'id' => $user->id,
                 'nama' => $request->username,
                 'asal_sekolah_universitas' => '-',
                 'jurusan' => '-',

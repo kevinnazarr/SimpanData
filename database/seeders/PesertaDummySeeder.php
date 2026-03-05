@@ -43,19 +43,20 @@ class PesertaDummySeeder extends Seeder
                 $tanggalSelesai = (clone $tanggalMulai)->addMonths($durasiBulan);
             }
 
-            // Menentukan Status Peserta
             $now = Carbon::now();
             if ($now->greaterThan($tanggalSelesai)) {
                 $status = $faker->randomElement(['Selesai', 'Arsip']);
             } elseif ($now->lessThan($tanggalMulai)) {
                 $status = 'Aktif';
             } else {
-                $status = 'Aktif'; // Sedang berjalan
+                $status = 'Aktif';
             }
 
-            // --- USER ---
             $username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $faker->unique()->userName)) . $faker->numberBetween(100, 9999);
-            $userId = DB::table('user')->insertGetId([
+            $userId = \App\Helpers\IdGenerator::generate('peserta', $jenisKegiatan);
+            
+            DB::table('user')->insert([
+                'id' => $userId,
                 'username' => substr($username, 0, 191),
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make('password123'),
@@ -64,7 +65,6 @@ class PesertaDummySeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            // --- PESERTA ---
             $univList = ['Universitas Gadjah Mada', 'Universitas Negeri Yogyakarta', 'Universitas Islam Indonesia', 'Universitas Atma Jaya Yogyakarta', 'Universitas Muhammadiyah Yogyakarta', 'Universitas Amikom Yogyakarta', 'UPN Veteran Yogyakarta', 'Universitas Sanata Dharma', 'Institut Seni Indonesia Yogyakarta', 'Universitas Teknologi Yogyakarta', 'Universitas Ahmad Dahlan', 'Universitas Mercu Buana Yogyakarta', 'Universitas Kristen Duta Wacana'];
             $smkList = ['SMKN 2 Depok Sleman', 'SMKN 2 Yogyakarta', 'SMKN 3 Yogyakarta', 'SMKN 1 Bantul', 'SMK Telkom Sandhy Putra Pusat', 'SMK N 1 Wonosari', 'SMK N 1 Pengasih', 'SMK N 1 Depok', 'SMK Pelita Harapan', 'SMKN 1 Kasihan', 'SMKN 1 Tempel'];
             
@@ -77,7 +77,7 @@ class PesertaDummySeeder extends Seeder
                 : ['Rekayasa Perangkat Lunak', 'Teknik Komputer dan Jaringan', 'Multimedia', 'Otomatisasi Tata Kelola Perkantoran', 'Akuntansi', 'Teknik Mesin'];
             
             $pesertaId = DB::table('peserta')->insertGetId([
-                'user_id' => $userId,
+                'id' => $userId,
                 'nama' => $faker->firstName . ' ' . $faker->lastName,
                 'asal_sekolah_universitas' => $namaSekolah,
                 'jurusan' => $faker->randomElement($jurusanList),
@@ -93,8 +93,6 @@ class PesertaDummySeeder extends Seeder
 
             $insertedPesertas++;
 
-            // --- AKTIVITAS: ABSENSI, LAPORAN, LOG ---
-            // Hanya buat data absensi jika peserta sudah mulai
             if ($now->greaterThan($tanggalMulai)) {
                 $absenEnd = $now->lessThan($tanggalSelesai) ? $now : clone $tanggalSelesai;
                 $absenStart = clone $tanggalMulai;

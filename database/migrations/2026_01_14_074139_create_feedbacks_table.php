@@ -10,9 +10,12 @@ return new class extends Migration
     {
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('peserta_id')
-                ->constrained('peserta')
-                ->cascadeOnDelete();
+            $table->string('peserta_id', 20);
+            $table->foreign('peserta_id')
+                ->references('id')
+                ->on('peserta')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
             $table->enum('pengirim', ['Peserta', 'Admin']);
             $table->text('pesan');
             $table->boolean('tampilkan')->default(false);

@@ -25,11 +25,11 @@ Route::get('/', [IndexController::class, 'index'])->name('index');
 Route::get('/auth', fn() => view('auth.auth'))->name('auth');
 
 Route::post('/login', [AuthController::class, 'login'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:30,1')
     ->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/register', [AuthController::class, 'register'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:30,1')
     ->name('register');
 
 Route::get('/privacy-policy', function () {
@@ -44,7 +44,7 @@ Route::get('/help', function () {
     return view('legal.help');
 })->name('help');
 
-Route::middleware(['throttle:5,1'])->group(function () {
+Route::middleware(['throttle:30,1'])->group(function () {
     Route::post('/send-otp', [AuthController::class, 'sendOtp'])->name('send.otp');
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
     Route::post('/check-username', [AuthController::class, 'checkUsername'])->name('check.username');
@@ -54,7 +54,7 @@ Route::middleware(['throttle:5,1'])->group(function () {
 Route::get('/forgot-password', fn() => view('auth.forgot-password'))
     ->name('forgot.password.form');
 
-Route::middleware(['throttle:5,1'])->group(function () {
+Route::middleware(['throttle:30,1'])->group(function () {
     Route::post('/check-email', [AuthController::class, 'checkEmail'])
         ->name('check.email');
 

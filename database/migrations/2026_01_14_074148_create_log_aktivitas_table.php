@@ -10,10 +10,13 @@ return new class extends Migration
     {
         Schema::create('log_aktivitas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')
-                ->nullable()
-                ->constrained('user')
-                ->nullOnDelete();
+            $table->string('user_id', 20)
+                ->nullable();
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('user')
+                ->nullOnDelete()
+                ->cascadeOnUpdate();
             $table->string('aksi');
             $table->string('target_tabel')->nullable();
             $table->unsignedBigInteger('target_id')->nullable();

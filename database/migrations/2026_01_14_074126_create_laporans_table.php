@@ -11,9 +11,12 @@ return new class extends Migration
         Schema::create('laporan', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('peserta_id')
-                ->constrained('peserta')
-                ->cascadeOnDelete();
+            $table->string('peserta_id', 20);
+            $table->foreign('peserta_id')
+                ->references('id')
+                ->on('peserta')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
 
             $table->string('judul');
             $table->text('deskripsi');

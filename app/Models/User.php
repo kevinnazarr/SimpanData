@@ -20,7 +20,11 @@ class User extends Authenticatable
 
     protected $table = 'user';
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
+        'id',
         'username',
         'email',
         'password',
@@ -43,6 +47,6 @@ class User extends Authenticatable
     }
     public function peserta()
     {
-        return $this->hasOne(Peserta::class);
+        return $this->hasOne(Peserta::class, 'id', 'id');
     }
 }

@@ -27,11 +27,48 @@ class Peserta extends Model
 {
     use HasFactory;
     
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($peserta) {
+            if ($peserta->wasChanged('jenis_kegiatan')) {
+                $user = $peserta->user;
+                if ($user) {
+                    $oldId = $user->id;
+                    $newId = \App\Helpers\IdGenerator::generate('peserta', $peserta->jenis_kegiatan);
+                    
+                    \Illuminate\Support\Facades\DB::table('user')
+                        ->where('id', $oldId)
+                        ->update(['id' => $newId]);
+                        
+                    \Illuminate\Support\Facades\DB::table('peserta')
+                        ->where('id', $oldId)
+                        ->update(['id' => $newId]);
+                        
+                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::id() === $oldId) {
+                        $updatedUser = \App\Models\User::find($newId);
+                        if ($updatedUser) {
+                            \Illuminate\Support\Facades\Auth::login($updatedUser);
+                            
+                            request()->session()->put('password_hash_' . \Illuminate\Support\Facades\Auth::getName(), $updatedUser->getAuthPassword());
+                        }
+                    }
+                    
+                    $peserta->load('user');
+                }
+            }
+        });
+    }
+
     protected $appends = ['is_lengkap'];
 
     protected $table = 'peserta';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'user_id',
+        'id',
         'foto',
         'nama',
         'asal_sekolah_universitas',
@@ -50,7 +87,7 @@ class Peserta extends Model
     ];
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id', 'id');
     }
 
     public function absensis()
@@ -117,13 +154,13 @@ class Peserta extends Model
      */
     public function getIsLengkapAttribute()
     {
-        return $this->asal_sekolah_universitas !== '-' &&
+        return !empty($this->asal_sekolah_universitas) &&
+               $this->asal_sekolah_universitas !== '-' &&
+               !empty($this->jurusan) &&
                $this->jurusan !== '-' &&
+               !empty($this->alamat) &&
                $this->alamat !== '-' &&
-               $this->no_telepon !== '-' &&
-               !is_null($this->asal_sekolah_universitas) &&
-               !is_null($this->jurusan) &&
-               !is_null($this->alamat) &&
-               !is_null($this->no_telepon);
+               !empty($this->no_telepon) &&
+               $this->no_telepon !== '-';
     }
 }

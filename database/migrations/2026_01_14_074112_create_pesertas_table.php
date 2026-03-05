@@ -9,11 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('peserta', function (Blueprint $table) {
-            $table->id();
-
-            $table->foreignId('user_id')
-                ->constrained('user')
-                ->cascadeOnDelete();
+            $table->string('id', 20)->primary();
+            $table->foreign('id')
+                ->references('id')
+                ->on('user')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
             $table->string('foto')->nullable();
             $table->string('nama');
             $table->string('asal_sekolah_universitas');
