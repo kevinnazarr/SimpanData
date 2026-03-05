@@ -9,11 +9,13 @@ function updateStats(stats) {
     const pklEl = document.getElementById('statTotalPkl');
     const magangEl = document.getElementById('statTotalMagang');
     const aktifEl = document.getElementById('statTotalAktif');
+    const selesaiEl = document.getElementById('statTotalSelesai');
 
     if (totalEl) totalEl.textContent = stats.total ?? totalEl.textContent;
     if (pklEl) pklEl.textContent = stats.pkl ?? pklEl.textContent;
     if (magangEl) magangEl.textContent = stats.magang ?? magangEl.textContent;
     if (aktifEl) aktifEl.textContent = stats.aktif ?? aktifEl.textContent;
+    if (selesaiEl) selesaiEl.textContent = stats.selesai ?? selesaiEl.textContent;
 }
 
 function toggleBlur(active) {

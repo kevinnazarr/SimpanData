@@ -25,7 +25,7 @@
         </div>
 
         <div class="p-4 md:p-6">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
                 <div onclick="filterByTotal()"
                     class="overflow-hidden transition-all duration-300 rounded-lg shadow-sm cursor-pointer bg-gradient-to-br from-indigo-500 to-purple-500 hover:shadow-xl hover:-translate-y-1 group">
                     <div class="p-5">
@@ -109,6 +109,29 @@
                                 <div
                                     class="flex items-center justify-center w-12 h-12 transition-colors rounded-lg bg-white/20 group-hover:bg-white/30">
                                     <i class="text-2xl text-white bx bx-time-five"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Selesai Card -->
+                <div onclick="filterByStatus('Selesai')"
+                    class="overflow-hidden transition-all duration-300 rounded-lg shadow-sm cursor-pointer bg-gradient-to-br from-green-500 to-emerald-600 hover:shadow-xl hover:-translate-y-1 group">
+                    <div class="p-5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <p class="mb-1 text-xs font-semibold tracking-wider uppercase text-white/80">
+                                    Selesai
+                                </p>
+                                <h3 class="text-3xl font-bold text-white" id="statTotalSelesai">
+                                    {{ $selesai ?? 0 }}
+                                </h3>
+                                <p class="mt-1 text-xs text-white/70">Peserta</p>
+                            </div>
+                            <div class="ml-4">
+                                <div
+                                    class="flex items-center justify-center w-12 h-12 transition-colors rounded-lg bg-white/20 group-hover:bg-white/30">
+                                    <i class="text-2xl text-white bx bx-check-circle"></i>
                                 </div>
                             </div>
                         </div>

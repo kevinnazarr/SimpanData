@@ -41,13 +41,14 @@ class PesertaController extends Controller
             $baseQuery->where('asal_sekolah_universitas', $request->asal_sekolah_universitas);
         }
 
-        $peserta = (clone $baseQuery)->paginate(9);
+        $peserta = (clone $baseQuery)->paginate(9)->onEachSide(1);
 
         $statsQuery = clone $baseQuery;
         $totalFiltered = (clone $statsQuery)->count();
         $totalPklFiltered = (clone $statsQuery)->where('jenis_kegiatan', 'PKL')->count();
         $totalMagangFiltered = (clone $statsQuery)->where('jenis_kegiatan', 'Magang')->count();
         $totalAktifFiltered = (clone $statsQuery)->where('status', 'Aktif')->count();
+        $totalSelesaiFiltered = (clone $statsQuery)->where('status', 'Selesai')->count();
 
         if ($request->ajax()) {
             return response()->json([
@@ -57,6 +58,7 @@ class PesertaController extends Controller
                     'pkl' => $totalPklFiltered,
                     'magang' => $totalMagangFiltered,
                     'aktif' => $totalAktifFiltered,
+                    'selesai' => $totalSelesaiFiltered,
                 ],
             ]);
         }
@@ -65,7 +67,7 @@ class PesertaController extends Controller
         $totalPkl = $totalPklFiltered;
         $totalMagang = $totalMagangFiltered;
         $aktif = $totalAktifFiltered;
-        $selesai = (clone $statsQuery)->where('status', 'Selesai')->count();
+        $selesai = $totalSelesaiFiltered;
 
         $sekolahs = Peserta::select('asal_sekolah_universitas')
             ->whereNotNull('asal_sekolah_universitas')

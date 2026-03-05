@@ -18,7 +18,6 @@ class PenilaianController extends Controller
         $query = Peserta::with(['penilaian', 'user'])
             ->whereIn('status', ['Aktif', 'Selesai']);
 
-        // Filter pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -28,17 +27,14 @@ class PenilaianController extends Controller
             });
         }
 
-        // Filter jenis kegiatan
         if ($request->filled('jenis_kegiatan')) {
             $query->where('jenis_kegiatan', $request->jenis_kegiatan);
         }
         
-        // Filter sekolah
         if ($request->filled('sekolah')) {
             $query->where('asal_sekolah_universitas', $request->sekolah);
         }
 
-        // Filter status penilaian
         if ($request->filled('status_penilaian')) {
             if ($request->status_penilaian === 'sudah') {
                 $query->whereHas('penilaian');
@@ -47,21 +43,18 @@ class PenilaianController extends Controller
             }
         }
 
-        // Clone query for statistics BEFORE pagination
         $statsQuery = clone $query;
         $totalPeserta = $statsQuery->count();
         $sudahDinilai = (clone $statsQuery)->whereHas('penilaian')->count();
         $belumDinilai = $totalPeserta - $sudahDinilai;
         $rataRataNilai = Penilaian::whereIn('peserta_id', (clone $statsQuery)->select('id'))->avg('nilai_akhir') ?? 0;
 
-        $peserta = $query->orderBy('nama', 'asc')->paginate(12);
+        $peserta = $query->orderBy('nama', 'asc')->paginate(12)->onEachSide(1);
 
-        // Peserta dengan nilai terbaik (masih global/sesuai kebutuhan pencarian terbaik)
         $nilaiTerbaik = Penilaian::with('peserta')
             ->orderBy('nilai_akhir', 'desc')
             ->first();
 
-        // Data sekolah untuk filter
         $sekolahs = Peserta::select('asal_sekolah_universitas')
             ->distinct()
             ->orderBy('asal_sekolah_universitas')
@@ -106,7 +99,6 @@ class PenilaianController extends Controller
             'catatan' => 'nullable|string|max:1000',
         ]);
 
-        // Cek apakah sudah ada penilaian
         $existing = Penilaian::where('peserta_id', $request->peserta_id)->first();
         if ($existing) {
             return response()->json([
@@ -217,16 +209,14 @@ class PenilaianController extends Controller
             }
         }
 
-        // Clone query for statistics BEFORE pagination
         $statsQuery = clone $query;
         $totalPeserta = $statsQuery->count();
         $sudahDinilai = (clone $statsQuery)->whereHas('penilaian')->count();
         $belumDinilai = $totalPeserta - $sudahDinilai;
         
-        // Calculate average for filtered peserta who have assessment
         $rataRataNilai = Penilaian::whereIn('peserta_id', (clone $statsQuery)->select('id'))->avg('nilai_akhir') ?? 0;
 
-        $peserta = $query->with(['penilaian', 'user'])->orderBy('nama', 'asc')->paginate(12);
+        $peserta = $query->with(['penilaian', 'user'])->orderBy('nama', 'asc')->paginate(12)->onEachSide(1);
 
         return response()->json([
             'html' => view('admin.penilaian.partials.peserta-grid', compact('peserta'))->render(),

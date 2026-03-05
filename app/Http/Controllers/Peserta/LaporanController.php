@@ -54,8 +54,7 @@ class LaporanController extends Controller
 
         $search = request('search');
 
-        $approvedHistory = Laporan::where('peserta_id', $peserta->id)
-            ->where('status', 'Disetujui')
+        $historyLaporan = Laporan::where('peserta_id', $peserta->id)
             ->when($search, function($query, $search) {
                 return $query->where(function($q) use ($search) {
                     $q->where('judul', 'like', "%{$search}%")
@@ -73,7 +72,7 @@ class LaporanController extends Controller
             'revisi'    => $allReports->where('status', 'Revisi')->count(),
         ];
 
-        return view('peserta.laporan.laporan-harian', compact('user', 'peserta', 'todayReport', 'recentReports', 'pendingRevisions', 'allReports', 'stats', 'approvedHistory'));
+        return view('peserta.laporan.laporan-harian', compact('user', 'peserta', 'todayReport', 'recentReports', 'pendingRevisions', 'allReports', 'stats', 'historyLaporan'));
     }
 
     public function store(Request $request)

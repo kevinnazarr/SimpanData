@@ -52,7 +52,7 @@ class LaporanController extends Controller
         }
 
         $laporans = $query->orderBy('tanggal_laporan', 'desc')
-            ->paginate(10)
+            ->paginate(10)->onEachSide(1)
             ->withQueryString();
 
         $sekolahs = Peserta::select('asal_sekolah_universitas')
@@ -159,7 +159,7 @@ class LaporanController extends Controller
         }
 
         $laporans = $query->latest()
-            ->paginate(10)
+            ->paginate(10)->onEachSide(1)
             ->withQueryString();
 
         $sekolahs = Peserta::select('asal_sekolah_universitas')

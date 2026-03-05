@@ -19,7 +19,6 @@
         <div class="flex items-center gap-3">
             @php
                 $statusClasses = [
-                    'Draft' => 'bg-gray-100 text-gray-600',
                     'Dikirim' => 'bg-blue-100 text-blue-600 border-blue-200',
                     'Disetujui' => 'bg-emerald-100 text-emerald-600 border-emerald-200',
                     'Revisi' => 'bg-amber-100 text-amber-600 border-amber-200',

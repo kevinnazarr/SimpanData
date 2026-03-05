@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('file_path')->nullable();
             $table->date('tanggal_laporan');
 
-            $table->enum('status', ['Draft', 'Dikirim', 'Disetujui', 'Revisi'])
-                ->default('Draft');
+            $table->enum('status', ['Dikirim', 'Disetujui', 'Revisi'])
+                ->default('Dikirim');
 
             $table->text('catatan_admin')->nullable();
 

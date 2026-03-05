@@ -122,7 +122,7 @@ class AuthController extends Controller
         );
 
         try {
-            Mail::to($email)->queue(new ResetPasswordOtpMail($otp, $email));
+            Mail::to($email)->send(new ResetPasswordOtpMail($otp, $email));
 
             Log::info('Reset password OTP sent to: ' . $email);
 
@@ -230,7 +230,7 @@ class AuthController extends Controller
         );
 
         try {
-            Mail::to($email)->queue(new ResetPasswordOtpMail($otp, $email));
+            Mail::to($email)->send(new ResetPasswordOtpMail($otp, $email));
 
             Log::info('Reset password OTP resent to: ' . $email);
 

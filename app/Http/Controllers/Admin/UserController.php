@@ -46,7 +46,7 @@ class UserController extends Controller
             });
         }
 
-        $users = (clone $baseQuery)->paginate(9);
+        $users = (clone $baseQuery)->paginate(9)->onEachSide(1);
 
         $statsQuery = clone $baseQuery;
         $totalPeserta = (clone $statsQuery)->count();

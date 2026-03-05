@@ -11,7 +11,7 @@ class PartnerController extends Controller
 {
     public function index(Request $request)
     {
-        $partners = Partner::latest()->paginate(10);
+        $partners = Partner::latest()->paginate(10)->onEachSide(1);
 
         if ($request->ajax()) {
             return response()->json([

@@ -66,7 +66,7 @@ class DashboardController extends Controller
                     $pesertaQuery->where('asal_sekolah_universitas', $asal);
                 }
                 
-                $peserta = $pesertaQuery->paginate(10)->withQueryString();
+                $peserta = $pesertaQuery->paginate(10)->onEachSide(1)->withQueryString();
 
                 return response()->json([
                     'rows' => view('admin.partials.peserta-rows', compact('peserta'))->render(),

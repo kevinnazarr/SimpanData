@@ -214,3 +214,24 @@
 .hidden-print-element {
     display: none;
 }
+
+
+.pdf-wrapper {
+    width: 1123px !important;
+    height: 794px !important;
+    background: white !important;
+    position: relative !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.pdf-wrapper .certificate-container {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+}

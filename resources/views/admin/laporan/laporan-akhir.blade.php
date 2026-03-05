@@ -208,7 +208,6 @@
                                 <td class="px-4 py-3 text-center">
                                     @php
                                         $statusClasses = [
-                                            'Draft'     => 'bg-gray-100 text-gray-600',
                                             'Dikirim'   => 'bg-blue-100 text-blue-700',
                                             'Disetujui' => 'bg-emerald-100 text-emerald-700',
                                             'Revisi'    => 'bg-amber-100 text-amber-700',

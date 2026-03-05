@@ -30,7 +30,6 @@
             <span class="px-4 py-2 text-sm font-bold rounded-full
                 {{ $laporan->status == 'Disetujui' ? 'bg-green-100 text-green-800' : '' }}
                 {{ $laporan->status == 'Dikirim' ? 'bg-blue-100 text-blue-800' : '' }}
-                {{ $laporan->status == 'Draft' ? 'bg-gray-100 text-gray-800' : '' }}
                 {{ $laporan->status == 'Revisi' ? 'bg-yellow-100 text-yellow-800' : '' }}">
                 {{ $laporan->status }}
             </span>
@@ -83,7 +82,7 @@
             </div>
         </div>
 
-        @if($laporan->status == 'Draft' || $laporan->status == 'Revisi')
+        @if($laporan->status == 'Revisi')
             <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-slate-200">
                 <form action="{{ route('peserta.laporan.destroy', $laporan->id) }}" method="POST" class="inline-block" id="delete-form">
                     @csrf

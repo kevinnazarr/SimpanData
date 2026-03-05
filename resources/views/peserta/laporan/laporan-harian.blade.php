@@ -225,8 +225,8 @@
                         <i class='bx bx-history'></i>
                     </div>
                     <h4 class="text-lg font-bold text-slate-800">History Laporan</h4>
-                    <span class="px-3 py-1 text-xs font-bold text-green-700 bg-green-100 border border-green-200 rounded-full">
-                        {{ $approvedHistory->total() }} Laporan
+                    <span class="px-3 py-1 text-xs font-bold text-indigo-700 bg-indigo-100 border border-indigo-200 rounded-full">
+                        {{ $historyLaporan->total() }} Laporan
                     </span>
                 </div>
 
@@ -261,9 +261,9 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y">
-                        @forelse ($approvedHistory as $index => $history)
+                        @forelse ($historyLaporan as $index => $history)
                             <tr class="transition-colors hover:bg-gray-50/50">
-                                <td class="px-4 py-3 text-gray-500">{{ $index + $approvedHistory->firstItem() }}</td>
+                                <td class="px-4 py-3 text-gray-500">{{ $index + $historyLaporan->firstItem() }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-gray-900">{{ \Carbon\Carbon::parse($history->tanggal_laporan)->translatedFormat('d F Y') }}</span>
@@ -274,9 +274,23 @@
                                     <p class="font-medium text-gray-700 line-clamp-1">{{ $history->judul }}</p>
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-700">
-                                        {{ $history->status }}
-                                    </span>
+                                    @if ($history->status == 'Disetujui')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-700">
+                                            {{ $history->status }}
+                                        </span>
+                                    @elseif ($history->status == 'Dikirim')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-blue-100 text-blue-700">
+                                            {{ $history->status }}
+                                        </span>
+                                    @elseif ($history->status == 'Revisi')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-amber-100 text-amber-700">
+                                            {{ $history->status }}
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-700">
+                                            {{ $history->status }}
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <a href="{{ route('peserta.laporan.show', $history->id) }}"
@@ -294,7 +308,7 @@
                                         <div class="flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300">
                                             <i class='text-3xl bx bx-file-blank'></i>
                                         </div>
-                                        <p class="text-sm font-medium text-slate-400">Belum ada history laporan yang disetujui</p>
+                                        <p class="text-sm font-medium text-slate-400">Belum ada history laporan</p>
                                     </div>
                                 </td>
                             </tr>
@@ -303,9 +317,9 @@
                 </table>
             </div>
 
-            @if($approvedHistory->hasPages())
+            @if($historyLaporan->hasPages())
                 <div class="p-6 border-t border-slate-100 bg-slate-50/30">
-                    {{ $approvedHistory->appends(['history_page' => $approvedHistory->currentPage()])->links() }}
+                    {{ $historyLaporan->appends(['history_page' => $historyLaporan->currentPage()])->links() }}
                 </div>
             @endif
         </div>

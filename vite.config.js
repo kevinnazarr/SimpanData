@@ -30,6 +30,7 @@ export default defineConfig({
                 'resources/js/landing.js',
                 'resources/css/landing.css',
                 'resources/css/peserta/penilaian.css',
+                'resources/js/peserta/penilaian.js',
             ],
             refresh: true,
         }),

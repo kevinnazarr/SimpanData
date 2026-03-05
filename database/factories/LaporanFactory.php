@@ -20,7 +20,7 @@ class LaporanFactory extends Factory
             'deskripsi' => fake()->paragraph(5),
             'file_path' => fake()->optional()->filePath(),
             'tanggal_laporan' => $tanggalLaporan,
-            'status' => fake()->randomElement(['Draft', 'Dikirim', 'Disetujui', 'Revisi']),
+            'status' => fake()->randomElement(['Dikirim', 'Disetujui', 'Revisi']),
         ];
     }
 }

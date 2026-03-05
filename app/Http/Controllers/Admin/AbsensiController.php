@@ -56,7 +56,7 @@ class AbsensiController extends Controller
 
         $absensis = (clone $baseQuery)
             ->orderBy('waktu_absen', 'desc')
-            ->paginate(10)
+            ->paginate(10)->onEachSide(1)
             ->withQueryString();
 
         $hadirMasuk = (clone $baseQuery)

@@ -37,7 +37,7 @@ class ArsipController extends Controller
             $query->where('jenis_kegiatan', $request->jenis_kegiatan);
         }
 
-        $pesertaArsip = $query->paginate(12)->withQueryString();
+        $pesertaArsip = $query->paginate(12)->onEachSide(1)->withQueryString();
 
         $cutoffDate = Carbon::today()->subMonth();
         $pesertaArsip->each(function ($peserta) use ($cutoffDate) {

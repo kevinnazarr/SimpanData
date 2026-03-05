@@ -17,6 +17,9 @@
 
             <div class="flex items-center gap-3">
                 @if($peserta && $peserta->penilaian)
+                    <button id="btn-download-pdf" class="flex items-center justify-center p-2 text-white transition-all bg-emerald-600 shadow-sm w-10 h-10 rounded-xl hover:bg-emerald-700 hover:shadow-md" title="Download PDF">
+                        <i class='text-xl bx bx-download'></i>
+                    </button>
                     <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition-all bg-indigo-600 shadow-sm rounded-xl hover:bg-indigo-700 hover:shadow-md">
                         <i class='text-lg bx bx-printer'></i>
                         <span>Print</span>
@@ -190,3 +193,22 @@
 @push('styles')
     @vite(['resources/css/peserta/penilaian.css'])
 @endpush
+
+@section('scripts')
+    <template id="pdf-style-template">
+        <style>
+            {!! str_replace('@media print', '@media all', file_get_contents(resource_path('css/peserta/penilaian.css'))) !!}
+        </style>
+    </template>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    @vite(['resources/js/peserta/penilaian.js'])
+    <script>
+        document.getElementById('btn-download-pdf')?.addEventListener('click', function() {
+            if (window.downloadPDF) {
+                window.downloadPDF('{{ $peserta->user->username }}');
+            }
+        });
+    </script>
+@endsection
+

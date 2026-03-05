@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('judul');
             $table->text('deskripsi');
             $table->string('file_path')->nullable();
-            $table->enum('status', ['Draft', 'Dikirim', 'Disetujui', 'Revisi'])
-                ->default('Draft');
+            $table->enum('status', ['Dikirim', 'Disetujui', 'Revisi'])
+                ->default('Dikirim');
             $table->text('catatan_admin')->nullable();
             $table->timestamps();
         });
