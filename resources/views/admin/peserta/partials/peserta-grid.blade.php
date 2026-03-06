@@ -136,12 +136,11 @@
                         <span>Hapus</span>
                     </button>
 
-                    <a href="{{ route('admin.peserta.print', $item->id) }}"
-                        target="_blank"
+                    <button data-print-id="{{ $item->id }}"
                         class="inline-flex items-center justify-center w-12 px-3 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 bg-gray-100 rounded-lg hover:bg-gray-200 hover:shadow-lg hover:scale-105"
                         title="Cetak ID Card">
                         <i class='text-base bx bx-id-card'></i>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>

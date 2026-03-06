@@ -374,6 +374,44 @@
         </div>
     </div>
 </div>
+
+<div id="printModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-900/50 backdrop-blur-sm" onclick="closePrintModal(event)"></div>
+<div id="printModal" class="hidden fixed inset-0 z-[40] overflow-y-auto flex items-center justify-center p-4">
+    <div class="relative w-full max-w-2xl transition-all transform bg-transparent">
+        <div class="absolute right-0 z-50 -top-12">
+            <button onclick="closePrintModal(event)" 
+                    class="flex items-center justify-center w-10 h-10 text-white transition-all bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md">
+                <i class='text-2xl bx bx-x'></i>
+            </button>
+        </div>
+        
+        <div class="overflow-hidden bg-white shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-100 rounded-lg">
+                        <i class='text-xl bx bx-id-card'></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Preview ID Card</h4>
+                        <p class="text-xs text-gray-500">Tampilan sebelum dicetak</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('printFrame').contentWindow.print()" 
+                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition-all rounded-lg bg-indigo-600 hover:bg-indigo-700 shadow-md active:scale-95">
+                    <i class='bx bx-printer'></i>
+                    <span>Cetak Sekarang</span>
+                </button>
+            </div>
+            <div class="relative bg-gray-100 aspect-[4/5] sm:aspect-video flex items-center justify-center p-8">
+                <div id="printLoader" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
+                    <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
+                    <p class="mt-3 text-sm font-medium text-gray-600">Menyiapkan Preview...</p>
+                </div>
+                <iframe id="printFrame" src="" class="w-full h-full border-none shadow-lg rounded-lg bg-white" onload="document.getElementById('printLoader').classList.add('opacity-0', 'pointer-events-none')"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
 @endpush
 
 @push('styles')
