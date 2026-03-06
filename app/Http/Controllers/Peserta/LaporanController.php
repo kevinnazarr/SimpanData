@@ -16,7 +16,7 @@ class LaporanController extends Controller
     public function index($editId = null)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->route('peserta.dashboard')
@@ -78,7 +78,7 @@ class LaporanController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->back()
@@ -142,7 +142,7 @@ class LaporanController extends Controller
     public function show(string $id)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->route('peserta.dashboard')
@@ -164,7 +164,7 @@ class LaporanController extends Controller
     public function update(Request $request, string $id)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->back()
@@ -226,7 +226,7 @@ class LaporanController extends Controller
     public function destroy(string $id)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->back()
@@ -256,7 +256,7 @@ class LaporanController extends Controller
     public function laporanAkhir()
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->route('peserta.dashboard')
@@ -294,7 +294,7 @@ class LaporanController extends Controller
     public function laporanAkhirStore(Request $request)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
@@ -339,7 +339,7 @@ class LaporanController extends Controller
     public function laporanAkhirUpdate(Request $request, $id)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->back()->with('error', 'Data peserta tidak ditemukan.');
@@ -390,7 +390,7 @@ class LaporanController extends Controller
     public function laporanAkhirShow($id)
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->first();
+        $peserta = Peserta::where('id', $user->id)->first();
 
         if (!$peserta) {
             return redirect()->route('peserta.dashboard')

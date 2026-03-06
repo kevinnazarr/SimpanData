@@ -56,7 +56,6 @@
                                 </div>
                             </div>
 
-                            {{-- Actions --}}
                             <div class="flex gap-2 mt-3">
                                 <button onclick="openDetailModal({{ $p->id }})"
                                     class="flex-1 px-3 py-2 text-sm font-medium text-indigo-600 transition-colors bg-indigo-50 rounded-lg hover:bg-indigo-100">
@@ -70,7 +69,6 @@
                                 </button>
                             </div>
                         @else
-                            {{-- Belum Dinilai --}}
                             <div class="p-3 rounded-lg bg-gray-50">
                                 <div class="flex items-center justify-center gap-2 text-gray-400">
                                     <i class='text-xl bx bx-time-five'></i>
@@ -78,7 +76,6 @@
                                 </div>
                             </div>
 
-                            {{-- Action --}}
                             <div class="mt-3">
                                 <button onclick="openPenilaianModal({{ $p->id }}, '{{ $p->nama }}', '{{ $p->asal_sekolah_universitas }}', '{{ $p->jurusan }}', '{{ $p->foto }}')"
                                     class="w-full px-3 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
@@ -93,7 +90,6 @@
         @endforeach
     </div>
 
-    {{-- Pagination --}}
     <div class="pt-4 mt-4 border-t border-gray-200">
         {{ $peserta->links() }}
     </div>

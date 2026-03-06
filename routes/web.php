@@ -146,6 +146,12 @@ Route::middleware(['auth', 'role:peserta'])->group(function () {
     Route::post('/peserta/feedback', [PesertaFeedbackController::class, 'store'])
         ->name('peserta.feedback.store');
 
+    Route::put('/peserta/feedback/{id}', [PesertaFeedbackController::class, 'update'])
+        ->name('peserta.feedback.update');
+
+    Route::delete('/peserta/feedback/{id}', [PesertaFeedbackController::class, 'destroy'])
+        ->name('peserta.feedback.destroy');
+
     Route::get('/peserta/settings', [PesertaSettingsController::class, 'index'])->name('peserta.settings.index');
     Route::post('/peserta/settings', [PesertaSettingsController::class, 'update'])->name('peserta.settings.update');
 });
@@ -209,6 +215,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
 
     Route::get('/admin/arsip', [AdminArsipController::class, 'index'])->name('admin.arsip.index');
+    Route::post('/admin/feedback', [\App\Http\Controllers\Admin\FeedbackController::class, 'store'])->name('admin.feedback.store');
+    Route::delete('/admin/feedback/{id}', [\App\Http\Controllers\Admin\FeedbackController::class, 'destroy'])->name('admin.feedback.destroy');
+    Route::post('/admin/feedback/{id}/mark-as-read', [\App\Http\Controllers\Admin\FeedbackController::class, 'markAsRead'])->name('admin.feedback.mark-as-read');
     Route::post('/admin/arsip/{id}/pulihkan', [AdminArsipController::class, 'pulihkan'])->name('admin.arsip.pulihkan');
     Route::delete('/admin/arsip/{id}', [AdminArsipController::class, 'destroy'])->name('admin.arsip.destroy');
 });

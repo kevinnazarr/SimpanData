@@ -165,14 +165,16 @@ class PesertaController extends Controller
 
     public function show($id)
     {
-        $peserta = Peserta::with(['user', 'absensis', 'laporans', 'feedbacks'])->findOrFail($id);
+        $peserta = Peserta::with([
+            'user', 
+            'absensis' => fn($q) => $q->orderBy('waktu_absen', 'desc'),
+            'laporans' => fn($q) => $q->orderBy('tanggal_laporan', 'desc'),
+            'feedbacks' => fn($q) => $q->orderBy('created_at', 'desc'),
+            'penilaian', 
+            'laporanAkhir'
+        ])->findOrFail($id);
 
-        if (request()->ajax()) {
-            $html = view('admin.peserta.partials.modal-show', compact('peserta'))->render();
-            return response()->json(['html' => $html]);
-        }
-
-        return redirect()->route('admin.peserta.index');
+        return view('admin.peserta.show', compact('peserta'));
     }
 
     public function edit($id)

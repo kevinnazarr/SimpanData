@@ -52,7 +52,7 @@ class ProfilController extends Controller
         ]);
         
         if ($request->hasFile('foto')) {
-            $peserta = \App\Models\Peserta::where('id', $user->id)->first();
+            $peserta = $user->peserta;
             if ($peserta && $peserta->foto) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($peserta->foto);
             }

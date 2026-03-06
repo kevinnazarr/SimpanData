@@ -14,7 +14,7 @@ class AbsensiController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->firstOrFail();
+        $peserta = Peserta::where('id', $user->id)->firstOrFail();
 
         $todayAttendance = Absensi::where('peserta_id', $peserta->id)
             ->whereDate('waktu_absen', Carbon::today())
@@ -51,7 +51,7 @@ class AbsensiController extends Controller
         }
 
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->firstOrFail();
+        $peserta = Peserta::where('id', $user->id)->firstOrFail();
 
         $jenisAbsen = $request->type == 'checkin' ? 'Masuk' : 'Pulang';
 
@@ -101,7 +101,7 @@ class AbsensiController extends Controller
     public function history()
     {
         $user = Auth::user();
-        $peserta = Peserta::where('user_id', $user->id)->firstOrFail();
+        $peserta = Peserta::where('id', $user->id)->firstOrFail();
 
         $absensiHistory = Absensi::where('peserta_id', $peserta->id)
             ->orderBy('waktu_absen', 'desc')
