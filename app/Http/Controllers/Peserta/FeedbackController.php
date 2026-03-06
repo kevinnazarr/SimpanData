@@ -55,4 +55,40 @@ class FeedbackController extends Controller
 
         return back()->with('success', 'Feedback berhasil dikirim!');
     }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'pesan' => 'required|string|max:1000',
+            'rating' => 'nullable|integer|min:1|max:5',
+        ]);
+
+        $feedback = Feedback::findOrFail($id);
+
+        $peserta = Auth::user()->peserta;
+        if (!$peserta || $feedback->peserta_id !== $peserta->id || $feedback->pengirim !== 'Peserta') {
+            return back()->with('error', 'Tindakan tidak diizinkan.');
+        }
+
+        $feedback->update([
+            'pesan' => $request->pesan,
+            'rating' => $request->rating,
+        ]);
+
+        return back()->with('success', 'Feedback berhasil diperbarui!');
+    }
+
+    public function destroy($id)
+    {
+        $feedback = Feedback::findOrFail($id);
+
+        $peserta = Auth::user()->peserta;
+        if (!$peserta || $feedback->peserta_id !== $peserta->id || $feedback->pengirim !== 'Peserta') {
+            return back()->with('error', 'Tindakan tidak diizinkan.');
+        }
+
+        $feedback->delete();
+
+        return back()->with('success', 'Feedback berhasil dihapus!');
+    }
 }

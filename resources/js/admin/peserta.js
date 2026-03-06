@@ -205,12 +205,6 @@ function bindActionButtons() {
         });
     });
 
-    document.querySelectorAll('[data-show-id]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = this.getAttribute('data-show-id');
-            openShowModal(id);
-        });
-    });
 
     document.querySelectorAll('[data-delete-id]').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -474,76 +468,6 @@ window.submitEditForm = function() {
     });
 };
 
-window.openShowModal = function(id) {
-    const modal = document.getElementById('showModal');
-    const content = document.getElementById('showModalContent');
-    const config = window.pesertaConfig || {};
-
-    content.innerHTML = `
-        <div class="py-12 text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-indigo-50">
-                <i class="text-3xl text-indigo-600 bx bx-loader-alt bx-spin spinner"></i>
-            </div>
-            <h3 class="mb-2 text-lg font-semibold text-gray-800">Memuat Data</h3>
-            <p class="text-gray-600">Mohon tunggu sebentar...</p>
-        </div>
-    `;
-
-    modal.classList.remove('hidden');
-    modal.classList.add('modal-enter');
-    document.getElementById('showModalOverlay').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    toggleBlur(true);
-
-    fetch(`${config.baseUrl}/${id}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-    })
-    .then(data => {
-        if (data.html) {
-            content.innerHTML = data.html;
-        } else {
-            throw new Error('Invalid response format');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        content.innerHTML = `
-            <div class="py-12 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-red-50">
-                    <i class="text-3xl text-red-600 bx bx-error"></i>
-                </div>
-                <h3 class="mb-2 text-lg font-semibold text-red-800">Gagal Memuat Data</h3>
-                <p class="mb-4 text-gray-600">Terjadi kesalahan saat memuat data</p>
-                <button onclick="openShowModal(${id})" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">
-                    <i class="mr-2 bx bx-refresh"></i>Coba Lagi
-                </button>
-            </div>
-        `;
-    });
-};
-
-window.closeShowModal = function(e) {
-    if (e) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-
-    preventMultipleCalls(() => {
-        const modal = document.getElementById('showModal');
-        modal.classList.remove('modal-enter');
-        modal.classList.add('hidden');
-        document.getElementById('showModalOverlay').classList.add('hidden');
-        document.body.style.overflow = '';
-        document.getElementById('showModalContent').innerHTML = '';
-        toggleBlur(false);
-    });
-};
 
 window.openDeleteModal = function(id, name, jenis) {
     currentDeleteId = id;
@@ -776,9 +700,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             break;
                         case 'editModal':
                             closeEditModal();
-                            break;
-                        case 'showModal':
-                            closeShowModal();
                             break;
                         case 'deleteModal':
                             closeDeleteModal();
