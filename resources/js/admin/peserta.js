@@ -220,6 +220,13 @@ function bindActionButtons() {
             openDeleteModal(id, name, jenis);
         });
     });
+
+    document.querySelectorAll('[data-print-id]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-print-id');
+            openPrintModal(id);
+        });
+    });
 }
 
 window.openCreateModal = function() {
@@ -578,6 +585,45 @@ window.closeDeleteModal = function(e) {
     });
 };
 
+window.openPrintModal = function(id) {
+    const modal = document.getElementById('printModal');
+    const overlay = document.getElementById('printModalOverlay');
+    const frame = document.getElementById('printFrame');
+    const loader = document.getElementById('printLoader');
+    const config = window.pesertaConfig || {};
+
+    if (!modal || !frame || !loader) return;
+
+    loader.classList.remove('opacity-0', 'pointer-events-none');
+    frame.src = `${config.baseUrl}/${id}/print-id-card`;
+    
+    modal.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    toggleBlur(true);
+};
+
+window.closePrintModal = function(e) {
+    if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    preventMultipleCalls(() => {
+        const modal = document.getElementById('printModal');
+        const overlay = document.getElementById('printModalOverlay');
+        const frame = document.getElementById('printFrame');
+
+        if (modal) {
+            modal.classList.add('hidden');
+            overlay.classList.add('hidden');
+            frame.src = '';
+            document.body.style.overflow = '';
+            toggleBlur(false);
+        }
+    });
+};
+
 window.confirmDeletePeserta = function() {
     if (!currentDeleteId) return;
 
@@ -720,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            const modals = ['createModal', 'editModal', 'showModal', 'deleteModal'];
+            const modals = ['createModal', 'editModal', 'showModal', 'deleteModal', 'printModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (modal && !modal.classList.contains('hidden')) {
@@ -736,6 +782,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             break;
                         case 'deleteModal':
                             closeDeleteModal();
+                            break;
+                        case 'printModal':
+                            closePrintModal();
                             break;
                     }
                 }
