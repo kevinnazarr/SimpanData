@@ -190,51 +190,58 @@
     <div class="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-12">
         <div class="p-6 lg:col-span-8 card md:p-8 shadow-soft hover:shadow-md transition-shadow duration-300">
             <h4 class="mb-6 text-lg font-bold tracking-tight uppercase text-slate-800">Feedback Peserta</h4>
-            <div
-                class="flex flex-col flex-1 p-0 space-y-3 md:space-y-4 overflow-y-auto min-h-0 max-h-[400px] feedback-scroll">
-                @forelse ($feedbacks as $feedback)
-                        <div class="flex gap-3 p-4 border border-slate-100 rounded-2xl hover:bg-slate-50/50 transition-colors duration-200 group relative">
-                            <div class="flex-shrink-0">
-                                @if($feedback->peserta->foto)
-                                    <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
-                                         class="object-cover w-12 h-12 shadow-sm rounded-xl border border-slate-100">
-                                @else
-                                    <div class="flex items-center justify-center w-12 h-12 font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                                        {{ strtoupper(substr($feedback->peserta->nama, 0, 1)) }}
-                                    </div>
-                                @endif
-                            </div>
+            <div class="relative group">
+                <div class="absolute top-0 left-0 right-0 z-10 h-8 pointer-events-none bg-gradient-to-b from-white to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                            <div class="flex-1">
-                                <div class="flex items-center justify-between mb-1">
-                                    <p class="text-sm font-bold text-slate-800">
-                                        {{ $feedback->peserta->nama }}
-                                    </p>
-                                    <div class="flex items-center gap-3">
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                            {{ $feedback->created_at->diffForHumans() }}
-                                        </p>
-                                        <button type="button" 
-                                            class="transition-all duration-200 p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg delete-feedback" 
-                                            data-id="{{ $feedback->id }}"
-                                            title="Hapus Feedback">
-                                            <i class='bx bx-trash text-lg'></i>
-                                        </button>
-                                    </div>
+                <div
+                    class="flex flex-col flex-1 px-1 py-2 space-y-3 md:space-y-4 overflow-y-auto min-h-0 max-h-[500px] feedback-scroll">
+                    @forelse ($feedbacks as $feedback)
+                            <div class="flex gap-3 p-4 border border-slate-100 rounded-2xl hover:bg-slate-50/50 transition-colors duration-200 group relative">
+                                <div class="flex-shrink-0">
+                                    @if($feedback->peserta->foto)
+                                        <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
+                                             class="object-cover w-12 h-12 shadow-sm rounded-xl border border-slate-100">
+                                    @else
+                                        <div class="flex items-center justify-center w-12 h-12 font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                                            {{ strtoupper(substr($feedback->peserta->nama, 0, 1)) }}
+                                        </div>
+                                    @endif
                                 </div>
-                                <p class="text-sm text-slate-600 leading-relaxed line-clamp-2 italic">
-                                    "{{ $feedback->pesan }}"
-                                </p>
+
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <p class="text-sm font-bold text-slate-800">
+                                            {{ $feedback->peserta->nama }}
+                                        </p>
+                                        <div class="flex items-center gap-3">
+                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                {{ $feedback->created_at->diffForHumans() }}
+                                            </p>
+                                            <button type="button" 
+                                                class="transition-all duration-200 p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg delete-feedback" 
+                                                data-id="{{ $feedback->id }}"
+                                                title="Hapus Feedback">
+                                                <i class='bx bx-trash text-lg'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-slate-600 leading-relaxed line-clamp-2 italic">
+                                        "{{ $feedback->pesan }}"
+                                    </p>
+                                </div>
                             </div>
+                    @empty
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                <i class='bx bx-message-square-detail text-3xl text-slate-300'></i>
+                            </div>
+                            <p class="text-sm font-medium text-slate-500">Belum ada feedback peserta</p>
                         </div>
-                @empty
-                    <div class="flex flex-col items-center justify-center py-12 text-center">
-                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                            <i class='bx bx-message-square-detail text-3xl text-slate-300'></i>
-                        </div>
-                        <p class="text-sm font-medium text-slate-500">Belum ada feedback peserta</p>
-                    </div>
-                @endforelse
+                    @endforelse
+                </div>
+
+                <!-- Bottom Fade -->
+                <div class="absolute bottom-0 left-0 right-0 z-10 h-12 pointer-events-none bg-gradient-to-t from-white via-white/80 to-transparent"></div>
             </div>
         </div>
 
@@ -322,6 +329,7 @@
 @endpush
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.dashboardData = {
             totalPkl: {{ $totalPkl ?? 0 }},

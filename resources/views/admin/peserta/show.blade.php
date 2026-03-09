@@ -4,6 +4,7 @@
 
 @section('content')
     <div class="p-4 md:p-6 lg:p-8 bg-gray-50/50 min-h-screen">
+        <input type="hidden" name="peserta_id" value="{{ $peserta->id }}">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 md:mb-10">
             <div class="flex items-center gap-4 md:gap-5">
                 <a href="{{ route('admin.peserta.index') }}"
@@ -306,86 +307,15 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                @forelse($peserta->absensis->sortByDesc('waktu_absen') as $index => $absensi)
-                                    <tr class="hover:bg-gray-50/50 transition-all duration-300">
-                                        <td class="px-6 py-4 text-gray-500 font-bold">{{ $index + 1 }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center gap-3">
-                                                <div
-                                                    class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-xs font-black">
-                                                    {{ $absensi->waktu_absen->format('d') }}
-                                                </div>
-                                                <div>
-                                                    <p class="text-sm font-black text-gray-900 leading-none mb-1">
-                                                        {{ $absensi->waktu_absen->format('H:i') }} <span
-                                                            class="text-[8px] text-gray-400 font-bold ml-0.5">WIB</span>
-                                                    </p>
-                                                    <p
-                                                        class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
-                                                        {{ $absensi->waktu_absen->format('Y-m-d') }}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <span
-                                                class="px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg {{ $absensi->jenis_absen === 'Masuk' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700' }}">
-                                                {{ $absensi->jenis_absen }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @if ($absensi->mode_kerja === 'WFO')
-                                                <span
-                                                    class="px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-700 bg-indigo-100 rounded-lg">WFO</span>
-                                            @elseif($absensi->mode_kerja === 'WFA')
-                                                <span
-                                                    class="px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-purple-700 bg-purple-100 rounded-lg">WFA</span>
-                                            @else
-                                                <span
-                                                    class="px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500 bg-gray-100 rounded-lg">-</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <span
-                                                class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest
-                                        {{ $absensi->status === 'Hadir' ? 'bg-emerald-100 text-emerald-700' : ($absensi->status === 'Izin' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700') }}">
-                                                {{ $absensi->status }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-600 font-medium">
-                                            <p class="text-xs italic line-clamp-1 max-w-[150px]">
-                                                "{{ $absensi->wa_pengirim ?: '-' }}"</p>
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            @if ($absensi->latitude && $absensi->longitude)
-                                                <button
-                                                    onclick="showMap('{{ $absensi->latitude }}', '{{ $absensi->longitude }}')"
-                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:border-blue-300 transition-all group">
-                                                    <i class='bx bx-map-pin'></i>
-                                                    <span>Detail</span>
-                                                    <i
-                                                        class='bx bx-chevron-right transition-transform group-hover:translate-x-0.5'></i>
-                                                </button>
-                                            @else
-                                                <span
-                                                    class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">N/A</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="px-6 py-20 text-center">
-                                            <div class="flex flex-col items-center">
-                                                <i class='bx bx-calendar-x text-5xl text-gray-200 mb-2'></i>
-                                                <p class="text-gray-400 font-black uppercase tracking-widest text-[10px]">
-                                                    Data Absensi Kosong</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
+                            <tbody class="divide-y divide-gray-100" id="absensi-container">
+                                @include('admin.peserta.partials.absensi-rows', ['absensis' => $absensis])
                             </tbody>
                         </table>
                     </div>
+                    <div id="absensi-pagination" class="mt-4">
+                        {{ $absensis->appends(['laporan_page' => $laporans->currentPage()])->links() }}
+                    </div>
+                </div>
                 </div>
 
                 <div id="tab-laporan" class="tab-panel animate-fade-in hidden">
@@ -393,66 +323,13 @@
                         <h3 class="text-lg font-bold text-gray-900 font-display">Log Kegiatan Harian</h3>
                     </div>
 
-                    <div
-                        class="space-y-10 relative before:absolute before:left-[19px] before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-indigo-50 before:via-indigo-200 before:to-indigo-50">
-                        @forelse($peserta->laporans as $laporan)
-                            <div class="relative pl-14 group">
-                                <div
-                                    class="absolute left-0 top-1 w-10 h-10 bg-white border-2 border-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all duration-500 z-10 shadow-sm shadow-indigo-100/50">
-                                    <i class='bx bx-file-blank text-xl'></i>
-                                </div>
-                                <div
-                                    class="bg-white border border-gray-100 rounded-[2rem] p-8 hover:border-indigo-100 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-500">
-                                    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-                                        <div class="flex-1">
-                                            <div class="flex flex-wrap items-center gap-3 mb-4">
-                                                <h4
-                                                    class="text-lg font-black text-gray-900 group-hover:text-indigo-700 transition-colors font-display tracking-tight">
-                                                    {{ $laporan->judul }}</h4>
-                                                <span
-                                                    class="px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border {{ $laporan->status == 'Disetujui' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : ($laporan->status == 'Revisi' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-indigo-50 text-indigo-600 border-indigo-100') }}">
-                                                    {{ $laporan->status }}
-                                                </span>
-                                            </div>
-                                            <p class="text-sm text-gray-500 font-medium leading-relaxed mb-6 italic">
-                                                "{{ $laporan->deskripsi }}"</p>
-
-                                            <div class="flex flex-wrap items-center gap-6">
-                                                <div
-                                                    class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">
-                                                    <i class='bx bx-time-five text-base text-indigo-300'></i>
-                                                    {{ $laporan->tanggal_laporan->format('d F Y') }}
-                                                </div>
-                                                @if ($laporan->file_path)
-                                                    <a href="{{ asset('storage/' . $laporan->file_path) }}" target="_blank"
-                                                        class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-4 py-1.5 rounded-xl border border-indigo-100 transition-all">
-                                                        <i class='bx bx-link-alt text-base'></i>
-                                                        Berkas Pendukung
-                                                    </a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="flex">
-                                            <a href="{{ route('admin.laporan.harian.show', $laporan->id) }}"
-                                                class="w-full lg:w-auto px-8 py-3 bg-gray-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-gray-200 text-center">
-                                                Review Detail
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div
-                                class="py-20 text-center bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100">
-                                <div
-                                    class="w-20 h-20 bg-white border border-gray-100 rounded-[2rem] flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                    <i class='bx bx-ghost text-4xl text-gray-200'></i>
-                                </div>
-                                <p class="text-gray-400 font-black uppercase tracking-widest text-[10px]">Log laporan masih
-                                    kosong</p>
-                            </div>
-                        @endforelse
+                    <div class="space-y-10 relative before:absolute before:left-[19px] before:top-4 before:bottom-4 before:w-0.5 before:bg-gradient-to-b before:from-indigo-50 before:via-indigo-200 before:to-indigo-50" id="laporan-container">
+                        @include('admin.peserta.partials.laporan-rows', ['laporans' => $laporans])
                     </div>
+                    <div id="laporan-pagination" class="mt-8">
+                        {{ $laporans->appends(['absensi_page' => $absensis->currentPage()])->links() }}
+                    </div>
+                </div>
                 </div>
 
                 <div id="tab-pajak" class="tab-panel animate-fade-in hidden">

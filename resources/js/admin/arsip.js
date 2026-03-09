@@ -17,8 +17,10 @@ function fetchTable() {
     const newUrl = arsipUrl + (params.toString() ? '?' + params.toString() : '');
     window.history.replaceState(null, '', newUrl);
 
-    tableCard.style.opacity = '0.5';
-    tableCard.style.pointerEvents = 'none';
+    if (tableCard) {
+        tableCard.style.opacity = '0.5';
+        tableCard.style.pointerEvents = 'none';
+    }
 
     fetch(arsipUrl + '?' + params.toString(), {
         headers: {
@@ -28,21 +30,26 @@ function fetchTable() {
     })
     .then(r => r.json())
     .then(data => {
-        tableCard.innerHTML = data.table;
-        tableCard.style.opacity = '1';
-        tableCard.style.pointerEvents = '';
+        if (tableCard) {
+            tableCard.innerHTML = data.table;
+            tableCard.style.opacity = '1';
+            tableCard.style.pointerEvents = '';
+        }
     })
     .catch(() => {
-        tableCard.style.opacity = '1';
-        tableCard.style.pointerEvents = '';
+        if (tableCard) {
+            tableCard.style.opacity = '1';
+            tableCard.style.pointerEvents = '';
+        }
     });
 }
 
-function resetFilter() {
-    searchInput.value = '';
-    filterJenis.value = '';
+// Global reset function
+window.resetFilter = function() {
+    if (searchInput) searchInput.value = '';
+    if (filterJenis) filterJenis.value = '';
     fetchTable();
-}
+};
 
 searchInput?.addEventListener('input', () => {
     clearTimeout(debounceTimer);
@@ -51,7 +58,23 @@ searchInput?.addEventListener('input', () => {
 
 filterJenis?.addEventListener('change', fetchTable);
 
-window.pulihkan = function (id, nama) {
+// Event Delegation for Table Actions
+tableCard?.addEventListener('click', function(e) {
+    const btnPulihkan = e.target.closest('.btn-pulihkan');
+    const btnHapus = e.target.closest('.btn-hapus');
+
+    if (btnPulihkan) {
+        const id = btnPulihkan.dataset.id;
+        const nama = btnPulihkan.dataset.nama;
+        handlePulihkan(id, nama);
+    } else if (btnHapus) {
+        const id = btnHapus.dataset.id;
+        const nama = btnHapus.dataset.nama;
+        handleHapusPermanent(id, nama);
+    }
+});
+
+function handlePulihkan(id, nama) {
     Swal.fire({
         title: 'Pulihkan Peserta?',
         html: `Data <strong>${nama}</strong> akan dikembalikan ke status <strong>Selesai</strong>.`,
@@ -70,7 +93,7 @@ window.pulihkan = function (id, nama) {
     }).then(result => {
         if (!result.isConfirmed) return;
 
-        fetch(`/admin/arsip/${id}/pulihkan`, {
+        fetch(`${arsipUrl}/${id}/pulihkan`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -88,9 +111,9 @@ window.pulihkan = function (id, nama) {
         })
         .catch(() => showErrorToast('Koneksi bermasalah. Coba lagi.'));
     });
-};
+}
 
-window.hapusPermanent = function (id, nama) {
+function handleHapusPermanent(id, nama) {
     Swal.fire({
         title: 'Hapus Permanen?',
         html: `<div class="text-left text-sm text-gray-600">
@@ -112,7 +135,7 @@ window.hapusPermanent = function (id, nama) {
     }).then(result => {
         if (!result.isConfirmed) return;
 
-        fetch(`/admin/arsip/${id}`, {
+        fetch(`${arsipUrl}/${id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -130,7 +153,7 @@ window.hapusPermanent = function (id, nama) {
         })
         .catch(() => showErrorToast('Koneksi bermasalah. Coba lagi.'));
     });
-};
+}
 
 function showSuccessToast(message) {
     Swal.fire({

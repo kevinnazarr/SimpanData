@@ -11,6 +11,9 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $baseQuery = User::where('role', 'peserta')
+            ->whereHas('peserta', function ($q) {
+                $q->active();
+            })
             ->with('peserta')
             ->latest();
 
