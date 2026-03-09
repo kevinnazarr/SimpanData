@@ -13,6 +13,7 @@ use App\Models\LaporanAkhir;
  * @property string $nama
  * @property string $asal_sekolah_universitas
  * @property string $jurusan
+ * @property string|null $tugas
  * @property string|null $alamat
  * @property string|null $no_telepon
  * @property string $jenis_kegiatan
@@ -73,6 +74,7 @@ class Peserta extends Model
         'nama',
         'asal_sekolah_universitas',
         'jurusan',
+        'tugas',
         'alamat',
         'no_telepon',
         'jenis_kegiatan',
@@ -163,6 +165,8 @@ class Peserta extends Model
                $this->asal_sekolah_universitas !== '-' &&
                !empty($this->jurusan) &&
                $this->jurusan !== '-' &&
+               !empty($this->tugas) &&
+               $this->tugas !== '-' &&
                !empty($this->alamat) &&
                $this->alamat !== '-' &&
                !empty($this->no_telepon) &&

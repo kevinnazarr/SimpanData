@@ -303,6 +303,7 @@ class AuthController extends Controller
                 'nama' => $request->username,
                 'asal_sekolah_universitas' => '-',
                 'jurusan' => '-',
+                'tugas' => '-',
                 'jenis_kegiatan' => 'Magang',
                 'tanggal_mulai' => now(),
                 'tanggal_selesai' => now()->addMonths(3),

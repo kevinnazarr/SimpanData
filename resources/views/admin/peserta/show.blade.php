@@ -26,6 +26,11 @@
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <button onclick="openPrintModal('{{ $peserta->id }}')"
+                    class="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-2xl hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-100 transition-all duration-300 shadow-sm font-bold text-sm">
+                    <i class='bx bx-id-card text-xl'></i>
+                    <span>Cetak ID Card</span>
+                </button>
                 <button onclick="window.print()"
                     class="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-2xl hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-100 transition-all duration-300 shadow-sm font-bold text-sm">
                     <i class='bx bx-printer text-xl'></i>
@@ -75,6 +80,11 @@
                                         {{ $peserta->nama }}</h1>
                                     <span
                                         class="px-3 py-1.5 {{ $peserta->status == 'Aktif' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100' }} text-[9px] font-black uppercase tracking-[0.2em] rounded-xl border-2">{{ $peserta->status }}</span>
+                                    @if($peserta->tugas)
+                                        <span class="px-3 py-1.5 bg-indigo-50 text-indigo-600 border-indigo-100 text-[9px] font-black uppercase tracking-[0.2em] rounded-xl border-2">
+                                            <i class='bx bx-task mr-1 text-[10px]'></i> {{ $peserta->tugas }}
+                                        </span>
+                                    @endif
                                 </div>
                                 <div
                                     class="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4 text-[10px] md:text-xs font-bold text-gray-400">
@@ -138,6 +148,20 @@
                                                     class="text-sm font-black text-gray-700 font-display leading-tight">{{ $peserta->jurusan ?: '-' }}</span>
                                             </div>
                                         </div>
+                                        @if($peserta->tugas)
+                                        <div class="flex items-center gap-3 group/item">
+                                            <div
+                                                class="w-9 h-9 bg-white border border-gray-100 text-indigo-500 rounded-xl flex items-center justify-center shadow-sm group-hover/item:bg-indigo-500 group-hover/item:text-white transition-all">
+                                                <i class='bx bx-task text-xl'></i>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span
+                                                    class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Tugas</span>
+                                                <span
+                                                    class="text-sm font-black text-gray-700 font-display leading-tight">{{ $peserta->tugas }}</span>
+                                            </div>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -535,67 +559,108 @@
     </div>
 
     @vite(['resources/css/admin/monitoring.css', 'resources/js/admin/monitoring.js'])
+@endsection
 
-    @push('modals')
-        <div id="map-modal" class="fixed inset-0 z-30 hidden items-center justify-center p-3 md:p-6">
-            <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-all duration-500" onclick="closeMap()">
-            </div>
-            <div class="relative w-full max-w-3xl animate-fade-in-up">
-                <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20">
-                    <div
-                        class="p-5 md:p-8 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-md">
-                        <div class="flex items-center gap-3 md:gap-4">
-                            <div
-                                class="w-10 h-10 md:w-14 md:h-14 bg-indigo-50 text-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm border border-indigo-100/50">
-                                <i class='bx bx-map-pin text-xl md:text-2xl'></i>
-                            </div>
-                            <div>
-                                <h3
-                                    class="text-base md:text-xl font-black text-gray-900 font-display tracking-tight leading-none mb-1 md:mb-1.5">
-                                    Lokasi Real-time</h3>
-                                <p class="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest"
-                                    id="map-coords-text">Mendeteksi Koordinat...</p>
-                            </div>
+@push('modals')
+    <div id="map-modal" class="fixed inset-0 z-30 hidden items-center justify-center p-3 md:p-6">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-all duration-500" onclick="closeMap()"></div>
+        <div class="relative w-full max-w-3xl animate-fade-in-up">
+            <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20">
+                <div class="p-5 md:p-8 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-md">
+                    <div class="flex items-center gap-3 md:gap-4">
+                        <div class="w-10 h-10 md:w-14 md:h-14 bg-indigo-50 text-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm border border-indigo-100/50">
+                            <i class='bx bx-map-pin text-xl md:text-2xl'></i>
                         </div>
-                        <button onclick="closeMap()"
-                            class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 text-gray-400 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all">
-                            <i class='bx bx-x text-xl md:text-2xl'></i>
-                        </button>
+                        <div>
+                            <h3 class="text-base md:text-xl font-black text-gray-900 font-display tracking-tight leading-none mb-1 md:mb-1.5">Lokasi Real-time</h3>
+                            <p class="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest" id="map-coords-text">Mendeteksi Koordinat...</p>
+                        </div>
                     </div>
-
-                    <div class="relative">
-                        <div id="map-container-leaflet" class="w-full h-[300px] md:h-[450px] bg-gray-50"></div>
-
-                        <div class="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 z-[1000] animate-fade-in"
-                            id="map-address-card" style="display: none;">
-                            <div
-                                class="bg-white/90 backdrop-blur-xl p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-2xl border border-white flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
-                                <div class="flex items-start gap-3 md:gap-4 flex-1">
-                                    <div
-                                        class="w-8 h-8 md:w-10 md:h-10 bg-indigo-600 text-white rounded-lg md:rounded-xl flex items-center justify-center shrink-0">
-                                        <i class='bx bx-current-location text-lg'></i>
-                                    </div>
-                                    <div>
-                                        <h4
-                                            class="text-[8px] md:text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">
-                                            Alamat Terdeteksi</h4>
-                                        <p class="text-xs md:text-sm font-bold text-gray-800 leading-relaxed font-display line-clamp-2"
-                                            id="location-address">Mengambil data alamat...</p>
-                                    </div>
+                    <button onclick="closeMap()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 text-gray-400 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all">
+                        <i class='bx bx-x text-xl md:text-2xl'></i>
+                    </button>
+                </div>
+                <div class="relative">
+                    <div id="map-container-leaflet" class="w-full h-[300px] md:h-[450px] bg-gray-50"></div>
+                    <div class="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 z-[1000] animate-fade-in" id="map-address-card" style="display: none;">
+                        <div class="bg-white/90 backdrop-blur-xl p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-2xl border border-white flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+                            <div class="flex items-start gap-3 md:gap-4 flex-1">
+                                <div class="w-8 h-8 md:w-10 md:h-10 bg-indigo-600 text-white rounded-lg md:rounded-xl flex items-center justify-center shrink-0">
+                                    <i class='bx bx-current-location text-lg'></i>
                                 </div>
-                                <a href="#" id="google-maps-link" target="_blank"
-                                    class="w-full md:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 text-center flex items-center justify-center gap-2">
-                                    <i class='bx bxl-google text-base md:text-lg'></i>
-                                    <span>Google Maps</span>
-                                </a>
+                                <div>
+                                    <h4 class="text-[8px] md:text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">Alamat Terdeteksi</h4>
+                                    <p class="text-xs md:text-sm font-bold text-gray-800 leading-relaxed font-display line-clamp-2" id="location-address">Mengambil data alamat...</p>
+                                </div>
                             </div>
+                            <a href="#" id="google-maps-link" target="_blank" class="w-full md:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 text-center flex items-center justify-center gap-2">
+                                <i class='bx bxl-google text-base md:text-lg'></i>
+                                <span>Google Maps</span>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    @endpush
+    </div>
+@endpush
 
+@push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+@endpush
+
+@push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@endpush
+@push('modals')
+<div id="printModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-900/50 backdrop-blur-sm" onclick="closePrintModal(event)"></div>
+<div id="printModal" class="hidden fixed inset-0 z-[40] overflow-y-auto items-center justify-center p-4">
+    <div class="relative w-full max-w-2xl transition-all transform bg-transparent">
+        <div class="absolute right-0 z-50 -top-12">
+            <button onclick="closePrintModal(event)" 
+                    class="flex items-center justify-center w-10 h-10 text-white transition-all bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md">
+                <i class='text-2xl bx bx-x'></i>
+            </button>
+        </div>
+        
+        <div class="overflow-hidden bg-white shadow-2xl rounded-2xl">
+            <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-100 rounded-lg">
+                        <i class='text-xl bx bx-id-card'></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Preview ID Card</h4>
+                        <p class="text-xs text-gray-500">Tampilan sebelum dicetak</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('printFrame').contentWindow.print()" 
+                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition-all rounded-lg bg-indigo-600 hover:bg-indigo-700 shadow-md active:scale-95">
+                    <i class='bx bx-printer'></i>
+                    <span>Cetak Sekarang</span>
+                </button>
+            </div>
+            <div class="relative bg-gray-100 aspect-[4/5] sm:aspect-video flex items-center justify-center p-8">
+                <div id="printLoader" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
+                    <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
+                    <p class="mt-3 text-sm font-medium text-gray-600">Menyiapkan Preview...</p>
+                </div>
+                <iframe id="printFrame" src="" class="w-full h-full border-none shadow-lg rounded-lg bg-white" onload="document.getElementById('printLoader').classList.add('opacity-0', 'pointer-events-none')"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+@endpush
+
+@push('styles')
+    @vite('resources/css/admin/peserta.css')
+@endpush
+
+@section('scripts')
+<script>
+    window.pesertaConfig = {
+        baseUrl: '{{ url('admin/peserta') }}'
+    };
+</script>
+@vite('resources/js/admin/peserta.js')
 @endsection
