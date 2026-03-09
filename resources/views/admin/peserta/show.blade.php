@@ -217,7 +217,7 @@
             </div>
 
             <div class="lg:col-span-1">
-                <div onclick="switchTab('penilaian')"
+                <div onclick="window.location.href='{{ route('admin.penilaian.form', $peserta->id) }}'"
                     class="h-full bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-3xl p-6 md:p-8 shadow-xl shadow-indigo-100/50 text-white overflow-hidden relative group cursor-pointer hover:-translate-y-1 transition-all duration-300 flex flex-col justify-center min-h-[160px] md:min-h-0">
                     <div
                         class="absolute -right-8 -bottom-8 opacity-10 group-hover:scale-110 transition-transform duration-700 rotate-12">
@@ -660,7 +660,7 @@
     @vite(['resources/css/admin/monitoring.css', 'resources/js/admin/monitoring.js'])
 
     @push('modals')
-        <div id="map-modal" class="fixed inset-0 z-30 flex hidden  items-center justify-center p-3 md:p-6">
+        <div id="map-modal" class="fixed inset-0 z-30 hidden items-center justify-center p-3 md:p-6">
             <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-all duration-500" onclick="closeMap()">
             </div>
             <div class="relative w-full max-w-3xl animate-fade-in-up">

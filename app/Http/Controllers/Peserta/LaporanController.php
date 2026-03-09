@@ -52,13 +52,13 @@ class LaporanController extends Controller
             ->orderBy('tanggal_laporan', 'desc')
             ->get();
 
-        $search = request('search');
+        $search = mb_strtolower(request('search'));
 
         $historyLaporan = Laporan::where('peserta_id', $peserta->id)
             ->when($search, function($query, $search) {
                 return $query->where(function($q) use ($search) {
-                    $q->where('judul', 'like', "%{$search}%")
-                      ->orWhere('deskripsi', 'like', "%{$search}%");
+                    $q->whereRaw('LOWER(judul) LIKE ?', ["%{$search}%"])
+                      ->orWhereRaw('LOWER(deskripsi) LIKE ?', ["%{$search}%"]);
                 });
             })
             ->orderBy('tanggal_laporan', 'desc')
@@ -267,11 +267,11 @@ class LaporanController extends Controller
             ->latest()
             ->first();
 
-        $search = request('search');
+        $search = mb_strtolower(request('search'));
 
         $historyLaporanAkhir = LaporanAkhir::where('peserta_id', $peserta->id)
             ->when($search, function($query, $search) {
-                return $query->where('judul', 'like', "%{$search}%");
+                return $query->whereRaw('LOWER(judul) LIKE ?', ["%{$search}%"]);
             })
             ->latest()
             ->paginate(5, ['*'], 'final_page')
@@ -371,6 +371,10 @@ class LaporanController extends Controller
 
         $filePath = $laporanAkhir->file_path;
         if ($request->hasFile('file')) {
+            if ($laporanAkhir->file_path && Storage::disk('public')->exists($laporanAkhir->file_path)) {
+                Storage::disk('public')->delete($laporanAkhir->file_path);
+            }
+
             $file = $request->file('file');
             $filePath = $file->store('laporan_akhir', 'public');
         }

@@ -30,21 +30,20 @@ class Penilaian extends Model
     protected $fillable = [
         'peserta_id',
         'user_id',
-        'kedisiplinan',
-        'keterampilan',
-        'kerjasama',
-        'inisiatif',
-        'komunikasi',
         'nilai_akhir',
         'catatan',
     ];
 
     /**
-     * Hitung nilai akhir dari rata-rata semua aspek
+     * Hitung nilai akhir dari rata-rata semua aspek yang ada
+     * Ini bisa dipanggil sebelum save untuk kalkulasi nilai akhir
      */
-    public static function hitungNilaiAkhir(int $kedisiplinan, int $keterampilan, int $kerjasama, int $inisiatif, int $komunikasi): int
+    public function hitungNilaiAkhirLagi(): void
     {
-        return (int) round(($kedisiplinan + $keterampilan + $kerjasama + $inisiatif + $komunikasi) / 5);
+        if ($this->details()->count() > 0) {
+            $this->nilai_akhir = round($this->details()->avg('nilai'));
+            $this->save();
+        }
     }
 
     /**
@@ -73,5 +72,13 @@ class Penilaian extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relasi ke detail penilaian
+     */
+    public function details()
+    {
+        return $this->hasMany(PenilaianDetail::class);
     }
 }

@@ -43,16 +43,31 @@
             @php $n = $peserta->penilaian; @endphp
 
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 no-print">
-                <div class="flex flex-col items-center justify-center p-8 lg:col-span-4 card shadow-soft bg-gradient-to-br from-indigo-600 to-purple-700 animate-fade-in-up" style="animation-delay: 100ms">
-                    <p class="mb-4 text-sm font-bold tracking-widest uppercase text-white/80">Nilai Akhir</p>
-                    <div class="relative flex items-center justify-center w-40 h-40 mb-6 border rounded-full bg-white/10 backdrop-blur-sm border-white/20 animate-pulse-subtle">
-                        <div class="text-center">
-                            <h2 class="text-6xl font-black leading-none text-white">{{ $n->nilai_akhir }}</h2>
-                            <p class="mt-1 text-xs font-bold uppercase text-white/70">Skor Indeks</p>
+                <div class="flex flex-col items-center justify-center p-8 lg:col-span-4 card shadow-soft bg-gradient-to-br from-indigo-600 to-purple-700 animate-fade-in-up relative overflow-hidden" style="animation-delay: 100ms">
+                    <!-- Ornamen background -->
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-5 rounded-full blur-2xl"></div>
+                    <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white opacity-5 rounded-full blur-2xl"></div>
+
+                    <p class="mb-6 text-sm font-bold tracking-widest uppercase text-indigo-100">Nilai Akhir</p>
+
+                    <!-- Kotak Indeks -->
+                    <div class="relative flex items-center justify-center w-48 h-48 mb-8">
+                        <div class="absolute inset-0 border-4 border-white/20 rounded-full" style="border-top-color: rgba(255,255,255,0.7); animation: spin 8s linear infinite;"></div>
+                        <div class="absolute inset-2 border border-white/20 rounded-full"></div>
+                        <div class="relative flex flex-col items-center justify-center w-40 h-40 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.15)]">
+                            <h2 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-indigo-100 tracking-tighter">{{ round($n->nilai_akhir) }}</h2>
+                            <p class="mt-1 text-[10px] font-bold tracking-widest uppercase text-white/70">Skor Indeks</p>
                         </div>
                     </div>
-                    <div class="px-6 py-2 transition duration-300 transform bg-white rounded-full shadow-lg hover:scale-105">
-                        <p class="text-lg font-black text-indigo-900">Grade: <span class="text-2xl">{{ $n->grade }}</span></p>
+
+                    <div class="flex items-center gap-3 px-6 py-3 transition duration-300 transform bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg hover:bg-white/20">
+                        <div class="flex items-center justify-center w-10 h-10 bg-white rounded-xl shadow-sm">
+                            <i class='bx bx-award text-2xl text-indigo-600'></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold tracking-widest uppercase text-white/70 leading-none mb-1">Grade Predikat</p>
+                            <p class="text-2xl font-black text-white leading-none">{{ $n->grade }}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -60,13 +75,27 @@
                     <h4 class="mb-6 text-lg font-bold uppercase text-slate-800">Rincian Kompetensi</h4>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                         @php
-                            $aspek = [
-                                ['label' => 'Kedisiplinan', 'icon' => 'bx-time', 'val' => $n->kedisiplinan, 'color' => 'indigo', 'delay' => '300ms'],
-                                ['label' => 'Keterampilan', 'icon' => 'bx-code-alt', 'val' => $n->keterampilan, 'color' => 'purple', 'delay' => '400ms'],
-                                ['label' => 'Kerjasama', 'icon' => 'bx-group', 'val' => $n->kerjasama, 'color' => 'emerald', 'delay' => '500ms'],
-                                ['label' => 'Inisiatif', 'icon' => 'bx-bulb', 'val' => $n->inisiatif, 'color' => 'amber', 'delay' => '600ms'],
-                                ['label' => 'Komunikasi', 'icon' => 'bx-message-dots', 'val' => $n->komunikasi, 'color' => 'blue', 'delay' => '700ms'],
-                            ];
+                            $icons = ['bx-star', 'bx-award', 'bx-check-shield', 'bx-trophy', 'bx-target-lock', 'bx-bulb', 'bx-time', 'bx-group', 'bx-message-dots', 'bx-medal'];
+                            $colors = ['indigo', 'purple', 'emerald', 'amber', 'blue', 'rose', 'cyan', 'fuchsia'];
+                            $aspek = [];
+                            $delayMs = 300;
+
+                            if (isset($n->details) && $n->details->count() > 0) {
+                                foreach($n->details as $index => $detail) {
+                                    $aspek[] = [
+                                        'label' => $detail->kategori->nama ?? 'Kriteria',
+                                        'icon'  => $icons[$index % count($icons)],
+                                        'val'   => $detail->nilai,
+                                        'color' => $colors[$index % count($colors)],
+                                        'delay' => $delayMs . 'ms'
+                                    ];
+                                    $delayMs += 100;
+                                }
+                            } else {
+                                $aspek = [
+                                    ['label' => 'Belum ada rincian data', 'icon' => 'bx-info-circle', 'val' => 0, 'color' => 'gray', 'delay' => '300ms']
+                                ];
+                            }
                         @endphp
 
                         @foreach($aspek as $a)
@@ -136,7 +165,7 @@
 
                             <div class="certificate-body">
                                 <h3 class="title-competency">DAFTAR KOMPETENSI</h3>
-                                
+
                                 <table class="table-competency">
                                     <thead>
                                         <tr>
@@ -157,7 +186,7 @@
                                     <tfoot>
                                         <tr class="font-bold bg-slate-50">
                                             <td colspan="2" class="text-right">Rata-rata</td>
-                                            <td class="col-score">{{ $n->nilai_akhir }}</td>
+                                            <td class="col-score">{{ round($n->nilai_akhir) }}</td>
                                         </tr>
                                     </tfoot>
                                 </table>

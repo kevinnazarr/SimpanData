@@ -15,12 +15,12 @@ class UserController extends Controller
             ->latest();
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search);
             $baseQuery->where(function ($q) use ($search) {
-                $q->where('username', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
+                $q->whereRaw('LOWER(username) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"])
                     ->orWhereHas('peserta', function ($pesertaQuery) use ($search) {
-                        $pesertaQuery->where('nama', 'like', "%{$search}%");
+                        $pesertaQuery->whereRaw('LOWER(nama) LIKE ?', ["%{$search}%"]);
                     });
             });
         }

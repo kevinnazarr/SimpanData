@@ -106,6 +106,7 @@ window.showMap = function(lat, lng) {
     externalLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
     
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
     document.body.classList.add('overflow-hidden');
     
     setTimeout(() => {
@@ -143,5 +144,6 @@ window.closeMap = function() {
         monitoringMap = null;
     }
     modal.classList.add('hidden');
+    modal.classList.remove('flex');
     document.body.classList.remove('overflow-hidden');
 };

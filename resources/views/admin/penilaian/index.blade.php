@@ -90,7 +90,7 @@
                                     Rata-rata Nilai
                                 </p>
                                 <h3 class="text-3xl font-bold text-white" id="statRataRata">
-                                    {{ number_format($rataRataNilai, 1) }}
+                                    {{ round($rataRataNilai) }}
                                 </h3>
                                 <p class="mt-1 text-xs text-white/70">Dari 100</p>
                             </div>

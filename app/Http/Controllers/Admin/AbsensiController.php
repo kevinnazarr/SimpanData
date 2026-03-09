@@ -59,35 +59,23 @@ class AbsensiController extends Controller
             ->paginate(10)->onEachSide(1)
             ->withQueryString();
 
-        $hadirMasuk = (clone $baseQuery)
-            ->where('status', 'Hadir')
-            ->where('jenis_absen', 'Masuk')
-            ->count();
+        $stats = (clone $baseQuery)
+            ->selectRaw("
+                count(case when status = 'Hadir' and jenis_absen = 'Masuk' then 1 end) as hadir_masuk,
+                count(case when status = 'Hadir' and jenis_absen = 'Pulang' then 1 end) as hadir_pulang,
+                count(case when status = 'Izin' then 1 end) as izin,
+                count(case when status = 'Sakit' then 1 end) as sakit,
+                count(case when status = 'Hadir' and jenis_absen = 'Masuk' and mode_kerja = 'WFO' then 1 end) as wfo,
+                count(case when status = 'Hadir' and jenis_absen = 'Masuk' and mode_kerja = 'WFA' then 1 end) as wfa
+            ")
+            ->first();
 
-        $hadirPulang = (clone $baseQuery)
-            ->where('status', 'Hadir')
-            ->where('jenis_absen', 'Pulang')
-            ->count();
-
-        $izin = (clone $baseQuery)
-            ->where('status', 'Izin')
-            ->count();
-
-        $sakit = (clone $baseQuery)
-            ->where('status', 'Sakit')
-            ->count();
-
-        $wfo = (clone $baseQuery)
-            ->where('status', 'Hadir')
-            ->where('jenis_absen', 'Masuk')
-            ->where('mode_kerja', 'WFO')
-            ->count();
-
-        $wfa = (clone $baseQuery)
-            ->where('status', 'Hadir')
-            ->where('jenis_absen', 'Masuk')
-            ->where('mode_kerja', 'WFA')
-            ->count();
+        $hadirMasuk = $stats->hadir_masuk;
+        $hadirPulang = $stats->hadir_pulang;
+        $izin = $stats->izin;
+        $sakit = $stats->sakit;
+        $wfo = $stats->wfo;
+        $wfa = $stats->wfa;
 
         $sekolahs = Peserta::select('asal_sekolah_universitas')
             ->whereNotNull('asal_sekolah_universitas')
@@ -111,7 +99,7 @@ class AbsensiController extends Controller
             'jenis',
             'status'
         ))->with([
-            'pesertas' => Peserta::orderBy('nama')->get()
+            'pesertas' => Peserta::select('id', 'nama')->orderBy('nama')->get()
         ]);
     }
 

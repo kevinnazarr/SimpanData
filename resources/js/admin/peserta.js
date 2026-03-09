@@ -522,6 +522,7 @@ window.openPrintModal = function(id) {
     frame.src = `${config.baseUrl}/${id}/print-id-card`;
     
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
     overlay.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
     toggleBlur(true);
@@ -540,6 +541,7 @@ window.closePrintModal = function(e) {
 
         if (modal) {
             modal.classList.add('hidden');
+            modal.classList.remove('flex');
             overlay.classList.add('hidden');
             frame.src = '';
             document.body.style.overflow = '';

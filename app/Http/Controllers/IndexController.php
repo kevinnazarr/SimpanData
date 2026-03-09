@@ -15,16 +15,29 @@ class IndexController extends Controller
     public function index()
     {
         try {
-            $totalPeserta = Peserta::count();
+            // Konsolidasi statistik dasar (Peserta & Laporan)
+            $baseStats = \Illuminate\Support\Facades\DB::table('peserta')
+                ->selectRaw("
+                    count(*) as total_peserta,
+                    count(case when status = 'Aktif' then 1 end) as peserta_aktif
+                ")
+                ->first();
 
-            $totalLaporan = Laporan::count();
+            $totalPeserta = $baseStats->total_peserta;
+            $pesertaAktif = $baseStats->peserta_aktif;
 
-            $pesertaAktif = Peserta::where('status', 'Aktif')->count();
+            $laporanStats = Laporan::selectRaw("
+                    count(*) as total_laporan,
+                    count(case when status = 'Dikirim' then 1 end) as laporan_masuk
+                ")
+                ->first();
+
+            $totalLaporan = $laporanStats->total_laporan;
+            $laporanMasuk = $laporanStats->laporan_masuk;
 
             $startDate = Carbon::now()->subDays(30);
             $totalAbsensiHadir = Absensi::where('status', 'Hadir')
                 ->where('waktu_absen', '>=', $startDate)
-                ->select('peserta_id')
                 ->distinct()
                 ->count('peserta_id');
 
@@ -32,17 +45,19 @@ class IndexController extends Controller
                 ? min(100, round(($totalAbsensiHadir / $pesertaAktif) * 100))
                 : 0;
 
-            $laporanMasuk = Laporan::where('status', 'Dikirim')->count();
+            $feedbackStats = Feedback::selectRaw("
+                    count(case when dibaca = 1 then 1 end) as feedback_selesai,
+                    avg(case when tampilkan = 1 and rating is not null then rating end) as average_rating,
+                    count(case when tampilkan = 1 and rating is not null then 1 end) as total_reviews
+                ")
+                ->first();
 
-            $feedbackSelesai = Feedback::where('dibaca', true)->count();
+            $feedbackSelesai = $feedbackStats->feedback_selesai;
+            $averageRating = round($feedbackStats->average_rating ?? 0, 1);
+            $totalReviews = $feedbackStats->total_reviews;
 
-            $laporanProgress = $pesertaAktif > 0
-                ? round(($laporanMasuk / $pesertaAktif) * 100)
-                : 0;
-
-            $feedbackProgress = $pesertaAktif > 0
-                ? round(($feedbackSelesai / $pesertaAktif) * 100)
-                : 0;
+            $laporanProgress = $pesertaAktif > 0 ? round(($laporanMasuk / $pesertaAktif) * 100) : 0;
+            $feedbackProgress = $pesertaAktif > 0 ? round(($feedbackSelesai / $pesertaAktif) * 100) : 0;
 
             $recentAbsensi = Absensi::with('peserta:id,nama')
                 ->latest('waktu_absen')
@@ -65,15 +80,6 @@ class IndexController extends Controller
                     $feedbacks = $feedbacks->concat($original->take(10 - $feedbacks->count()));
                 }
             }
-
-            $averageRating = Feedback::where('tampilkan', true)
-                ->whereNotNull('rating')
-                ->avg('rating');
-
-            $averageRating = round($averageRating, 1);
-            $totalReviews = Feedback::where('tampilkan', true)
-                ->whereNotNull('rating')
-                ->count();
 
             $partners = Partner::latest()->get();
 

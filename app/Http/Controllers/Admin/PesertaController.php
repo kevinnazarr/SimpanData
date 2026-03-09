@@ -17,14 +17,14 @@ class PesertaController extends Controller
         $baseQuery = Peserta::with('user')->where('status', '!=', 'Arsip')->latest();
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search);
             $baseQuery->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                    ->orWhere('asal_sekolah_universitas', 'like', "%{$search}%")
-                    ->orWhere('jurusan', 'like', "%{$search}%")
+                $q->whereRaw('LOWER(nama) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(asal_sekolah_universitas) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(jurusan) LIKE ?', ["%{$search}%"])
                     ->orWhereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('email', 'like', "%{$search}%")
-                            ->orWhere('username', 'like', "%{$search}%");
+                        $userQuery->whereRaw('LOWER(email) LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('LOWER(username) LIKE ?', ["%{$search}%"]);
                     });
             });
         }

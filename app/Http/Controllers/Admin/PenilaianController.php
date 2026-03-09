@@ -19,11 +19,11 @@ class PenilaianController extends Controller
             ->whereIn('status', ['Aktif', 'Selesai']);
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search);
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                    ->orWhere('asal_sekolah_universitas', 'like', "%{$search}%")
-                    ->orWhere('jurusan', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(nama) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(asal_sekolah_universitas) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(jurusan) LIKE ?', ["%{$search}%"]);
             });
         }
 
@@ -43,11 +43,16 @@ class PenilaianController extends Controller
             }
         }
 
-        $statsQuery = clone $query;
-        $totalPeserta = $statsQuery->count();
-        $sudahDinilai = (clone $statsQuery)->whereHas('penilaian')->count();
+        $stats = (clone $query)->selectRaw("
+                count(*) as total_peserta,
+                count(case when id in (select peserta_id from penilaian) then 1 end) as sudah_dinilai
+            ")->first();
+
+        $totalPeserta = $stats->total_peserta;
+        $sudahDinilai = $stats->sudah_dinilai;
         $belumDinilai = $totalPeserta - $sudahDinilai;
-        $rataRataNilai = Penilaian::whereIn('peserta_id', (clone $statsQuery)->select('id'))->avg('nilai_akhir') ?? 0;
+        
+        $rataRataNilai = Penilaian::whereIn('peserta_id', (clone $query)->select('id'))->avg('nilai_akhir') ?? 0;
 
         $peserta = $query->orderBy('nama', 'asc')->paginate(12)->onEachSide(1);
 
@@ -72,16 +77,46 @@ class PenilaianController extends Controller
     }
 
     /**
-     * Mendapatkan detail penilaian peserta (untuk modal)
+     * Menampilkan halaman form penilaian (create/edit)
      */
-    public function show($id)
+    public function form($peserta_id)
     {
-        $peserta = Peserta::with(['penilaian.user', 'user'])->findOrFail($id);
+        $peserta = Peserta::findOrFail($peserta_id);
+        
+        $kategoris = \App\Models\KategoriPenilaian::where('peserta_id', $peserta_id)
+            ->orderBy('nama')
+            ->get();
+            
+        $penilaian = Penilaian::with('details')->where('peserta_id', $peserta_id)->first();
 
-        return response()->json([
-            'peserta' => $peserta,
-            'penilaian' => $peserta->penilaian
-        ]);
+        return view('admin.penilaian.form', compact('peserta', 'kategoris', 'penilaian'));
+    }
+
+    /**
+     * Menyalin kriteria standar ke peserta yang belum memiliki kriteria
+     */
+    public function copyDefaultKriteria(Request $request, $peserta_id)
+    {
+        $peserta = Peserta::findOrFail($peserta_id);
+        
+        $defaults = [
+            ['nama' => 'Kedisiplinan', 'deskripsi' => 'Ketepatan waktu dan kepatuhan aturan'],
+            ['nama' => 'Keterampilan', 'deskripsi' => 'Kualitas teknis hasil pekerjaan'],
+            ['nama' => 'Kerjasama', 'deskripsi' => 'Kemampuan bekerja dalam tim'],
+            ['nama' => 'Inisiatif', 'deskripsi' => 'Keaktifan dalam memberikan ide/solusi'],
+            ['nama' => 'Komunikasi', 'deskripsi' => 'Kemampuan menyampaikan informasi'],
+        ];
+
+        foreach ($defaults as $data) {
+            \App\Models\KategoriPenilaian::firstOrCreate([
+                'peserta_id' => $peserta_id,
+                'nama' => $data['nama']
+            ], [
+                'deskripsi' => $data['deskripsi']
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Kriteria standar berhasil diterapkan untuk peserta ini.');
     }
 
     /**
@@ -91,47 +126,35 @@ class PenilaianController extends Controller
     {
         $request->validate([
             'peserta_id' => 'required|exists:peserta,id',
-            'kedisiplinan' => 'required|integer|min:1|max:100',
-            'keterampilan' => 'required|integer|min:1|max:100',
-            'kerjasama' => 'required|integer|min:1|max:100',
-            'inisiatif' => 'required|integer|min:1|max:100',
-            'komunikasi' => 'required|integer|min:1|max:100',
-            'catatan' => 'nullable|string|max:1000',
+            'kategori'   => 'required|array',
+            'kategori.*' => 'required|integer|min:0|max:100',
+            'catatan'    => 'nullable|string|max:1000',
         ]);
 
         $existing = Penilaian::where('peserta_id', $request->peserta_id)->first();
         if ($existing) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Peserta sudah memiliki penilaian. Gunakan fitur update untuk mengubah nilai.'
-            ], 422);
+            return redirect()->route('admin.penilaian.index')
+                ->with('error', 'Peserta sudah memiliki penilaian. Gunakan fitur edit untuk mengubah nilai.');
         }
 
-        $nilaiAkhir = Penilaian::hitungNilaiAkhir(
-            $request->kedisiplinan,
-            $request->keterampilan,
-            $request->kerjasama,
-            $request->inisiatif,
-            $request->komunikasi
-        );
-
         $penilaian = Penilaian::create([
-            'peserta_id' => $request->peserta_id,
-            'user_id' => Auth::id(),
-            'kedisiplinan' => $request->kedisiplinan,
-            'keterampilan' => $request->keterampilan,
-            'kerjasama' => $request->kerjasama,
-            'inisiatif' => $request->inisiatif,
-            'komunikasi' => $request->komunikasi,
-            'nilai_akhir' => $nilaiAkhir,
-            'catatan' => $request->catatan,
+            'peserta_id'  => $request->peserta_id,
+            'user_id'     => Auth::id(),
+            'nilai_akhir' => 0,
+            'catatan'     => $request->catatan,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Penilaian berhasil disimpan!',
-            'data' => $penilaian->load('peserta')
-        ]);
+        foreach ($request->kategori as $kategori_id => $nilai) {
+            \App\Models\PenilaianDetail::create([
+                'penilaian_id'          => $penilaian->id,
+                'kategori_penilaian_id' => $kategori_id,
+                'nilai'                 => $nilai,
+            ]);
+        }
+
+        $penilaian->hitungNilaiAkhirLagi();
+
+        return redirect()->route('admin.penilaian.index')->with('success', 'Penilaian peserta berhasil disimpan!');
     }
 
     /**
@@ -142,38 +165,29 @@ class PenilaianController extends Controller
         $penilaian = Penilaian::findOrFail($id);
 
         $request->validate([
-            'kedisiplinan' => 'required|integer|min:1|max:100',
-            'keterampilan' => 'required|integer|min:1|max:100',
-            'kerjasama' => 'required|integer|min:1|max:100',
-            'inisiatif' => 'required|integer|min:1|max:100',
-            'komunikasi' => 'required|integer|min:1|max:100',
-            'catatan' => 'nullable|string|max:1000',
+            'kategori'   => 'required|array',
+            'kategori.*' => 'required|integer|min:0|max:100',
+            'catatan'    => 'nullable|string|max:1000',
         ]);
-
-        $nilaiAkhir = Penilaian::hitungNilaiAkhir(
-            $request->kedisiplinan,
-            $request->keterampilan,
-            $request->kerjasama,
-            $request->inisiatif,
-            $request->komunikasi
-        );
 
         $penilaian->update([
             'user_id' => Auth::id(),
-            'kedisiplinan' => $request->kedisiplinan,
-            'keterampilan' => $request->keterampilan,
-            'kerjasama' => $request->kerjasama,
-            'inisiatif' => $request->inisiatif,
-            'komunikasi' => $request->komunikasi,
-            'nilai_akhir' => $nilaiAkhir,
             'catatan' => $request->catatan,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Penilaian berhasil diperbarui!',
-            'data' => $penilaian->load('peserta')
-        ]);
+        foreach ($request->kategori as $kategori_id => $nilai) {
+            \App\Models\PenilaianDetail::updateOrCreate(
+                [
+                    'penilaian_id' => $penilaian->id, 
+                    'kategori_penilaian_id' => $kategori_id
+                ],
+                ['nilai' => $nilai]
+            );
+        }
+
+        $penilaian->hitungNilaiAkhirLagi();
+
+        return redirect()->route('admin.penilaian.index')->with('success', 'Penilaian peserta berhasil diperbarui!');
     }
 
     /**
@@ -185,11 +199,11 @@ class PenilaianController extends Controller
             ->whereIn('status', ['Aktif', 'Selesai']);
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search);
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                    ->orWhere('asal_sekolah_universitas', 'like', "%{$search}%")
-                    ->orWhere('jurusan', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(nama) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(asal_sekolah_universitas) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(jurusan) LIKE ?', ["%{$search}%"]);
             });
         }
 
@@ -209,12 +223,16 @@ class PenilaianController extends Controller
             }
         }
 
-        $statsQuery = clone $query;
-        $totalPeserta = $statsQuery->count();
-        $sudahDinilai = (clone $statsQuery)->whereHas('penilaian')->count();
+        $stats = (clone $query)->selectRaw("
+                count(*) as total_peserta,
+                count(case when id in (select peserta_id from penilaian) then 1 end) as sudah_dinilai
+            ")->first();
+
+        $totalPeserta = $stats->total_peserta;
+        $sudahDinilai = $stats->sudah_dinilai;
         $belumDinilai = $totalPeserta - $sudahDinilai;
         
-        $rataRataNilai = Penilaian::whereIn('peserta_id', (clone $statsQuery)->select('id'))->avg('nilai_akhir') ?? 0;
+        $rataRataNilai = Penilaian::whereIn('peserta_id', (clone $query)->select('id'))->avg('nilai_akhir') ?? 0;
 
         $peserta = $query->with(['penilaian', 'user'])->orderBy('nama', 'asc')->paginate(12)->onEachSide(1);
 
@@ -224,7 +242,7 @@ class PenilaianController extends Controller
                 'total' => $totalPeserta,
                 'sudah' => $sudahDinilai,
                 'belum' => $belumDinilai,
-                'rata' => number_format($rataRataNilai, 1)
+                'rata' => round($rataRataNilai)
             ]
         ]);
     }

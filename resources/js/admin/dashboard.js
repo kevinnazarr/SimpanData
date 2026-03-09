@@ -367,6 +367,45 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    initBarChart("schoolBarChart", "schoolChartWrapper", data.pesertaSekolah, { bg: '#4f46e5', border: '#4338ca' });
     initBarChart("uniBarChart", "uniChartWrapper", data.pesertaUniversitas, { bg: '#0ea5e9', border: '#0284c7' });
+
+    document.querySelectorAll('.delete-feedback').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            const item = this.closest('.group');
+            
+            if (confirm('Apakah Anda yakin ingin menghapus feedback ini?')) {
+                fetch(`/admin/feedback/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        item.classList.add('opacity-0', 'scale-95');
+                        setTimeout(() => {
+                            item.remove();
+                            if (window.showToast) {
+                                window.showToast('Feedback berhasil dihapus', 'success');
+                            }
+                        }, 300);
+                    } else {
+                        if (window.showToast) {
+                            window.showToast('Gagal menghapus feedback', 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (window.showToast) {
+                        window.showToast('Terjadi kesalahan sistem', 'error');
+                    }
+                });
+            }
+        });
+    });
 });
