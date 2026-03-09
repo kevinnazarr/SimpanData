@@ -117,6 +117,11 @@ class Peserta extends Model
         return $this->hasOne(LaporanAkhir::class);
     }
 
+    public function kategoriPenilaians()
+    {
+        return $this->hasMany(KategoriPenilaian::class, 'peserta_id');
+    }
+
     /**
      * Scope untuk peserta dengan profil terisi (tidak ada data '-')
      */

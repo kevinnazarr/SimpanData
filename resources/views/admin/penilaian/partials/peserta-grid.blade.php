@@ -39,7 +39,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-xs font-medium text-gray-500">Nilai Akhir</p>
-                                        <p class="text-2xl font-bold text-emerald-600">{{ $p->penilaian->nilai_akhir }}</p>
+                                        <p class="text-2xl font-bold text-emerald-600">{{ round($p->penilaian->nilai_akhir) }}</p>
                                     </div>
                                     <div class="text-right">
                                         <span class="px-2 py-1 text-sm font-bold rounded
@@ -56,17 +56,12 @@
                                 </div>
                             </div>
 
-                            <div class="flex gap-2 mt-3">
-                                <button onclick="openDetailModal({{ $p->id }})"
-                                    class="flex-1 px-3 py-2 text-sm font-medium text-indigo-600 transition-colors bg-indigo-50 rounded-lg hover:bg-indigo-100">
-                                    <i class='mr-1 bx bx-show'></i>
-                                    Detail
-                                </button>
-                                <button onclick="openEditModal({{ $p->id }})"
-                                    class="flex-1 px-3 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                            <div class="mt-3">
+                                <a href="{{ url('/admin/penilaian/' . $p->id . '/form') }}"
+                                    class="w-full inline-flex justify-center items-center px-3 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
                                     <i class='mr-1 bx bx-edit'></i>
-                                    Edit
-                                </button>
+                                    Edit Nilai
+                                </a>
                             </div>
                         @else
                             <div class="p-3 rounded-lg bg-gray-50">
@@ -77,11 +72,11 @@
                             </div>
 
                             <div class="mt-3">
-                                <button onclick="openPenilaianModal({{ $p->id }}, '{{ $p->nama }}', '{{ $p->asal_sekolah_universitas }}', '{{ $p->jurusan }}', '{{ $p->foto }}')"
-                                    class="w-full px-3 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                                <a href="{{ url('/admin/penilaian/' . $p->id . '/form') }}"
+                                    class="w-full inline-flex justify-center items-center px-3 py-2 text-sm font-medium text-white transition-colors rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
                                     <i class='mr-1 bx bx-star'></i>
                                     Beri Nilai
-                                </button>
+                                </a>
                             </div>
                         @endif
                     </div>

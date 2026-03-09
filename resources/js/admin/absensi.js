@@ -46,6 +46,7 @@ window.openLocationModal = function(nama, waktu, jenis, status, mode, lat, lng, 
 
     const modal = document.getElementById('locationModal');
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
     document.body.style.overflow = 'hidden';
 
     setTimeout(() => {
@@ -75,7 +76,9 @@ window.openLocationModal = function(nama, waktu, jenis, status, mode, lat, lng, 
 };
 
 window.closeLocationModal = function() {
-    document.getElementById('locationModal').classList.add('hidden');
+    const modal = document.getElementById('locationModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
     document.body.style.overflow = '';
     if (locationMap) {
         locationMap.remove();

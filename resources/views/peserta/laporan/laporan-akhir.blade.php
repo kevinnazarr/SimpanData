@@ -134,7 +134,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex-col items-center hidden w-full space-y-4" id="file-preview">
+                            <div class="items-center hidden w-full space-y-4" id="file-preview">
                                 <div class="relative w-full overflow-hidden border border-slate-200 rounded-xl bg-slate-50 aspect-[4/3] md:aspect-video">
                                     <iframe id="pdf-viewer" class="w-full h-full rounded-lg" frameborder="0"></iframe>
                                     <div class="absolute top-4 right-4 animate-fade-in">
@@ -221,6 +221,7 @@
 
                                 placeholder.classList.add('hidden');
                                 preview.classList.remove('hidden');
+                                preview.classList.add('flex-col');
                                 submitBtn.disabled = false;
                             } else {
                                 alert('Ukuran file maksimal 10MB');
@@ -239,6 +240,7 @@
                     pdfViewer.src = '';
                     placeholder.classList.remove('hidden');
                     preview.classList.add('hidden');
+                    preview.classList.remove('flex-col');
                     submitBtn.disabled = {{ $laporanAkhir ? 'false' : 'true' }};
                 }
 

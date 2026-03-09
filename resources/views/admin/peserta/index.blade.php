@@ -343,7 +343,7 @@
 </div>
 
 <div id="printModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-900/50 backdrop-blur-sm" onclick="closePrintModal(event)"></div>
-<div id="printModal" class="hidden fixed inset-0 z-[40] overflow-y-auto flex items-center justify-center p-4">
+<div id="printModal" class="hidden fixed inset-0 z-[40] overflow-y-auto items-center justify-center p-4">
     <div class="relative w-full max-w-2xl transition-all transform bg-transparent">
         <div class="absolute right-0 z-50 -top-12">
             <button onclick="closePrintModal(event)" 

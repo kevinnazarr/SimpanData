@@ -198,9 +198,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/admin/penilaian', [AdminPenilaianController::class, 'index'])->name('admin.penilaian.index');
     Route::get('/admin/penilaian/peserta-grid', [AdminPenilaianController::class, 'getPesertaGrid'])->name('admin.penilaian.peserta-grid');
-    Route::get('/admin/penilaian/{id}', [AdminPenilaianController::class, 'show'])->name('admin.penilaian.show');
+    Route::get('/admin/penilaian/{id}/form', [AdminPenilaianController::class, 'form'])->name('admin.penilaian.form');
+    Route::post('/admin/penilaian/{id}/copy-defaults', [AdminPenilaianController::class, 'copyDefaultKriteria'])->name('admin.penilaian.copy_defaults');
     Route::post('/admin/penilaian', [AdminPenilaianController::class, 'store'])->name('admin.penilaian.store');
     Route::put('/admin/penilaian/{id}', [AdminPenilaianController::class, 'update'])->name('admin.penilaian.update');
+
+    Route::resource('admin/kategori-penilaian', \App\Http\Controllers\Admin\KategoriPenilaianController::class)->names([
+        'index'   => 'admin.kategori_penilaians.index',
+        'store'   => 'admin.kategori_penilaians.store',
+        'update'  => 'admin.kategori_penilaians.update',
+        'destroy' => 'admin.kategori_penilaians.destroy',
+    ])->except(['create', 'show', 'edit']);
 
     Route::get('/admin/laporan', [AdminLaporanController::class, 'index'])->name('admin.laporan.index');
     Route::get('/admin/laporan/{id}', [AdminLaporanController::class, 'show'])->name('admin.laporan.harian.show'); // User naming preference
