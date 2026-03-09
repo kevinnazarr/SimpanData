@@ -70,14 +70,18 @@
                         <td class="px-5 py-4">
                             <div class="flex items-center justify-center gap-2">
                                 <button
-                                    onclick="pulihkan({{ $peserta->id }}, '{{ addslashes($peserta->nama) }}')"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200"
+                                    type="button"
+                                    data-id="{{ $peserta->id }}"
+                                    data-nama="{{ $peserta->nama }}"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors border border-emerald-200 btn-pulihkan"
                                     title="Pulihkan ke status Selesai">
                                     <i class='bx bx-undo'></i> Pulihkan
                                 </button>
                                 <button
-                                    onclick="hapusPermanent({{ $peserta->id }}, '{{ addslashes($peserta->nama) }}')"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-200"
+                                    type="button"
+                                    data-id="{{ $peserta->id }}"
+                                    data-nama="{{ $peserta->nama }}"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors border border-red-200 btn-hapus"
                                     title="Hapus permanen sekarang">
                                     <i class='bx bx-trash'></i> Hapus
                                 </button>

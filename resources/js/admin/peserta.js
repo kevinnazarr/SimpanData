@@ -63,13 +63,8 @@ if (filterJenisKegiatan) {
     });
 }
 
-const filterStatus = document.getElementById('filterStatus');
-if (filterStatus) {
-    filterStatus.addEventListener('change', () => {
-        currentPage = 1;
-        loadData();
-    });
-}
+// filterStatus is now a hidden input, so it doesn't need a change listener.
+// Card clicks call filterByStatus() which triggers loadData().
 
 const filterAsalSekolah = document.getElementById('filterAsalSekolah');
 if (filterAsalSekolah) {
@@ -79,11 +74,39 @@ if (filterAsalSekolah) {
     });
 }
 
+window.filterByTotal = function() {
+    window.resetFilters();
+};
+
+window.filterByJenis = function(jenis) {
+    const filterJenis = document.getElementById('filterJenisKegiatan');
+    if (filterJenis) {
+        filterJenis.value = jenis;
+        currentPage = 1;
+        loadData();
+    }
+};
+
+window.filterByStatus = function(status) {
+    const filterStatus = document.getElementById('filterStatus');
+    if (filterStatus) {
+        filterStatus.value = status;
+        currentPage = 1;
+        loadData();
+    }
+};
+
 window.resetFilters = function() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterJenisKegiatan').selectedIndex = 0;
-    document.getElementById('filterAsalSekolah').selectedIndex = 0;
-    document.getElementById('filterStatus').selectedIndex = 0;
+    const searchInput = document.getElementById('searchInput');
+    const filterJenis = document.getElementById('filterJenisKegiatan');
+    const filterSekolah = document.getElementById('filterAsalSekolah');
+    const filterStatus = document.getElementById('filterStatus');
+
+    if (searchInput) searchInput.value = '';
+    if (filterJenis) filterJenis.selectedIndex = 0;
+    if (filterSekolah) filterSekolah.selectedIndex = 0;
+    if (filterStatus) filterStatus.value = '';
+
     currentPage = 1;
 
     const resetBtn = document.querySelector('[onclick="resetFilters()"]');

@@ -147,3 +147,55 @@ window.closeMap = function() {
     modal.classList.remove('flex');
     document.body.classList.remove('overflow-hidden');
 };
+
+document.addEventListener('click', function(e) {
+    const absLink = e.target.closest('#absensi-pagination a');
+    if (absLink) {
+        e.preventDefault();
+        const url = new URL(absLink.href);
+        const page = url.searchParams.get('absensi_page');
+        if (page) loadTabData('absensi', page);
+    }
+
+    const lapLink = e.target.closest('#laporan-pagination a');
+    if (lapLink) {
+        e.preventDefault();
+        const url = new URL(lapLink.href);
+        const page = url.searchParams.get('laporan_page');
+        if (page) loadTabData('laporan', page);
+    }
+});
+
+function loadTabData(tab, page) {
+    const container = document.getElementById(tab + '-container');
+    const pagination = document.getElementById(tab + '-pagination');
+    const pesertaId = document.querySelector('input[name="peserta_id"]')?.value;
+    
+    if (!container || !pagination || !pesertaId) return;
+
+    container.classList.add('opacity-50', 'pointer-events-none');
+    
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set(tab + '_page', page);
+
+    fetch(currentUrl.toString(), {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        container.innerHTML = data.html;
+        pagination.innerHTML = data.pagination;
+        container.classList.remove('opacity-50', 'pointer-events-none');
+        
+        if (tab === 'absensi') {
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    })
+    .catch(err => {
+        console.error('Failed to load ' + tab + ' data:', err);
+        container.classList.remove('opacity-50', 'pointer-events-none');
+    });
+}

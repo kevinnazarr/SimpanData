@@ -19,8 +19,9 @@ class DashboardController extends Controller
     public function index(\Illuminate\Http\Request $request)
     {
         try {
-            $totalPkl = Peserta::where('jenis_kegiatan', 'PKL')->count();
-            $totalMagang = Peserta::where('jenis_kegiatan', 'Magang')->count();
+            Peserta::syncArchive();
+            $totalPkl = Peserta::active()->where('jenis_kegiatan', 'PKL')->count();
+            $totalMagang = Peserta::active()->where('jenis_kegiatan', 'Magang')->count();
             $aktif = Peserta::where('status', 'Aktif')->count();
             $selesai = Peserta::where('status', 'Selesai')->count();
 
@@ -59,7 +60,7 @@ class DashboardController extends Controller
                 }
 
                 $asal = $request->get('asal_sekolah_universitas');
-                $pesertaQuery = Peserta::select('id', 'nama', 'jenis_kegiatan', 'status', 'asal_sekolah_universitas')
+                $pesertaQuery = Peserta::active()->select('id', 'nama', 'jenis_kegiatan', 'status', 'asal_sekolah_universitas')
                     ->orderBy('nama');
                 
                 if (!empty($asal)) {

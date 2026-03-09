@@ -367,6 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    initBarChart("schoolBarChart", "schoolChartWrapper", data.pesertaSekolah, { bg: '#6366f1', border: '#4f46e5' });
     initBarChart("uniBarChart", "uniChartWrapper", data.pesertaUniversitas, { bg: '#0ea5e9', border: '#0284c7' });
 
     document.querySelectorAll('.delete-feedback').forEach(btn => {
@@ -375,37 +376,85 @@ document.addEventListener("DOMContentLoaded", function () {
             const id = this.getAttribute('data-id');
             const item = this.closest('.group');
             
-            if (confirm('Apakah Anda yakin ingin menghapus feedback ini?')) {
-                fetch(`/admin/feedback/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        item.classList.add('opacity-0', 'scale-95');
-                        setTimeout(() => {
-                            item.remove();
-                            if (window.showToast) {
-                                window.showToast('Feedback berhasil dihapus', 'success');
-                            }
-                        }, 300);
-                    } else {
-                        if (window.showToast) {
-                            window.showToast('Gagal menghapus feedback', 'error');
+            Swal.fire({
+                title: 'Hapus Feedback?',
+                text: "Feedback ini akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                background: '#ffffff',
+                customClass: {
+                    popup: 'rounded-2xl shadow-xl border border-slate-100',
+                    title: 'text-slate-800 font-bold',
+                    htmlContainer: 'text-slate-600',
+                    confirmButton: 'rounded-xl px-5 py-2.5 text-sm font-bold',
+                    cancelButton: 'rounded-xl px-5 py-2.5 text-sm font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    if (window.showToast) {
-                        window.showToast('Terjadi kesalahan sistem', 'error');
-                    }
-                });
-            }
+                    });
+
+                    fetch(`/admin/feedback/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            item.classList.add('opacity-0', 'scale-95', 'translate-x-4');
+                            setTimeout(() => {
+                                item.remove();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Terhapus!',
+                                    text: 'Feedback telah berhasil dihapus.',
+                                    timer: 2000,
+                                    showConfirmButton: false,
+                                    background: '#ffffff',
+                                    customClass: {
+                                        popup: 'rounded-2xl shadow-xl'
+                                    }
+                                });
+                            }, 300);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: 'Gagal menghapus feedback.',
+                                background: '#ffffff',
+                                customClass: {
+                                    popup: 'rounded-2xl shadow-xl'
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan sistem.',
+                            background: '#ffffff',
+                            customClass: {
+                                popup: 'rounded-2xl shadow-xl'
+                            }
+                        });
+                    });
+                }
+            });
         });
     });
 });

@@ -14,7 +14,8 @@ class PesertaController extends Controller
 {
     public function index(Request $request)
     {
-        $baseQuery = Peserta::with('user')->where('status', '!=', 'Arsip')->latest();
+        Peserta::syncArchive();
+        $baseQuery = Peserta::with('user')->active()->latest();
 
         if ($request->filled('search')) {
             $search = mb_strtolower($request->search);
@@ -163,18 +164,30 @@ class PesertaController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $peserta = Peserta::with([
-            'user', 
-            'absensis' => fn($q) => $q->orderBy('waktu_absen', 'desc'),
-            'laporans' => fn($q) => $q->orderBy('tanggal_laporan', 'desc'),
-            'feedbacks' => fn($q) => $q->orderBy('created_at', 'desc'),
-            'penilaian', 
-            'laporanAkhir'
-        ])->findOrFail($id);
+        $peserta = Peserta::with(['user', 'penilaian', 'laporanAkhir'])->findOrFail($id);
+        
+        $absensis = $peserta->absensis()->orderBy('waktu_absen', 'desc')->paginate(10, ['*'], 'absensi_page');
+        $laporans = $peserta->laporans()->orderBy('tanggal_laporan', 'desc')->paginate(5, ['*'], 'laporan_page');
+        $feedbacks = $peserta->feedbacks()->where('pengirim', 'Peserta')->orderBy('created_at', 'desc')->get();
 
-        return view('admin.peserta.show', compact('peserta'));
+        if ($request->ajax()) {
+            if ($request->has('absensi_page')) {
+                return response()->json([
+                    'html' => view('admin.peserta.partials.absensi-rows', compact('absensis'))->render(),
+                    'pagination' => $absensis->appends(['laporan_page' => $request->laporan_page])->links()->toHtml()
+                ]);
+            }
+            if ($request->has('laporan_page')) {
+                return response()->json([
+                    'html' => view('admin.peserta.partials.laporan-rows', compact('laporans'))->render(),
+                    'pagination' => $laporans->appends(['absensi_page' => $request->absensi_page])->links()->toHtml()
+                ]);
+            }
+        }
+
+        return view('admin.peserta.show', compact('peserta', 'absensis', 'laporans', 'feedbacks'));
     }
 
     public function edit($id)

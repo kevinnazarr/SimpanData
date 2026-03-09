@@ -168,4 +168,35 @@ class Peserta extends Model
                !empty($this->no_telepon) &&
                $this->no_telepon !== '-';
     }
+
+    /**
+     * Scope untuk peserta yang aktif (bukan arsip).
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', '!=', 'Arsip');
+    }
+
+    /**
+     * Sinkronisasi data peserta yang sudah melewati tanggal selesai ke status Arsip.
+     */
+    public static function syncArchive()
+    {
+        $expired = self::whereIn('status', ['Aktif', 'Selesai'])
+            ->whereDate('tanggal_selesai', '<', \Carbon\Carbon::today())
+            ->get();
+
+        if ($expired->isEmpty()) return;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($expired) {
+            foreach ($expired as $peserta) {
+                $peserta->update(['status' => 'Arsip']);
+                
+                \App\Models\Arsip::firstOrCreate(
+                    ['peserta_id' => $peserta->id],
+                    ['diarsipkan_pada' => \Carbon\Carbon::today()->toDateString()]
+                );
+            }
+        });
+    }
 }
