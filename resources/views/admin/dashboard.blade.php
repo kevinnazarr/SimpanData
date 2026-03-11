@@ -198,8 +198,8 @@
                     @forelse ($feedbacks as $feedback)
                             <div class="flex gap-3 p-4 border border-slate-100 rounded-2xl hover:bg-slate-50/50 transition-colors duration-200 group relative">
                                 <div class="flex-shrink-0">
-                                    @if($feedback->peserta->foto)
-                                        <img src="{{ asset('storage/' . $feedback->peserta->foto) }}" 
+                                    @if($feedback->peserta->user->photo_profile)
+                                        <img src="{{ asset('storage/' . $feedback->peserta->user->photo_profile) }}" 
                                              class="object-cover w-12 h-12 shadow-sm rounded-xl border border-slate-100">
                                     @else
                                         <div class="flex items-center justify-center w-12 h-12 font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
@@ -240,7 +240,6 @@
                     @endforelse
                 </div>
 
-                <!-- Bottom Fade -->
                 <div class="absolute bottom-0 left-0 right-0 z-10 h-12 pointer-events-none bg-gradient-to-t from-white via-white/80 to-transparent"></div>
             </div>
         </div>

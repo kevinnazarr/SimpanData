@@ -23,7 +23,12 @@ class ProfileController extends Controller
         $request->validate([
             'username' => 'required|string|max:255|unique:user,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:user,email,' . $user->id,
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        if ($request->hasFile('foto')) {
+            $user->updateProfilePhoto($request->file('foto'), 'admin/foto');
+        }
 
         $user->update([
             'username' => $request->username,

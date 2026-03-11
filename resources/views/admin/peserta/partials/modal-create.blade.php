@@ -58,6 +58,18 @@
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                     <div class="mt-1 text-sm text-red-600 error-message"></div>
                 </div>
+                <div>
+                    <label for="create_nim_nis" class="block mb-2 text-sm font-medium text-gray-700">NIM / NIS</label>
+                    <input type="text" id="create_nim_nis" name="nim_nis"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div class="mt-1 text-sm text-red-600 error-message"></div>
+                </div>
+                <div>
+                    <label for="create_tugas" class="block mb-2 text-sm font-medium text-gray-700">Tugas</label>
+                    <input type="text" id="create_tugas" name="tugas"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div class="mt-1 text-sm text-red-600 error-message"></div>
+                </div>
                 <div class="md:col-span-2">
                     <label for="create_alamat" class="block mb-2 text-sm font-medium text-gray-700">Alamat</label>
                     <textarea id="create_alamat" name="alamat" rows="3"

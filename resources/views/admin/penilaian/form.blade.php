@@ -3,45 +3,131 @@
 @section('title', isset($penilaian) ? 'Edit Penilaian Peserta' : 'Beri Penilaian Peserta')
 
 @section('content')
-<div class="mb-6 card">
-    <div class="p-4 border-b border-gray-200 md:p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-            <h2 class="text-base font-semibold text-gray-800 md:text-lg">
-                {{ isset($penilaian) ? 'Edit Penilaian Peserta' : 'Beri Penilaian Peserta' }}
-            </h2>
-            <p class="mt-1 text-sm text-gray-600">
-                Lengkapi seluruh aspek penilaian di bawah ini.
-            </p>
-        </div>
-        <a href="{{ route('admin.penilaian.index') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50">
-            <i class='bx bx-arrow-back'></i> Kembali
-        </a>
-    </div>
-
-    @if ($errors->any())
-        <div class="p-4 m-4 text-red-700 bg-red-100 rounded-lg" role="alert">
-            <ul class="list-disc pl-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <div class="p-4 md:p-5">
-        <div class="flex items-center gap-4 p-4 mb-6 rounded-lg bg-gray-50 border border-gray-200">
-            @if($peserta->foto)
-                <img src="{{ asset('storage/'.$peserta->foto) }}" alt="{{ $peserta->nama }}" class="object-cover w-16 h-16 rounded-full border border-gray-300">
-            @else
-                <div class="flex items-center justify-center w-16 h-16 text-xl font-bold text-white rounded-full bg-gradient-to-br from-indigo-500 to-purple-500">
-                    {{ strtoupper(substr($peserta->nama, 0, 1)) }}
+    <div class="mb-6 card">
+        <div class="p-4 border-b border-gray-200 md:p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.penilaian.index') }}"
+                    class="inline-flex items-center justify-center w-10 h-10 text-gray-400 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:text-indigo-600 transition-all">
+                    <i class='bx bx-left-arrow-alt text-2xl'></i>
+                </a>
+                <div>
+                    <h2 class="text-base font-semibold text-gray-800 md:text-lg">
+                        {{ isset($penilaian) ? 'Edit Penilaian Peserta' : 'Beri Penilaian Peserta' }}
+                    </h2>
+                    <p class="text-xs text-gray-500 font-medium">Lengkapi aspek kriteria untuk kalkulasi nilai akhir</p>
                 </div>
-            @endif
-            <div>
-                <h3 class="text-lg font-bold text-gray-800">{{ $peserta->nama }}</h3>
-                <p class="text-sm text-gray-600">{{ $peserta->asal_sekolah_universitas }} - {{ $peserta->jurusan }}</p>
             </div>
+            <a href="{{ route('admin.penilaian.index') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50">
+                <i class='bx bx-arrow-back'></i> Kembali
+            </a>
         </div>
+
+        @if ($errors->any())
+            <div class="p-4 m-6 text-red-700 bg-red-50 border border-red-100 rounded-xl" role="alert">
+                <div class="flex items-center gap-2 mb-2 font-bold">
+                    <i class='bx bx-error-circle text-xl'></i>
+                    <span>Terdapat kesalahan input:</span>
+                </div>
+                <ul class="list-disc pl-9 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="p-4 md:p-6 lg:p-8">
+            <div class="flex flex-col lg:flex-row items-stretch gap-6 p-6 rounded-xl bg-gray-50 border border-gray-200 mb-8">
+                <div class="flex-1 flex flex-col md:flex-row items-center md:items-start gap-6">
+                    <div class="relative flex-shrink-0">
+                        @if ($peserta->user->photo_profile)
+                            <img src="{{ asset('storage/' . $peserta->user->photo_profile) }}"
+                                class="w-32 h-32 md:w-36 md:h-36 rounded-2xl object-cover border-4 border-white shadow-sm">
+                        @else
+                            <div class="w-32 h-32 md:w-36 md:h-36 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-5xl font-bold text-white shadow-sm border-4 border-white">
+                                {{ strtoupper(substr($peserta->nama, 0, 1)) }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex-1 w-full text-center md:text-left">
+                        <div class="mb-4">
+                            <div class="flex flex-col md:flex-row items-center gap-2 mb-1 justify-center md:justify-start">
+                                <h1 class="text-2xl font-bold text-gray-900 leading-tight">{{ $peserta->nama }}</h1>
+                                <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border {{ $peserta->status == 'Aktif' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-amber-50 text-amber-700 border-amber-100' }}">
+                                    {{ $peserta->status }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-500 font-medium">{{ $peserta->asal_sekolah_universitas }} • {{ $peserta->jurusan }}</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-indigo-600 shadow-sm shrink-0">
+                                        <i class='bx bx-user'></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase leading-none">Username</p>
+                                        <p class="text-sm font-semibold text-gray-700">{{ $peserta->user->username }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-indigo-600 shadow-sm shrink-0">
+                                        <i class='bx bx-id-card'></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase leading-none">NIM / NIS</p>
+                                        <p class="text-sm font-semibold text-gray-700">{{ $peserta->nim_nis ?: '-' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-indigo-600 shadow-sm shrink-0">
+                                        <i class='bx bx-calendar'></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase leading-none">Periode</p>
+                                        <p class="text-sm font-semibold text-gray-700">{{ $peserta->tanggal_mulai->format('d M') }} - {{ $peserta->tanggal_selesai->format('d M Y') }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-lg text-indigo-600 shadow-sm shrink-0">
+                                        <i class='bx bx-bookmark'></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase leading-none">Program</p>
+                                        <p class="text-sm font-semibold text-gray-700">{{ $peserta->jenis_kegiatan }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-44 flex-shrink-0 flex items-center justify-center lg:border-l lg:border-gray-200 lg:pl-6">
+                    <div class="w-full aspect-square p-6 rounded-xl bg-white border border-indigo-100 shadow-sm flex flex-col justify-center items-center text-center">
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-3">
+                            <i class='bx bxs-star text-xl'></i>
+                        </div>
+                        <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1 leading-none">Score</p>
+                        
+                        @if (isset($penilaian))
+                            <div class="flex items-end gap-0.5 mb-1.5">
+                                <span class="text-4xl font-bold text-indigo-600 leading-none">{{ round($penilaian->nilai_akhir) }}</span>
+                                <span class="text-xs font-bold text-indigo-300 mb-0.5">/100</span>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 bg-indigo-600 text-white text-[9px] font-bold uppercase rounded-md">
+                                Grade: {{ $penilaian->grade }}
+                            </span>
+                        @else
+                            <h4 class="text-xl font-bold text-gray-400 uppercase tracking-tight mb-1">?</h4>
+                            <p class="text-[8px] text-gray-400 font-bold uppercase tracking-wider leading-none">PENDING</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
 
         <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
             <h3 class="text-lg font-bold text-gray-800">Kriteria Penilaian</h3>

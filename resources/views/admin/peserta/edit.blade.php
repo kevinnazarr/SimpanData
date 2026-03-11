@@ -138,10 +138,10 @@
                     </div>
 
                     <div>
-                        <label for="foto" class="block mb-2 text-sm font-medium text-gray-700">Foto</label>
-                        @if($peserta->foto)
+                        <label for="foto" class="block mb-2 text-sm font-medium text-gray-700">Foto Profil</label>
+                        @if($peserta->user->photo_profile)
                         <div class="mb-2">
-                            <img src="{{ asset('storage/'.$peserta->foto) }}" alt="{{ $peserta->nama }}" class="object-cover w-20 h-20 rounded-lg">
+                            <img src="{{ asset('storage/'.$peserta->user->photo_profile) }}" alt="{{ $peserta->nama }}" class="object-cover w-20 h-20 rounded-lg">
                         </div>
                         @endif
                         <input type="file"

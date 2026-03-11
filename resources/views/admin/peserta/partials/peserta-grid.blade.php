@@ -6,9 +6,9 @@
             <div class="relative p-5 border-b border-gray-100">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
-                        @if($item->foto)
+                        @if($item->user->photo_profile)
                         <div class="relative flex-shrink-0">
-                            <img src="{{ asset('storage/'.$item->foto) }}"
+                            <img src="{{ asset('storage/'.$item->user->photo_profile) }}"
                                 alt="{{ $item->nama }}"
                                 class="object-cover border-white rounded-full shadow-md w-14 h-14 border-3">
                             <div class="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full {{ $item->status == 'Aktif' ? 'bg-emerald-500' : ($item->status == 'Selesai' ? 'bg-amber-500' : 'bg-gray-400') }}"></div>

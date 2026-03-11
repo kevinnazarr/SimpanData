@@ -16,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, \App\Traits\HandlesProfilePhoto;
 
     protected $table = 'user';
 
@@ -29,6 +29,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'photo_profile',
     ];
 
     protected $hidden = [

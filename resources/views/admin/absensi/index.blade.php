@@ -236,8 +236,8 @@
                                 <td class="px-4 py-3 text-gray-500">{{ $index + $absensis->firstItem() }}</td>
                                 <td class="px-4 py-3 font-medium text-gray-900">
                                     <div class="flex items-center gap-3">
-                                        @if($item->peserta->foto && Storage::disk('public')->exists($item->peserta->foto))
-                                            <img src="{{ asset('storage/' . $item->peserta->foto) }}"
+                                        @if($item->peserta->user->photo_profile)
+                                            <img src="{{ asset('storage/' . $item->peserta->user->photo_profile) }}"
                                                 alt="{{ $item->peserta->nama }}"
                                                 class="flex-shrink-0 object-cover w-8 h-8 rounded-lg shadow-soft">
                                         @else

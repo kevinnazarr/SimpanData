@@ -2,9 +2,9 @@
 <div class="space-y-6">
     <div class="p-5 border border-gray-200 rounded-lg bg-gradient-to-br from-gray-50 to-white">
         <div class="flex items-center gap-4 mb-4">
-            @if($user->peserta && $user->peserta->foto)
+            @if($user->photo_profile)
             <div class="relative flex-shrink-0">
-                <img src="{{ asset('storage/'.$user->peserta->foto) }}"
+                <img src="{{ asset('storage/'.$user->photo_profile) }}"
                     alt="{{ $user->username }}"
                     class="object-cover w-20 h-20 border-4 border-white rounded-full shadow-lg">
                 @if($user->peserta && $user->peserta->is_lengkap)

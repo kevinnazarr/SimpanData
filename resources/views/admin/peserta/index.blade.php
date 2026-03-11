@@ -146,28 +146,27 @@
                 <div class="flex-1">
                     <div class="relative">
                         <i class='absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2 bx bx-search'></i>
-                        <input type="text"
-                                id="searchInput"
-                                value="{{ request('search') }}"
-                                placeholder="Cari nama, sekolah, atau jurusan..."
-                                class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
+                        <input type="text" id="searchInput" value="{{ request('search') }}"
+                            placeholder="Cari nama, sekolah, atau jurusan..."
+                            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200">
                     </div>
                 </div>
 
                 <div class="flex flex-col gap-3 sm:flex-row">
                     <div class="relative">
                         <select id="filterJenisKegiatan"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white pr-10">
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white pr-10">
                             <option value="">Semua Jenis</option>
                             <option value="PKL" {{ request('jenis_kegiatan') == 'PKL' ? 'selected' : '' }}>PKL</option>
-                            <option value="Magang" {{ request('jenis_kegiatan') == 'Magang' ? 'selected' : '' }}>Magang</option>
+                            <option value="Magang" {{ request('jenis_kegiatan') == 'Magang' ? 'selected' : '' }}>Magang
+                            </option>
                         </select>
                         <i class='absolute text-gray-400 transform -translate-y-1/2 right-3 top-1/2 bx bx-chevron-down'></i>
                     </div>
 
                     <div class="relative">
                         <select id="filterAsalSekolah"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white pr-10">
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white pr-10">
                             <option value="">Semua Sekolah/Universitas</option>
                             @foreach ($sekolahs as $item)
                                 <option value="{{ $item->asal_sekolah_universitas }}"
@@ -182,7 +181,7 @@
                     <input type="hidden" id="filterStatus" value="{{ request('status') }}">
 
                     <button onclick="resetFilters()"
-                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 whitespace-nowrap">
+                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 whitespace-nowrap">
                         <i class='bx bx-refresh'></i>
                         <span>Reset</span>
                     </button>
@@ -199,178 +198,201 @@
 @endsection
 
 @push('modals')
-{{-- createModal: overlay z-30 tidak menutupi navbar (z-40), card z-50 di atas navbar --}}
-<div id="createModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-500/75" onclick="closeCreateModal(event)"></div>
-<div id="createModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[35] overflow-y-auto">
-    <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-        <div class="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-800">Tambah Peserta Baru</h3>
-                    <p class="mt-1 text-gray-600">Masukkan data peserta PKL atau Magang</p>
-                </div>
-                <button onclick="closeCreateModal(event)"
-                        class="p-2 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
-                    <i class='text-2xl bx bx-x'></i>
-                </button>
-            </div>
-            <div class="p-6">
-                <div id="createModalContent">
-                    <div class="py-12 text-center">
-                        <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
-                        <p class="mt-3 text-gray-600">Memuat formulir...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
-                <button onclick="closeCreateModal(event)"
-                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                    Batal
-                </button>
-                <button onclick="submitCreateForm()"
-                        class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg inline-flex items-center gap-2">
-                    <i class='bx bx-save'></i>
-                    <span>Simpan Peserta</span>
-                </button>
-            </div>
-        </div>
+    <div id="createModalOverlay" class="hidden fixed inset-0 z-[950] bg-gray-500/75" onclick="closeCreateModal(event)">
     </div>
-</div>
-
-{{-- editModal: overlay z-30 tidak menutupi navbar (z-40), card z-50 di atas navbar --}}
-<div id="editModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-500/75" onclick="closeEditModal(event)"></div>
-<div id="editModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[35] overflow-y-auto">
-    <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-        <div class="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-800">Edit Peserta</h3>
-                    <p class="mt-1 text-gray-600">Perbarui data peserta</p>
-                </div>
-                <button onclick="closeEditModal(event)"
-                        class="p-2 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
-                    <i class='text-2xl bx bx-x'></i>
-                </button>
-            </div>
-            <div class="p-6">
-                <div id="editModalContent">
-                    <div class="py-12 text-center">
-                        <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
-                        <p class="mt-3 text-gray-600">Memuat formulir...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
-                <button onclick="closeEditModal(event)"
-                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                    Batal
-                </button>
-                <button onclick="submitEditForm()"
-                        class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg inline-flex items-center gap-2">
-                    <i class='bx bx-save'></i>
-                    <span>Update Peserta</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-{{-- deleteModal: overlay z-30 tidak menutupi navbar (z-40), card z-50 di atas navbar --}}
-<div id="deleteModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-500/75" onclick="closeDeleteModal(event)"></div>
-<div id="deleteModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[35] overflow-y-auto">
-    <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-        <div class="inline-block w-full max-w-md my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-            <div class="p-6 border-b border-gray-100 modal-header">
-                <div class="flex items-center justify-center mb-4">
-                    <div class="flex items-center justify-center w-16 h-16 border rounded-full bg-gradient-to-br from-red-50 to-red-100/50 border-red-100">
-                        <i class='text-2xl text-red-600 bx bx-trash-alt'></i>
-                    </div>
-                </div>
-                <h3 class="text-xl font-bold text-center text-gray-800">Hapus Peserta</h3>
-                <p class="mt-1 text-sm text-center text-gray-600">Konfirmasi penghapusan data peserta</p>
-            </div>
-
-            <div class="p-6">
-                <div class="text-center">
-                    <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-50">
-                        <i class='text-xl text-red-600 bx bx-error'></i>
-                    </div>
-                    <h4 class="mb-2 text-lg font-semibold text-gray-800">Apakah Anda yakin?</h4>
-                    <p class="text-sm leading-relaxed text-gray-600">
-                        Data peserta yang dihapus <span class="font-medium text-red-600">tidak dapat dikembalikan</span>.
-                        Semua data terkait akan hilang secara permanen.
-                    </p>
-                    <div class="p-4 mt-4 border border-gray-100 rounded-lg bg-gray-50">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500">ID Peserta:</span>
-                            <span class="text-sm font-medium text-gray-800" id="deletePesertaId">-</span>
-                        </div>
-                        <div class="flex items-center justify-between mt-2">
-                            <span class="text-sm text-gray-500">Nama:</span>
-                            <span class="text-sm font-medium text-gray-800" id="deletePesertaName">-</span>
-                        </div>
-                        <div class="flex items-center justify-between mt-2">
-                            <span class="text-sm text-gray-500">Jenis:</span>
-                            <span class="text-sm font-medium text-gray-800" id="deletePesertaJenis">-</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
-                <button onclick="closeDeleteModal(event)"
-                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                    <i class='mr-2 bx bx-x'></i>
-                    Batal
-                </button>
-                <button onclick="confirmDeletePeserta()"
-                        class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-red-500/20 inline-flex items-center gap-2">
-                    <i class='bx bx-trash-alt'></i>
-                    <span>Ya, Hapus Data</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="printModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-900/50 backdrop-blur-sm" onclick="closePrintModal(event)"></div>
-<div id="printModal" class="hidden fixed inset-0 z-[40] overflow-y-auto items-center justify-center p-4">
-    <div class="relative w-full max-w-2xl transition-all transform bg-transparent">
-        <div class="absolute right-0 z-50 -top-12">
-            <button onclick="closePrintModal(event)" 
-                    class="flex items-center justify-center w-10 h-10 text-white transition-all bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md">
-                <i class='text-2xl bx bx-x'></i>
-            </button>
-        </div>
-        
-        <div class="overflow-hidden bg-white shadow-2xl rounded-2xl">
-            <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-100 rounded-lg">
-                        <i class='text-xl bx bx-id-card'></i>
-                    </div>
+    <div id="createModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[1100] overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div
+                class="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
                     <div>
-                        <h4 class="font-bold text-gray-800">Preview ID Card</h4>
-                        <p class="text-xs text-gray-500">Tampilan sebelum dicetak</p>
+                        <h3 class="text-2xl font-bold text-gray-800">Tambah Peserta Baru</h3>
+                        <p class="mt-1 text-gray-600">Masukkan data peserta PKL atau Magang</p>
+                    </div>
+                    <button onclick="closeCreateModal(event)"
+                        class="p-2 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
+                        <i class='text-2xl bx bx-x'></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div id="createModalContent">
+                        <div class="py-12 text-center">
+                            <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
+                            <p class="mt-3 text-gray-600">Memuat formulir...</p>
+                        </div>
                     </div>
                 </div>
-                <button onclick="document.getElementById('printFrame').contentWindow.print()" 
-                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition-all rounded-lg bg-indigo-600 hover:bg-indigo-700 shadow-md active:scale-95">
-                    <i class='bx bx-printer'></i>
-                    <span>Cetak Sekarang</span>
-                </button>
-            </div>
-            <div class="relative bg-gray-100 aspect-[4/5] sm:aspect-video flex items-center justify-center p-8">
-                <div id="printLoader" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
-                    <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
-                    <p class="mt-3 text-sm font-medium text-gray-600">Menyiapkan Preview...</p>
+                <div class="flex justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
+                    <button onclick="closeCreateModal(event)"
+                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        Batal
+                    </button>
+                    <button onclick="submitCreateForm()"
+                        class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg inline-flex items-center gap-2">
+                        <i class='bx bx-save'></i>
+                        <span>Simpan Peserta</span>
+                    </button>
                 </div>
-                <iframe id="printFrame" src="" class="w-full h-full border-none shadow-lg rounded-lg bg-white" onload="document.getElementById('printLoader').classList.add('opacity-0', 'pointer-events-none')"></iframe>
             </div>
         </div>
     </div>
-</div>
+
+    {{-- editModal: overlay z-30 tidak menutupi navbar (z-40), card z-50 di atas navbar --}}
+    <div id="editModalOverlay" class="hidden fixed inset-0 z-[950] bg-gray-500/75" onclick="closeEditModal(event)"></div>
+    <div id="editModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[1100] overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div
+                class="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Edit Peserta</h3>
+                        <p class="mt-1 text-gray-600">Perbarui data peserta</p>
+                    </div>
+                    <button onclick="closeEditModal(event)"
+                        class="p-2 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
+                        <i class='text-2xl bx bx-x'></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div id="editModalContent">
+                        <div class="py-12 text-center">
+                            <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
+                            <p class="mt-3 text-gray-600">Memuat formulir...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
+                    <button onclick="closeEditModal(event)"
+                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        Batal
+                    </button>
+                    <button onclick="submitEditForm()"
+                        class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg inline-flex items-center gap-2">
+                        <i class='bx bx-save'></i>
+                        <span>Update Peserta</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="deleteModalOverlay" class="hidden fixed inset-0 z-[950] bg-gray-500/75" onclick="closeDeleteModal(event)">
+    </div>
+    <div id="deleteModal" class="hidden fixed top-16 inset-x-0 bottom-0 z-[1100] overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div
+                class="inline-block w-full max-w-md my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                <div class="p-6 border-b border-gray-100 modal-header">
+                    <div class="flex items-center justify-center mb-4">
+                        <div
+                            class="flex items-center justify-center w-16 h-16 border rounded-full bg-gradient-to-br from-red-50 to-red-100/50 border-red-100">
+                            <i class='text-2xl text-red-600 bx bx-trash-alt'></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center text-gray-800">Hapus Peserta</h3>
+                    <p class="mt-1 text-sm text-center text-gray-600">Konfirmasi penghapusan data peserta</p>
+                </div>
+
+                <div class="p-6">
+                    <div class="text-center">
+                        <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-50">
+                            <i class='text-xl text-red-600 bx bx-error'></i>
+                        </div>
+                        <h4 class="mb-2 text-lg font-semibold text-gray-800">Apakah Anda yakin?</h4>
+                        <p class="text-sm leading-relaxed text-gray-600">
+                            Data peserta yang dihapus <span class="font-medium text-red-600">tidak dapat
+                                dikembalikan</span>.
+                            Semua data terkait akan hilang secara permanen.
+                        </p>
+                        <div class="p-4 mt-4 border border-gray-100 rounded-lg bg-gray-50">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">ID Peserta:</span>
+                                <span class="text-sm font-medium text-gray-800" id="deletePesertaId">-</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-sm text-gray-500">Nama:</span>
+                                <span class="text-sm font-medium text-gray-800" id="deletePesertaName">-</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-sm text-gray-500">Jenis:</span>
+                                <span class="text-sm font-medium text-gray-800" id="deletePesertaJenis">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 p-6 bg-gray-50 rounded-b-2xl">
+                    <button onclick="closeDeleteModal(event)"
+                        class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <i class='mr-2 bx bx-x'></i>
+                        Batal
+                    </button>
+                    <button onclick="confirmDeletePeserta()"
+                        class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg hover:shadow-red-500/20 inline-flex items-center gap-2">
+                        <i class='bx bx-trash-alt'></i>
+                        <span>Ya, Hapus Data</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="printModalOverlay" class="hidden fixed inset-0 z-[950] bg-gray-900/50 backdrop-blur-sm"
+        onclick="closePrintModal(event)"></div>
+    <div id="printModal" class="hidden fixed inset-0 z-[1100] overflow-y-auto p-4" onclick="closePrintModal(event)">
+        <div class="flex items-center justify-center min-h-full">
+            <div class="relative w-full max-w-2xl transition-all transform bg-transparent" onclick="event.stopPropagation()">
+            <div class="absolute right-0 z-50 -top-12">
+                <button onclick="closePrintModal(event)"
+                    class="flex items-center justify-center w-10 h-10 text-white transition-all bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md">
+                    <i class='text-2xl bx bx-x'></i>
+                </button>
+            </div>
+
+                <div class="overflow-hidden bg-white shadow-2xl rounded-2xl">
+                <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-100 rounded-lg">
+                            <i class='text-xl bx bx-id-card'></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Preview ID Card</h4>
+                            <p class="text-xs text-gray-500">Tampilan sebelum dicetak</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a id="downloadIdCardBtn" href="#" download
+                            class="group relative flex items-center justify-start w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:w-36 hover:bg-emerald-600 hover:text-white overflow-hidden shadow-sm active:scale-95">
+                            <div class="flex items-center justify-center min-w-[40px]">
+                                <i class='text-xl bx bx-download'></i>
+                            </div>
+                            <span class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Download PDF</span>
+                        </a>
+
+                        <button onclick="document.getElementById('printFrame').contentWindow.print()"
+                            class="group relative flex items-center justify-start w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:w-28 hover:bg-indigo-600 hover:text-white overflow-hidden shadow-sm active:scale-95">
+                            <div class="flex items-center justify-center min-w-[40px]">
+                                <i class='text-xl bx bx-printer'></i>
+                            </div>
+                            <span class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Cetak</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="relative bg-gray-100 aspect-[4/5] sm:aspect-video flex items-center justify-center p-8">
+                    <div id="printLoader"
+                        class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
+                        <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
+                        <p class="mt-3 text-sm font-medium text-gray-600">Menyiapkan Preview...</p>
+                    </div>
+                    <iframe id="printFrame" src=""
+                        class="w-full h-full border-none shadow-lg rounded-lg bg-white"
+                        onload="document.getElementById('printLoader').classList.add('opacity-0', 'pointer-events-none')"></iframe>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endpush
 
 @push('styles')
@@ -379,14 +401,14 @@
 @endpush
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    window.pesertaConfig = {
-        indexUrl: '{{ route('admin.peserta.index') }}',
-        createUrl: '{{ route('admin.peserta.create') }}',
-        storeUrl: '{{ route('admin.peserta.store') }}',
-        baseUrl: '{{ url('admin/peserta') }}'
-    };
-</script>
-@vite('resources/js/admin/peserta.js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.pesertaConfig = {
+            indexUrl: '{{ route('admin.peserta.index') }}',
+            createUrl: '{{ route('admin.peserta.create') }}',
+            storeUrl: '{{ route('admin.peserta.store') }}',
+            baseUrl: '{{ url('admin/peserta') }}'
+        };
+    </script>
+    @vite('resources/js/admin/peserta.js')
 @endsection

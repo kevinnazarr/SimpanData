@@ -7,9 +7,9 @@
             <div class="relative p-5 border-b border-gray-100">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
-                        @if($user->peserta && $user->peserta->foto)
+                        @if($user->photo_profile)
                         <div class="relative flex-shrink-0">
-                            <img src="{{ asset('storage/'.$user->peserta->foto) }}"
+                            <img src="{{ asset('storage/'.$user->photo_profile) }}"
                                 alt="{{ $user->username }}"
                                 class="object-cover border-white rounded-full shadow-md w-14 h-14 border-3">
                             @if($user->peserta && $user->peserta->is_lengkap)

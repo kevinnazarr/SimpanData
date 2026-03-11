@@ -54,6 +54,18 @@
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                     <div class="mt-1 text-sm text-red-600 error-message"></div>
                 </div>
+                <div>
+                    <label for="edit_nim_nis" class="block mb-2 text-sm font-medium text-gray-700">NIM / NIS</label>
+                    <input type="text" id="edit_nim_nis" name="nim_nis" value="{{ $peserta->nim_nis }}"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div class="mt-1 text-sm text-red-600 error-message"></div>
+                </div>
+                <div>
+                    <label for="edit_tugas" class="block mb-2 text-sm font-medium text-gray-700">Tugas</label>
+                    <input type="text" id="edit_tugas" name="tugas" value="{{ $peserta->tugas }}"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div class="mt-1 text-sm text-red-600 error-message"></div>
+                </div>
                 <div class="md:col-span-2">
                     <label for="edit_alamat" class="block mb-2 text-sm font-medium text-gray-700">Alamat</label>
                     <textarea id="edit_alamat" name="alamat" rows="3"
@@ -66,9 +78,9 @@
                 </div>
                 <div>
                     <label for="edit_foto" class="block mb-2 text-sm font-medium text-gray-700">Foto</label>
-                    @if($peserta->foto)
+                    @if($peserta->user->photo_profile)
                     <div class="mb-2">
-                        <img src="{{ asset('storage/'.$peserta->foto) }}" alt="{{ $peserta->nama }}" class="object-cover w-20 h-20 rounded-lg">
+                        <img src="{{ asset('storage/'.$peserta->user->photo_profile) }}" alt="{{ $peserta->nama }}" class="object-cover w-20 h-20 rounded-lg">
                     </div>
                     @endif
                     <input type="file" id="edit_foto" name="foto" accept="image/*"

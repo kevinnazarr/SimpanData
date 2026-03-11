@@ -53,8 +53,8 @@
             <div class="p-6 bg-white border border-gray-100 shadow-soft rounded-2xl">
                 <h3 class="mb-4 text-xs font-bold tracking-widest uppercase text-slate-400">Informasi Peserta</h3>
                 <div class="flex items-center gap-4">
-                    @if($laporan->peserta->foto && Storage::disk('public')->exists($laporan->peserta->foto))
-                        <img src="{{ asset('storage/' . $laporan->peserta->foto) }}"
+                    @if($laporan->peserta->user->photo_profile)
+                        <img src="{{ asset('storage/' . $laporan->peserta->user->photo_profile) }}"
                             alt="{{ $laporan->peserta->nama }}"
                             class="w-12 h-12 object-cover rounded-2xl shadow-soft">
                     @else

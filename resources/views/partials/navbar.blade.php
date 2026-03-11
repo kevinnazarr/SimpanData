@@ -60,7 +60,7 @@
                                             </div>
                                         </div>
                                         <div class="p-2 text-[11px] leading-relaxed text-red-700 bg-white/50 rounded-lg italic max-h-24 overflow-y-auto scrollbar-thin">
-                                            {{ $notifs['akhir']->catatan_admin }}
+                                            {{ $notifs['akhir']?->catatan_admin ?? '-' }}
                                         </div>
                                     </a>
                                 @endif
@@ -102,7 +102,7 @@
                     $user = Auth::user();
                     $peserta = $user->peserta ?? null;
                     $role = $user->role ?? 'User';
-                    $profilePhoto = ($role === 'peserta' && $peserta) ? $peserta->foto : null;
+                    $profilePhoto = $user->photo_profile;
                     $displayName = $peserta->nama ?? $user->name ?? $user->username ?? 'User';
                     $initial = strtoupper(substr($displayName, 0, 1));
                 @endphp
@@ -178,7 +178,7 @@
                 e.stopPropagation();
                 // Close profile dropdown if open
                 if (typeof closeDropdown === 'function') closeDropdown();
-                
+
                 const isOpen = !notificationMenu.classList.contains('invisible');
                 if (isOpen) {
                     closeNotificationDropdown();
@@ -211,7 +211,7 @@
             dropdownBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (typeof closeNotificationDropdown === 'function') closeNotificationDropdown();
-                
+
                 const isOpen = !dropdownMenu.classList.contains('invisible');
 
                 if (isOpen) {
@@ -239,7 +239,7 @@
 
             const navbarLogoutBtn = document.getElementById('navbarLogoutBtn');
             const logoutModal = document.getElementById('logout-modal');
-            
+
             if (navbarLogoutBtn && logoutModal) {
                 navbarLogoutBtn.addEventListener('click', (e) => {
                     e.preventDefault();

@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const mapContainer = document.getElementById('mapContainer');
     const locationLabel = document.getElementById('locationLabel');
     const mapDiv = document.getElementById('map');
+    const latitudeInput = document.getElementById('latitudeInput');
+    const longitudeInput = document.getElementById('longitudeInput');
     let map, marker, currentLat, currentLng;
 
     function showInlineMap() {
@@ -25,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function initMap(lat, lng) {
         currentLat = lat;
         currentLng = lng;
+
+        if(latitudeInput) latitudeInput.value = lat;
+        if(longitudeInput) longitudeInput.value = lng;
 
         showInlineMap();
 
@@ -41,6 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const newPos = marker.getLatLng();
                 currentLat = newPos.lat;
                 currentLng = newPos.lng;
+                
+                if(latitudeInput) latitudeInput.value = currentLat;
+                if(longitudeInput) longitudeInput.value = currentLng;
+
                 locationLabel.innerHTML =
                     `<i class='mr-1 bx bx-sync bx-spin'></i> Memperbarui Alamat...`;
                 reverseGeocode(currentLat, currentLng);
@@ -126,6 +135,66 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const btnPrintIDCard = document.getElementById('btnPrintIDCard');
+    const printModal = document.getElementById('printModal');
+    const printModalOverlay = document.getElementById('printModalOverlay');
+    const printModalContainer = document.getElementById('printModalContainer');
+    const printFrame = document.getElementById('printFrame');
+    const printLoader = document.getElementById('printLoader');
+
+    if (btnPrintIDCard) {
+        btnPrintIDCard.addEventListener('click', function() {
+            openPrintModal();
+        });
+    }
+
+    window.openPrintModal = function() {
+        if (!printModal || !printModalOverlay || !printFrame) return;
+
+        const downloadBtn = document.getElementById('downloadIdCardBtn');
+        printFrame.src = window.printUrl;
+        
+        if (downloadBtn) {
+            const separator = window.printUrl.includes('?') ? '&' : '?';
+            downloadBtn.href = window.printUrl + separator + 'download=1';
+        }
+
+        printLoader.classList.remove('hidden');
+        
+        printModal.classList.remove('hidden');
+        printModalOverlay.classList.remove('hidden');
+        
+        setTimeout(() => {
+            printModalContainer.classList.remove('scale-95', 'opacity-0');
+            printModalContainer.classList.add('scale-100', 'opacity-100');
+        }, 10);
+
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closePrintModal = function(e) {
+        if (e) {
+            e.stopPropagation();
+        }
+
+        if (printModalContainer) {
+            printModalContainer.classList.remove('scale-100', 'opacity-100');
+            printModalContainer.classList.add('scale-95', 'opacity-0');
+        }
+        
+        if (printModalOverlay) {
+            printModalOverlay.classList.add('hidden');
+        }
+
+        setTimeout(() => {
+            if (printModal) {
+                printModal.classList.add('hidden');
+            }
+            if (printFrame) printFrame.src = '';
+            document.body.style.overflow = '';
+        }, 300);
+    };
+
     fotoInput.addEventListener('change', function() {
         const file = this.files[0];
         if (file) {
@@ -138,4 +207,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-

@@ -537,6 +537,7 @@ window.openPrintModal = function(id) {
     const overlay = document.getElementById('printModalOverlay');
     const frame = document.getElementById('printFrame');
     const loader = document.getElementById('printLoader');
+    const downloadBtn = document.getElementById('downloadIdCardBtn');
     const config = window.pesertaConfig || {};
 
     if (!modal || !frame || !loader) return;
@@ -544,8 +545,11 @@ window.openPrintModal = function(id) {
     loader.classList.remove('opacity-0', 'pointer-events-none');
     frame.src = `${config.baseUrl}/${id}/print-id-card`;
     
+    if (downloadBtn) {
+        downloadBtn.href = `${config.baseUrl}/${id}/print-id-card?download=1`;
+    }
+
     modal.classList.remove('hidden');
-    modal.classList.add('flex');
     overlay.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
     toggleBlur(true);
@@ -564,7 +568,6 @@ window.closePrintModal = function(e) {
 
         if (modal) {
             modal.classList.add('hidden');
-            modal.classList.remove('flex');
             overlay.classList.add('hidden');
             frame.src = '';
             document.body.style.overflow = '';
