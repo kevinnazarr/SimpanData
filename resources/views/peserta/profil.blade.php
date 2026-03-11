@@ -69,9 +69,16 @@
                         <div class="text-center md:text-left">
                             <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">
                                 {{ $peserta->nama ?? $user->username }}</h1>
-                            <p
-                                class="inline-block px-3 py-1 mt-2 text-xs font-bold tracking-widest uppercase border rounded-full text-primary bg-primary/5 border-primary/10">
-                                {{ $jenisKegiatan }} - {{ $peserta->jurusan ?? 'Jurusan Belum Diisi' }}</p>
+                            <div class="flex flex-wrap items-center justify-center gap-2 mt-2 md:justify-start">
+                                <p class="px-3 py-1 text-xs font-bold tracking-widest uppercase border rounded-full text-primary bg-primary/5 border-primary/10 mb-0">
+                                    {{ $jenisKegiatan }} - {{ $peserta->jurusan ?? 'Jurusan Belum Diisi' }}
+                                </p>
+                                @if($peserta && $peserta->tugas)
+                                    <span class="px-3 py-1 text-[10px] font-black tracking-widest uppercase border rounded-lg text-indigo-600 bg-indigo-50 border-indigo-100 shadow-sm">
+                                        <i class='bx bx-task mr-1 text-xs'></i> {{ $peserta->tugas }}
+                                    </span>
+                                @endif
+                            </div>
                             <div class="flex flex-wrap justify-center gap-4 mt-5 md:justify-start">
                                 <span
                                     class="px-3.5 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 uppercase tracking-wider shadow-sm">
@@ -350,10 +357,20 @@
                             <input type="text" name="jurusan" value="{{ old('jurusan', $peserta->jurusan ?? '') }}"
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('jurusan') @enderror"
                                 placeholder="Teknik Informatika / Multimedia...">
-                            @error('jurusan')
-                                <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                             @error('jurusan')
+                                 <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
+                             @enderror
+                         </div>
+
+                         <div class="space-y-1">
+                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Tugas</label>
+                             <input type="text" name="tugas" value="{{ old('tugas', $peserta->tugas ?? '') }}"
+                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('tugas') @enderror"
+                                 placeholder="Contoh: Web Developer, UI Designer...">
+                             @error('tugas')
+                                 <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
+                             @enderror
+                         </div>
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Jenis
@@ -506,6 +523,7 @@
             </form>
         </div>
     </div>
+
 @endsection
 
 @push('modals')
@@ -581,4 +599,42 @@
 @section('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        window.openPrintModal = function(id) {
+            const modal = document.getElementById('printModal');
+            const overlay = document.getElementById('printModalOverlay');
+            const frame = document.getElementById('printFrame');
+            const loader = document.getElementById('printLoader');
+            const baseUrl = '{{ route("peserta.profil.print") }}';
+
+            if (!modal || !frame || !loader) return;
+
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            frame.src = baseUrl;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closePrintModal = function(e) {
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+
+            const modal = document.getElementById('printModal');
+            const overlay = document.getElementById('printModalOverlay');
+            const frame = document.getElementById('printFrame');
+
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                if (overlay) overlay.classList.add('hidden');
+                if (frame) frame.src = '';
+                document.body.style.overflow = '';
+            }
+        };
+    </script>
 @endsection

@@ -12,10 +12,10 @@
         }
         return asset($path);
     };
-    
+
     $bgUrl = $getImg('storage/background/ID-Card-Template.png');
-    $photoUrl = ($peserta->user && $peserta->user->photo_profile) 
-        ? $getImg('storage/' . $peserta->user->photo_profile) 
+    $photoUrl = ($peserta->user && $peserta->user->photo_profile)
+        ? $getImg('storage/' . $peserta->user->photo_profile)
         : null;
 
     $words = explode(' ', trim($peserta->nama));
@@ -179,14 +179,14 @@
         }
 
         .initial-placeholder {
-            width: 100%; 
-            height: 100%; 
-            line-height: 23mm; 
-            text-align: center; 
-            background: #f0f4f8; 
-            font-size: 24pt; 
-            color: #102A43; 
-            font-weight: 800; 
+            width: 100%;
+            height: 100%;
+            line-height: 23mm;
+            text-align: center;
+            background: #f0f4f8;
+            font-size: 24pt;
+            color: #102A43;
+            font-weight: 800;
             border-radius: 50%;
         }
     </style>

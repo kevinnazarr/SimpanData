@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('asal_sekolah_universitas');
             $table->string('jurusan');
+            $table->string('tugas')->nullable();
             $table->text('alamat')->nullable();
             $table->string('no_telepon')->nullable();
             $table->enum('jenis_kegiatan', ['PKL', 'Magang']);
