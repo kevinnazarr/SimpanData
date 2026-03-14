@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PesertaController extends Controller
 {
@@ -114,6 +115,10 @@ class PesertaController extends Controller
             'status' => 'required|in:Aktif,Selesai,Arsip',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'nim_nis' => 'nullable|string|max:255',
+            'tugas' => 'nullable|string|max:255',
+            'latitude' => 'nullable|string|max:255',
+            'longitude' => 'nullable|string|max:255',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -125,13 +130,9 @@ class PesertaController extends Controller
                 'username' => $validated['username'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => 'peserta'
+                'role' => 'peserta',
+                'photo_profile' => $request->hasFile('foto') ? $request->file('foto')->store('peserta/foto', 'public') : null
             ]);
-
-            $fotoPath = null;
-            if ($request->hasFile('foto')) {
-                $fotoPath = $request->file('foto')->store('peserta/foto', 'public');
-            }
 
             Peserta::create([
                 'id' => $user->id,
@@ -145,7 +146,10 @@ class PesertaController extends Controller
                 'status' => $validated['status'],
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'tanggal_selesai' => $validated['tanggal_selesai'],
-                'foto' => $fotoPath
+                'nim_nis' => $validated['nim_nis'] ?? null,
+                'tugas' => $validated['tugas'] ?? null,
+                'latitude' => $validated['latitude'] ?? null,
+                'longitude' => $validated['longitude'] ?? null,
             ]);
 
             DB::commit();
@@ -222,6 +226,10 @@ class PesertaController extends Controller
             'status' => 'required|in:Aktif,Selesai,Arsip',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'nim_nis' => 'nullable|string|max:255',
+            'tugas' => 'nullable|string|max:255',
+            'latitude' => 'nullable|string|max:255',
+            'longitude' => 'nullable|string|max:255',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -239,12 +247,8 @@ class PesertaController extends Controller
 
             $peserta->user->update($userData);
 
-            $fotoPath = $peserta->foto;
             if ($request->hasFile('foto')) {
-                if ($fotoPath) {
-                    Storage::disk('public')->delete($fotoPath);
-                }
-                $fotoPath = $request->file('foto')->store('peserta/foto', 'public');
+                $peserta->user->updateProfilePhoto($request->file('foto'), 'peserta/foto');
             }
 
             $peserta->update([
@@ -258,7 +262,10 @@ class PesertaController extends Controller
                 'status' => $validated['status'],
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'tanggal_selesai' => $validated['tanggal_selesai'],
-                'foto' => $fotoPath
+                'nim_nis' => $validated['nim_nis'] ?? null,
+                'tugas' => $validated['tugas'] ?? null,
+                'latitude' => $validated['latitude'] ?? null,
+                'longitude' => $validated['longitude'] ?? null,
             ]);
 
             DB::commit();
@@ -305,9 +312,7 @@ class PesertaController extends Controller
                 $peserta->arsip->delete();
             }
 
-            if ($peserta->foto) {
-                Storage::disk('public')->delete($peserta->foto);
-            }
+            $peserta->user->deleteProfilePhoto();
 
             $peserta->delete();
             $peserta->user->delete();
@@ -331,6 +336,19 @@ class PesertaController extends Controller
     public function printIdCard($id)
     {
         $peserta = Peserta::findOrFail($id);
-        return view('admin.peserta.print-id-card', compact('peserta'));
+
+        if (request()->has('download')) {
+            $pdf = Pdf::loadView('admin.peserta.print-id-card', [
+                'peserta' => $peserta,
+                'isPdf' => true
+            ])->setPaper([0, 0, 153.07, 242.65], 'portrait');
+            
+            return $pdf->download('ID_Card_' . str_replace(' ', '_', $peserta->nama) . '.pdf');
+        }
+
+        return view('admin.peserta.print-id-card', [
+            'peserta' => $peserta,
+            'isPdf' => false
+        ]);
     }
 }

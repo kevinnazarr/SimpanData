@@ -70,7 +70,6 @@ class Peserta extends Model
 
     protected $fillable = [
         'id',
-        'foto',
         'nama',
         'asal_sekolah_universitas',
         'jurusan',
@@ -80,6 +79,10 @@ class Peserta extends Model
         'jenis_kegiatan',
         'tanggal_mulai',
         'tanggal_selesai',
+        'nim_nis',
+        'tugas',
+        'latitude',
+        'longitude',
         'status',
     ];
 

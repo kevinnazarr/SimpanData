@@ -12,8 +12,8 @@
 
                 <div class="p-4">
                     <div class="flex items-start gap-3">
-                        @if($p->foto)
-                            <img src="{{ asset('storage/'.$p->foto) }}"
+                        @if($p->user->photo_profile)
+                            <img src="{{ asset('storage/'.$p->user->photo_profile) }}"
                                 alt="{{ $p->nama }}"
                                 class="object-cover w-12 h-12 border-2 border-gray-200 rounded-full">
                         @else

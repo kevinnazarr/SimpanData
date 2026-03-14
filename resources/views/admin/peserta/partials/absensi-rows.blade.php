@@ -50,7 +50,7 @@
         <td class="px-6 py-4 text-center">
             @if ($absensi->latitude && $absensi->longitude)
                 <button
-                    onclick="showMap('{{ $absensi->latitude }}', '{{ $absensi->longitude }}')"
+                    onclick="openPresensiDetail('{{ addslashes($absensi->peserta->nama) }}', '{{ $absensi->waktu_absen->format('H:i') }}', '{{ $absensi->jenis_absen }}', '{{ $absensi->status }}', '{{ $absensi->mode_kerja }}', {{ $absensi->latitude }}, {{ $absensi->longitude }}, '{{ addslashes($absensi->keterangan ?? '') }}')"
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:border-blue-300 transition-all group">
                     <i class='bx bx-map-pin'></i>
                     <span>Detail</span>

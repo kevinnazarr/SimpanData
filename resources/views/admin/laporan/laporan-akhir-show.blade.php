@@ -29,8 +29,8 @@
                 <h3 class="mb-4 text-sm font-bold tracking-widest uppercase text-slate-400">Informasi Peserta</h3>
                 <div class="space-y-4">
                     <div class="flex items-center gap-4 p-4 transition-colors bg-white border shadow-sm rounded-2xl group-hover:shadow-md">
-                        @if($laporan->peserta->foto && Storage::disk('public')->exists($laporan->peserta->foto))
-                            <img src="{{ asset('storage/' . $laporan->peserta->foto) }}"
+                        @if($laporan->peserta->user->photo_profile)
+                            <img src="{{ asset('storage/' . $laporan->peserta->user->photo_profile) }}"
                                 alt="{{ $laporan->peserta->nama }}"
                                 class="object-cover shadow-sm w-16 h-16 rounded-xl">
                         @else

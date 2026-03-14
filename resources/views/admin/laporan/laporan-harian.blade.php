@@ -197,8 +197,8 @@
                                 <td class="px-4 py-3 text-gray-500">{{ $index + $laporans->firstItem() }}</td>
                                 <td class="px-4 py-3 font-medium text-gray-900">
                                     <div class="flex items-center gap-3">
-                                        @if($laporan->peserta->foto && Storage::disk('public')->exists($laporan->peserta->foto))
-                                            <img src="{{ asset('storage/' . $laporan->peserta->foto) }}"
+                                        @if($laporan->peserta->user->photo_profile)
+                                            <img src="{{ asset('storage/' . $laporan->peserta->user->photo_profile) }}"
                                                 alt="{{ $laporan->peserta->nama }}"
                                                 class="flex-shrink-0 object-cover w-8 h-8 rounded-lg shadow-soft">
                                         @else

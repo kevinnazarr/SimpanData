@@ -25,6 +25,9 @@ return new class extends Migration
             $table->enum('jenis_kegiatan', ['PKL', 'Magang']);
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
+            $table->string('nim_nis')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->enum('status', ['Aktif', 'Selesai', 'Arsip'])->default('Aktif');
             $table->timestamps();
         });

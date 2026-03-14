@@ -10,12 +10,20 @@
     </div>
 
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <!-- Profile Card -->
         <div class="lg:col-span-1">
             <div class="p-6 bg-white border border-gray-100 shadow-soft rounded-2xl">
                 <div class="flex flex-col items-center text-center">
-                    <div class="flex items-center justify-center w-24 h-24 mb-4 text-3xl font-bold text-white rounded-full shadow-lg bg-gradient-to-br from-primary to-blue-600 ring-4 ring-blue-50">
-                        {{ strtoupper(substr($user->name ?? $user->username, 0, 1)) }}
+                    <div class="relative group mb-4">
+                        <div class="w-24 h-24 overflow-hidden rounded-full shadow-lg bg-gradient-to-br from-primary to-blue-600 ring-4 ring-blue-50 flex items-center justify-center">
+                            @if($user->photo_profile)
+                                <img src="{{ asset('storage/' . $user->photo_profile) }}" class="object-cover w-full h-full">
+                            @else
+                                <span class="text-3xl font-bold text-white">{{ strtoupper(substr($user->username, 0, 1)) }}</span>
+                            @endif
+                        </div>
+                        <label for="foto" class="absolute bottom-0 right-0 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-primary shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
+                            <i class='bx bx-camera'></i>
+                        </label>
                     </div>
                     <h2 class="text-xl font-bold text-slate-900">{{ $user->username }}</h2>
                     <p class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">{{ $user->role }}</p>
@@ -29,11 +37,11 @@
             </div>
         </div>
 
-        <!-- Edit Form -->
         <div class="lg:col-span-2">
             <div class="p-8 bg-white border border-gray-100 shadow-soft rounded-2xl">
-                <form action="{{ route('admin.profile.update') }}" method="POST">
+                <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="file" name="foto" id="foto" class="hidden" onchange="this.form.submit()">
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div class="space-y-2">
                             <label for="username" class="text-sm font-bold text-slate-700">Username</label>

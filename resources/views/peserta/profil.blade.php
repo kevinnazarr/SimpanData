@@ -51,8 +51,8 @@
                 <div class="relative z-10 flex flex-col items-center justify-between gap-6 md:flex-row">
                     <div class="flex flex-col items-center gap-6 md:flex-row">
                         <div class="relative">
-                            @if ($peserta && $peserta->foto)
-                                <img src="{{ asset('storage/' . $peserta->foto) }}"
+                            @if ($user->photo_profile)
+                                <img src="{{ asset('storage/' . $user->photo_profile) }}"
                                     class="object-cover w-32 h-32 border-4 border-white shadow-lg rounded-2xl">
                             @else
                                 <div
@@ -70,14 +70,10 @@
                             <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">
                                 {{ $peserta->nama ?? $user->username }}</h1>
                             <div class="flex flex-wrap items-center justify-center gap-2 mt-2 md:justify-start">
-                                <p class="px-3 py-1 text-xs font-bold tracking-widest uppercase border rounded-full text-primary bg-primary/5 border-primary/10 mb-0">
+                                <p
+                                    class="px-3 py-1 text-xs font-bold tracking-widest uppercase border rounded-full text-primary bg-primary/5 border-primary/10 mb-0">
                                     {{ $jenisKegiatan }} - {{ $peserta->jurusan ?? 'Jurusan Belum Diisi' }}
                                 </p>
-                                @if($peserta && $peserta->tugas)
-                                    <span class="px-3 py-1 text-[10px] font-black tracking-widest uppercase border rounded-lg text-indigo-600 bg-indigo-50 border-indigo-100 shadow-sm">
-                                        <i class='bx bx-task mr-1 text-xs'></i> {{ $peserta->tugas }}
-                                    </span>
-                                @endif
                             </div>
                             <div class="flex flex-wrap justify-center gap-4 mt-5 md:justify-start">
                                 <span
@@ -87,14 +83,26 @@
                                 </span>
                                 <span
                                     class="px-3.5 py-1.5 bg-blue-100/50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200 uppercase tracking-wider shadow-sm">
-                                    <i class='bx bx-check-shield mr-1.5 text-base'></i> Akun {{ ucfirst($user->role) }}
+                                    <i class='bx bx-id-card mr-1.5 text-base'></i>
+                                    {{ $peserta && $peserta->nim_nis ? $peserta->nim_nis : '-' }}
                                 </span>
+                                <span
+                                    class="px-3.5 py-1.5 bg-indigo-100/50 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 uppercase tracking-wider shadow-sm">
+                                    <i class='bx bx-task mr-1.5 text-base'></i>
+                                    {{ $peserta && $peserta->tugas ? $peserta->tugas : '-' }}
+                                </span>
+                                @if (!$peserta)
+                                    <span
+                                        class="px-3.5 py-1.5 bg-blue-100/50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200 uppercase tracking-wider shadow-sm">
+                                        <i class='bx bx-check-shield mr-1.5 text-base'></i> Akun {{ ucfirst($user->role) }}
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <button onclick="openPrintModal('{{ $peserta->id }}')" 
+                        <button id="btnPrintIDCard"
                             class="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-primary-dark transition-all shadow-sm active:scale-[0.98]">
                             <i class='text-base bx bx-printer'></i> Cetak ID Card
                         </button>
@@ -140,6 +148,14 @@
                                 <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Jenis
                                     Kegiatan</label>
                                 <p class="text-base font-bold text-slate-800">{{ $peserta->jenis_kegiatan ?? '-' }}</p>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold tracking-widest uppercase text-slate-500">NIM / NIS</label>
+                                <p class="text-base font-bold text-slate-800">{{ $peserta->nim_nis ?? '-' }}</p>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Tugas</label>
+                                <p class="text-base font-bold text-slate-800">{{ $peserta->tugas ?? '-' }}</p>
                             </div>
                             <div class="space-y-2">
                                 <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Masa
@@ -294,8 +310,8 @@
                             <div class="flex items-center gap-6">
                                 <div id="imagePreview"
                                     class="flex items-center justify-center w-24 h-24 overflow-hidden border-2 border-dashed rounded-2xl bg-slate-100 border-slate-200">
-                                    @if ($peserta && $peserta->foto)
-                                        <img src="{{ asset('storage/' . $peserta->foto) }}"
+                                    @if ($user->photo_profile)
+                                        <img src="{{ asset('storage/' . $user->photo_profile) }}"
                                             class="object-cover w-full h-full">
                                     @else
                                         <i class='text-3xl bx bx-camera text-slate-300'></i>
@@ -342,20 +358,11 @@
                             <input type="text" name="jurusan" value="{{ old('jurusan', $peserta->jurusan ?? '') }}"
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('jurusan') @enderror"
                                 placeholder="Teknik Informatika / Multimedia...">
-                             @error('jurusan')
-                                 <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
-                             @enderror
-                         </div>
- 
-                         <div class="space-y-1">
-                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Tugas</label>
-                             <input type="text" name="tugas" value="{{ old('tugas', $peserta->tugas ?? '') }}"
-                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('tugas') @enderror"
-                                 placeholder="Contoh: Web Developer, UI Designer...">
-                             @error('tugas')
-                                 <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
-                             @enderror
-                         </div>
+                            @error('jurusan')
+                                <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Jenis
@@ -396,6 +403,26 @@
                         </div>
 
                         <div class="space-y-1">
+                            <label class="text-xs font-bold tracking-widest uppercase text-slate-500">NIM / NIS</label>
+                            <input type="text" name="nim_nis" value="{{ old('nim_nis', $peserta->nim_nis ?? '') }}"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('nim_nis') @enderror"
+                                placeholder="Masukkan NIM / NIS...">
+                            @error('nim_nis')
+                                <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Tugas</label>
+                            <input type="text" name="tugas" value="{{ old('tugas', $peserta->tugas ?? '') }}"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('tugas') @enderror"
+                                placeholder="Masukkan Tugas...">
+                            @error('tugas')
+                                <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="space-y-1">
                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Nomor HP /
                                 WhatsApp</label>
                             <input type="text" name="no_telepon"
@@ -424,6 +451,10 @@
                                     <i class='text-base bx bx-map-pin'></i> Ambil dari GPS
                                 </button>
                             </div>
+                            <input type="hidden" name="latitude" id="latitudeInput"
+                                value="{{ old('latitude', $peserta->latitude ?? '') }}">
+                            <input type="hidden" name="longitude" id="longitudeInput"
+                                value="{{ old('longitude', $peserta->longitude ?? '') }}">
                             <textarea name="alamat" id="alamatInput" rows="3"
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all @error('alamat') @enderror"
                                 placeholder="Alamat tinggal saat ini...">{{ old('alamat', $peserta->alamat ?? '') }}</textarea>
@@ -488,44 +519,76 @@
 @endsection
 
 @push('modals')
-    {{-- Print Modal --}}
-    <div id="printModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-900/50 backdrop-blur-sm" onclick="closePrintModal(event)"></div>
-    <div id="printModal" class="hidden fixed inset-0 z-[40] overflow-y-auto items-center justify-center p-4">
-        <div class="relative w-full max-w-2xl transition-all transform bg-transparent">
-            <div class="absolute right-0 z-50 -top-12">
-                <button onclick="closePrintModal(event)" 
+    <div id="printModalOverlay" class="hidden fixed inset-0 z-[950] bg-gray-900/50 backdrop-blur-sm"
+        onclick="closePrintModal(event)"></div>
+    <div id="printModal" class="hidden fixed inset-0 z-[1100] overflow-y-auto p-4" onclick="closePrintModal(event)">
+        <div class="flex items-center justify-center min-h-full">
+            <div class="relative w-full max-w-2xl transition-all transform duration-300 scale-95 opacity-0"
+                id="printModalContainer" onclick="event.stopPropagation()">
+                <div class="absolute right-0 z-50 -top-12">
+                    <button onclick="closePrintModal(event)"
                         class="flex items-center justify-center w-10 h-10 text-white transition-all bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md">
-                    <i class='text-2xl bx bx-x'></i>
-                </button>
-            </div>
-            
-            <div class="overflow-hidden bg-white shadow-2xl rounded-2xl">
-                <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-100 rounded-lg">
-                            <i class='text-xl bx bx-id-card'></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-800">Preview ID Card</h4>
-                            <p class="text-xs text-gray-500">Tampilan sebelum dicetak</p>
-                        </div>
-                    </div>
-                    <button onclick="document.getElementById('printFrame').contentWindow.print()" 
-                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition-all rounded-lg bg-indigo-600 hover:bg-indigo-700 shadow-md active:scale-95">
-                        <i class='bx bx-printer'></i>
-                        <span>Cetak Sekarang</span>
+                        <i class='text-2xl bx bx-x'></i>
                     </button>
                 </div>
-                <div class="relative bg-gray-100 aspect-[4/5] sm:aspect-video flex items-center justify-center p-8">
-                    <div id="printLoader" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
-                        <i class="text-4xl text-indigo-600 bx bx-loader-alt bx-spin"></i>
-                        <p class="mt-3 text-sm font-medium text-gray-600">Menyiapkan Preview...</p>
+
+                <div class="overflow-hidden bg-white shadow-2xl rounded-2xl">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center justify-center w-10 h-10 text-primary bg-primary/10 rounded-lg">
+                                <i class='text-xl bx bx-id-card'></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Preview ID Card</h4>
+                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Tampilan sebelum
+                                    dicetak</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a id="downloadIdCardBtn" href="#" download
+                                class="group relative flex items-center justify-start w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:w-36 hover:bg-emerald-600 hover:text-white overflow-hidden shadow-sm active:scale-95">
+                                <div class="flex items-center justify-center min-w-[40px]">
+                                    <i class='text-xl bx bx-download'></i>
+                                </div>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Download
+                                    PDF</span>
+                            </a>
+
+                            <button onclick="document.getElementById('printFrame').contentWindow.print()"
+                                class="group relative flex items-center justify-start w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:w-28 hover:bg-indigo-600 hover:text-white overflow-hidden shadow-sm active:scale-95">
+                                <div class="flex items-center justify-center min-w-[40px]">
+                                    <i class='text-xl bx bx-printer'></i>
+                                </div>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Cetak</span>
+                            </button>
+                        </div>
                     </div>
-                    <iframe id="printFrame" src="" class="w-full h-full border-none shadow-lg rounded-lg bg-white" onload="document.getElementById('printLoader').classList.add('opacity-0', 'pointer-events-none')"></iframe>
+                    <div
+                        class="relative bg-slate-100/50 aspect-[4/5] sm:aspect-video flex items-center justify-center p-4 sm:p-8">
+                        <div id="printLoader"
+                            class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300">
+                            <div class="relative">
+                                <div
+                                    class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin">
+                                </div>
+                            </div>
+                            <p class="mt-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Menyiapkan
+                                Preview...</p>
+                        </div>
+                        <iframe id="printFrame" src=""
+                            class="w-full h-full border-none shadow-xl rounded-xl bg-white"
+                            onload="document.getElementById('printLoader').classList.add('hidden')"></iframe>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        window.printUrl = '{{ route('peserta.profil.print') }}';
+    </script>
 @endpush
 
 @section('scripts')
@@ -537,13 +600,13 @@
             const overlay = document.getElementById('printModalOverlay');
             const frame = document.getElementById('printFrame');
             const loader = document.getElementById('printLoader');
-            const baseUrl = '{{ route("peserta.profil.print") }}';
+            const baseUrl = '{{ route('peserta.profil.print') }}';
 
             if (!modal || !frame || !loader) return;
 
             loader.classList.remove('opacity-0', 'pointer-events-none');
             frame.src = baseUrl;
-            
+
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             overlay.classList.remove('hidden');

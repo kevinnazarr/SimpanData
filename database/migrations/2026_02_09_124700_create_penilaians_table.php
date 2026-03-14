@@ -31,7 +31,7 @@ return new class extends Migration
                 ->on('peserta')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
-                
+
             $table->string('user_id', 20);
             $table->foreign('user_id')
                 ->references('id')
@@ -46,15 +46,15 @@ return new class extends Migration
 
         Schema::create('penilaian_details', function (Blueprint $table) {
             $table->id();
-            
+
             $table->foreignId('penilaian_id')
-                  ->constrained('penilaian')
-                  ->cascadeOnDelete();
-                  
+                ->constrained('penilaian')
+                ->cascadeOnDelete();
+
             $table->foreignId('kategori_penilaian_id')
-                  ->constrained('kategori_penilaians')
-                  ->restrictOnDelete();
-                  
+                ->constrained('kategori_penilaians')
+                ->restrictOnDelete();
+
             $table->unsignedTinyInteger('nilai');
             $table->timestamps();
         });
