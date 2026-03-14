@@ -50,11 +50,6 @@
                                     <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border {{ $peserta->status == 'Aktif' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100' }}">
                                         {{ $peserta->status }}
                                     </span>
-                                    @if($peserta->tugas)
-                                        <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border bg-indigo-50 text-indigo-700 border-indigo-100">
-                                            {{ $peserta->tugas }}
-                                        </span>
-                                    @endif
                                 </div>
                                 <p class="text-sm text-gray-500 font-medium">{{ $peserta->asal_sekolah_universitas }} • {{ $peserta->jurusan }}</p>
                             </div>
@@ -424,8 +419,8 @@
                 </div>
 
                 @if($peserta->latitude && $peserta->longitude)
-                    <div class="relative w-full h-[400px] rounded-3xl overflow-hidden border-4 border-gray-50 shadow-inner z-[1]">
-                        <div id="peserta-map" class="w-full h-full"></div>
+                    <div class="relative w-full h-[400px] rounded-3xl overflow-hidden border-4 border-gray-50 shadow-inner z-[1]" style="min-height: 400px;">
+                        <div id="peserta-map" class="w-full h-full" style="height: 100%;"></div>
                     </div>
                     <div class="mt-4 flex flex-wrap items-center gap-4">
                          <div class="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
@@ -436,17 +431,6 @@
                              <i class='bx bx-map text-lg'></i> Buka di Google Maps
                          </a>
                     </div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var map = L.map('peserta-map').setView([{{ $peserta->latitude }}, {{ $peserta->longitude }}], 16);
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                attribution: '© OpenStreetMap contributors'
-                            }).addTo(map);
-                            L.marker([{{ $peserta->latitude }}, {{ $peserta->longitude }}]).addTo(map)
-                                .bindPopup("<div class='text-center'><b class='text-sm text-gray-800 block mb-1'>{{ addslashes($peserta->nama) }}</b><span class='text-xs text-gray-500'>Lokasi domisili tersimpan.</span></div>")
-                                .openPopup();
-                        });
-                    </script>
                 @else
                     <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100 flex items-center gap-4">
                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-amber-500 shadow-sm shrink-0 border border-amber-100">
@@ -462,60 +446,90 @@
         </div>
     </div>
 
-    @vite(['resources/css/admin/monitoring.css', 'resources/js/admin/monitoring.js'])
 @endsection
 
 @push('modals')
     <div id="map-modal" class="fixed inset-0 z-30 hidden items-center justify-center p-3 md:p-6">
         <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-all duration-500" onclick="closeMap()"></div>
-        <div class="relative w-full max-w-3xl animate-fade-in-up">
-            <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20">
-                <div class="p-5 md:p-8 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-md">
-                    <div class="flex items-center gap-3 md:gap-4">
-                        <div class="w-10 h-10 md:w-14 md:h-14 bg-indigo-50 text-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm border border-indigo-100/50">
-                            <i class='bx bx-map-pin text-xl md:text-2xl'></i>
-                        </div>
-                        <div>
-                            <h3 class="text-base md:text-xl font-black text-gray-900 font-display tracking-tight leading-none mb-1 md:mb-1.5">Lokasi Real-time</h3>
-                            <p class="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest" id="map-coords-text">Mendeteksi Koordinat...</p>
-                        </div>
+        <div class="relative w-full max-w-2xl bg-white shadow-2xl rounded-2xl animate-fade-in-up">
+            <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-10 h-10 text-indigo-600 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <i class='text-xl bx bx-map-pin'></i>
                     </div>
-                    <button onclick="closeMap()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 text-gray-400 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all">
-                        <i class='bx bx-x text-xl md:text-2xl'></i>
-                    </button>
+                    <div>
+                        <h3 class="font-bold text-gray-800">Detail Presensi</h3>
+                        <p class="text-xs text-gray-400 font-medium" id="modalSubtitle">Informasi deteksi lokasi dan status absensi</p>
+                    </div>
                 </div>
-                <div class="relative">
-                    <div id="map-container-leaflet" class="w-full h-[300px] md:h-[450px] bg-gray-50"></div>
-                    <div class="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 z-[1000] animate-fade-in" id="map-address-card" style="display: none;">
-                        <div class="bg-white/90 backdrop-blur-xl p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-2xl border border-white flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
-                            <div class="flex items-start gap-3 md:gap-4 flex-1">
-                                <div class="w-8 h-8 md:w-10 md:h-10 bg-indigo-600 text-white rounded-lg md:rounded-xl flex items-center justify-center shrink-0">
-                                    <i class='bx bx-current-location text-lg'></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-[8px] md:text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">Alamat Terdeteksi</h4>
-                                    <p class="text-xs md:text-sm font-bold text-gray-800 leading-relaxed font-display line-clamp-2" id="location-address">Mengambil data alamat...</p>
-                                </div>
-                            </div>
-                            <a href="#" id="google-maps-link" target="_blank" class="w-full md:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 text-center flex items-center justify-center gap-2">
-                                <i class='bx bxl-google text-base md:text-lg'></i>
-                                <span>Google Maps</span>
-                            </a>
+                <button type="button" onclick="closeMap()"
+                    class="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors rounded-lg hover:text-gray-600 hover:bg-gray-100">
+                    <i class='text-xl bx bx-x'></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div class="p-3 rounded-xl bg-gray-50">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Nama</p>
+                        <p class="text-sm font-bold text-gray-800 truncate" id="modalNama"></p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-50">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Jenis</p>
+                        <p class="text-sm font-bold text-gray-800" id="modalJenis"></p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-50">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Status</p>
+                        <p class="text-sm font-bold text-gray-800" id="modalStatus"></p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-50">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Mode</p>
+                        <p class="text-sm font-bold text-gray-800" id="modalMode"></p>
+                    </div>
+                </div>
+
+                <div id="modalCatatanWrapper" class="hidden">
+                    <div class="flex items-start gap-2 p-3 border border-amber-100 rounded-xl bg-amber-50/50">
+                        <i class='mt-0.5 text-amber-500 bx bx-note'></i>
+                        <div>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-amber-400 mb-0.5">Catatan</p>
+                            <p class="text-xs font-medium leading-relaxed text-gray-700" id="modalCatatan"></p>
                         </div>
                     </div>
+                </div>
+
+                <div id="map-container-leaflet" class="w-full overflow-hidden border border-gray-200 rounded-xl" style="height:320px;"></div>
+
+                <div id="map-address-card" class="flex items-start gap-2 p-3 border border-blue-100 rounded-xl bg-blue-50/50" style="display: none;">
+                    <i class='mt-0.5 text-blue-500 bx bx-current-location'></i>
+                    <div>
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-blue-400 mb-0.5">Alamat</p>
+                        <p class="text-xs font-medium leading-relaxed text-gray-700" id="location-address">Memuat alamat...</p>
+                        <a href="#" id="google-maps-link" target="_blank" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 mt-1 inline-block uppercase tracking-wider">
+                            <i class='bx bx-map-pin mr-1'></i> Buka di Google Maps
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 text-xs text-gray-400">
+                    <i class='bx bx-time-five'></i>
+                    <span id="modalWaktu"></span>
+                    <span class="mx-1">&bull;</span>
+                    <span id="map-coords-text"></span>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        window.closeLocationModal = window.closeMap;
+    </script>
 @endpush
 
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    @vite(['resources/css/admin/monitoring.css', 'resources/css/admin/peserta.css'])
 @endpush
 
-@push('scripts')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-@endpush
 @push('modals')
 <div id="printModalOverlay" class="hidden fixed inset-0 z-30 bg-gray-900/50 backdrop-blur-sm" onclick="closePrintModal(event)"></div>
 <div id="printModal" class="hidden fixed inset-0 z-[40] overflow-y-auto items-center justify-center p-4">
@@ -556,15 +570,37 @@
 </div>
 @endpush
 
-@push('styles')
-    @vite('resources/css/admin/peserta.css')
-@endpush
 
 @section('scripts')
-<script>
-    window.pesertaConfig = {
-        baseUrl: '{{ url('admin/peserta') }}'
-    };
-</script>
-@vite('resources/js/admin/peserta.js')
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        window.pesertaConfig = {
+            baseUrl: '{{ url('admin/peserta') }}'
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            @if($peserta->latitude && $peserta->longitude)
+                const mapId = 'peserta-map';
+                const lat = {{ $peserta->latitude }};
+                const lng = {{ $peserta->longitude }};
+
+                const container = document.getElementById(mapId);
+                if (container) {
+                    var map = L.map(mapId).setView([lat, lng], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors',
+                        maxZoom: 19
+                    }).addTo(map);
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup("<div class='text-center'><b class='text-sm text-gray-800 block mb-1'>{{ addslashes($peserta->nama) }}</b><span class='text-xs text-gray-500'>Lokasi domisili tersimpan.</span></div>")
+                        .openPopup();
+
+                    setTimeout(() => {
+                        map.invalidateSize();
+                    }, 500);
+                }
+            @endif
+        });
+    </script>
+    @vite(['resources/js/admin/monitoring.js', 'resources/js/admin/peserta.js'])
 @endsection

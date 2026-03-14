@@ -93,17 +93,42 @@ window.reviewLaporan = function(id) {
 
 let monitoringMap = null;
 
-window.showMap = function(lat, lng) {
+window.openPresensiDetail = function(nama, waktu, jenis, status, mode, lat, lng, catatan) {
     const modal = document.getElementById('map-modal');
     const coordsText = document.getElementById('map-coords-text');
     const addressCard = document.getElementById('map-address-card');
     const addressText = document.getElementById('location-address');
     const externalLink = document.getElementById('google-maps-link');
     
-    coordsText.innerText = `GPS: ${lat}, ${lng}`;
-    addressText.innerText = 'Menganalisis lokasi...';
-    addressCard.style.display = 'none';
-    externalLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
+    const modalNama = document.getElementById('modalNama');
+    const modalJenis = document.getElementById('modalJenis');
+    const modalStatus = document.getElementById('modalStatus');
+    const modalMode = document.getElementById('modalMode');
+    const modalWaktu = document.getElementById('modalWaktu');
+    const modalCatatan = document.getElementById('modalCatatan');
+    const modalCatatanWrapper = document.getElementById('modalCatatanWrapper');
+    const modalSubtitle = document.getElementById('modalSubtitle');
+
+    if(modalNama) modalNama.innerText = nama;
+    if(modalJenis) modalJenis.innerText = jenis;
+    if(modalStatus) modalStatus.innerText = status;
+    if(modalMode) modalMode.innerText = mode;
+    if(modalWaktu) modalWaktu.innerText = waktu;
+    if(modalSubtitle) modalSubtitle.innerText = `${nama} — ${jenis} ${waktu}`;
+    
+    if(modalCatatanWrapper) {
+        if (catatan && catatan.trim() !== '') {
+            modalCatatan.innerText = catatan;
+            modalCatatanWrapper.classList.remove('hidden');
+        } else {
+            modalCatatanWrapper.classList.add('hidden');
+        }
+    }
+
+    if(coordsText) coordsText.innerText = `${lat.toFixed(7)}, ${lng.toFixed(7)}`;
+    if(addressText) addressText.innerText = 'Menganalisis lokasi...';
+    if(addressCard) addressCard.style.display = 'none';
+    if(externalLink) externalLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
     
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -120,22 +145,26 @@ window.showMap = function(lat, lng) {
             maxZoom: 19
         }).addTo(monitoringMap);
         
-        L.marker([lat, lng]).addTo(monitoringMap);
+        L.marker([lat, lng]).addTo(monitoringMap)
+            .bindPopup(`<b>${nama}</b><br>${jenis} — ${waktu}`)
+            .openPopup();
 
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
             headers: { 'Accept-Language': 'id-ID,id;q=0.9', 'User-Agent': 'SimpanData-Monitoring-System' }
         })
         .then(r => r.json())
         .then(data => {
-            addressText.innerText = data.display_name || 'Alamat tidak terdeteksi';
-            addressCard.style.display = 'block';
+            if(addressText) addressText.innerText = data.display_name || 'Alamat tidak terdeteksi';
+            if(addressCard) addressCard.style.display = 'block';
         })
         .catch(() => {
-            addressText.innerText = 'Gagal sinkronisasi alamat';
-            addressCard.style.display = 'block';
+            if(addressText) addressText.innerText = 'Gagal sinkronisasi alamat';
+            if(addressCard) addressCard.style.display = 'block';
         });
     }, 150);
 };
+
+window.showMap = window.openPresensiDetail;
 
 window.closeMap = function() {
     const modal = document.getElementById('map-modal');

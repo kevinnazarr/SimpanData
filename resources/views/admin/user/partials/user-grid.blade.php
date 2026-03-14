@@ -36,14 +36,6 @@
                             <p class="mt-1 text-sm text-gray-600 truncate">{{ $user->email }}</p>
                         </div>
                     </div>
-
-                    <div class="flex items-center gap-1">
-                        <button data-show-id="{{ $user->id }}"
-                                class="p-2 text-gray-400 transition-all duration-200 rounded-lg hover:text-indigo-600 hover:bg-indigo-50 hover:scale-110"
-                                title="Lihat Detail">
-                            <i class='text-xl bx bx-show'></i>
-                        </button>
-                    </div>
                 </div>
 
                 <div class="flex items-center justify-between px-1">

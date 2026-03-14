@@ -26,7 +26,6 @@ return new class extends Migration
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
             $table->string('nim_nis')->nullable();
-            $table->string('tugas')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->enum('status', ['Aktif', 'Selesai', 'Arsip'])->default('Aktif');

@@ -70,14 +70,10 @@
                             <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">
                                 {{ $peserta->nama ?? $user->username }}</h1>
                             <div class="flex flex-wrap items-center justify-center gap-2 mt-2 md:justify-start">
-                                <p class="px-3 py-1 text-xs font-bold tracking-widest uppercase border rounded-full text-primary bg-primary/5 border-primary/10 mb-0">
+                                <p
+                                    class="px-3 py-1 text-xs font-bold tracking-widest uppercase border rounded-full text-primary bg-primary/5 border-primary/10 mb-0">
                                     {{ $jenisKegiatan }} - {{ $peserta->jurusan ?? 'Jurusan Belum Diisi' }}
                                 </p>
-                                @if($peserta && $peserta->tugas)
-                                    <span class="px-3 py-1 text-[10px] font-black tracking-widest uppercase border rounded-lg text-indigo-600 bg-indigo-50 border-indigo-100 shadow-sm">
-                                        <i class='bx bx-task mr-1 text-xs'></i> {{ $peserta->tugas }}
-                                    </span>
-                                @endif
                             </div>
                             <div class="flex flex-wrap justify-center gap-4 mt-5 md:justify-start">
                                 <span
@@ -85,16 +81,21 @@
                                     <i class='bx bx-buildings mr-1.5 text-base'></i>
                                     {{ $peserta->asal_sekolah_universitas ?? 'Institusi Belum Diisi' }}
                                 </span>
-                                <span class="px-3.5 py-1.5 bg-blue-100/50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200 uppercase tracking-wider shadow-sm">
-                                    <i class='bx bx-id-card mr-1.5 text-base'></i> {{ $peserta && $peserta->nim_nis ? $peserta->nim_nis : '-' }}
+                                <span
+                                    class="px-3.5 py-1.5 bg-blue-100/50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200 uppercase tracking-wider shadow-sm">
+                                    <i class='bx bx-id-card mr-1.5 text-base'></i>
+                                    {{ $peserta && $peserta->nim_nis ? $peserta->nim_nis : '-' }}
                                 </span>
-                                <span class="px-3.5 py-1.5 bg-indigo-100/50 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 uppercase tracking-wider shadow-sm">
-                                    <i class='bx bx-task mr-1.5 text-base'></i> {{ $peserta && $peserta->tugas ? $peserta->tugas : '-' }}
+                                <span
+                                    class="px-3.5 py-1.5 bg-indigo-100/50 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 uppercase tracking-wider shadow-sm">
+                                    <i class='bx bx-task mr-1.5 text-base'></i>
+                                    {{ $peserta && $peserta->tugas ? $peserta->tugas : '-' }}
                                 </span>
-                                @if(!$peserta)
-                                <span class="px-3.5 py-1.5 bg-blue-100/50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200 uppercase tracking-wider shadow-sm">
-                                    <i class='bx bx-check-shield mr-1.5 text-base'></i> Akun {{ ucfirst($user->role) }}
-                                </span>
+                                @if (!$peserta)
+                                    <span
+                                        class="px-3.5 py-1.5 bg-blue-100/50 text-blue-700 rounded-lg text-xs font-bold border border-blue-200 uppercase tracking-wider shadow-sm">
+                                        <i class='bx bx-check-shield mr-1.5 text-base'></i> Akun {{ ucfirst($user->role) }}
+                                    </span>
                                 @endif
                             </div>
                         </div>
@@ -357,20 +358,11 @@
                             <input type="text" name="jurusan" value="{{ old('jurusan', $peserta->jurusan ?? '') }}"
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('jurusan') @enderror"
                                 placeholder="Teknik Informatika / Multimedia...">
-                             @error('jurusan')
-                                 <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
-                             @enderror
-                         </div>
+                            @error('jurusan')
+                                <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                         <div class="space-y-1">
-                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Tugas</label>
-                             <input type="text" name="tugas" value="{{ old('tugas', $peserta->tugas ?? '') }}"
-                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('tugas') @enderror"
-                                 placeholder="Contoh: Web Developer, UI Designer...">
-                             @error('tugas')
-                                 <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p>
-                             @enderror
-                         </div>
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Jenis
@@ -412,8 +404,7 @@
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">NIM / NIS</label>
-                            <input type="text" name="nim_nis"
-                                value="{{ old('nim_nis', $peserta->nim_nis ?? '') }}"
+                            <input type="text" name="nim_nis" value="{{ old('nim_nis', $peserta->nim_nis ?? '') }}"
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('nim_nis') @enderror"
                                 placeholder="Masukkan NIM / NIS...">
                             @error('nim_nis')
@@ -423,8 +414,7 @@
 
                         <div class="space-y-1">
                             <label class="text-xs font-bold tracking-widest uppercase text-slate-500">Tugas</label>
-                            <input type="text" name="tugas"
-                                value="{{ old('tugas', $peserta->tugas ?? '') }}"
+                            <input type="text" name="tugas" value="{{ old('tugas', $peserta->tugas ?? '') }}"
                                 class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all @error('tugas') @enderror"
                                 placeholder="Masukkan Tugas...">
                             @error('tugas')
@@ -461,8 +451,10 @@
                                     <i class='text-base bx bx-map-pin'></i> Ambil dari GPS
                                 </button>
                             </div>
-                            <input type="hidden" name="latitude" id="latitudeInput" value="{{ old('latitude', $peserta->latitude ?? '') }}">
-                            <input type="hidden" name="longitude" id="longitudeInput" value="{{ old('longitude', $peserta->longitude ?? '') }}">
+                            <input type="hidden" name="latitude" id="latitudeInput"
+                                value="{{ old('latitude', $peserta->latitude ?? '') }}">
+                            <input type="hidden" name="longitude" id="longitudeInput"
+                                value="{{ old('longitude', $peserta->longitude ?? '') }}">
                             <textarea name="alamat" id="alamatInput" rows="3"
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all @error('alamat') @enderror"
                                 placeholder="Alamat tinggal saat ini...">{{ old('alamat', $peserta->alamat ?? '') }}</textarea>
@@ -558,7 +550,9 @@
                                 <div class="flex items-center justify-center min-w-[40px]">
                                     <i class='text-xl bx bx-download'></i>
                                 </div>
-                                <span class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Download PDF</span>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Download
+                                    PDF</span>
                             </a>
 
                             <button onclick="document.getElementById('printFrame').contentWindow.print()"
@@ -566,7 +560,8 @@
                                 <div class="flex items-center justify-center min-w-[40px]">
                                     <i class='text-xl bx bx-printer'></i>
                                 </div>
-                                <span class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Cetak</span>
+                                <span
+                                    class="opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100 font-bold text-sm whitespace-nowrap pr-4 pointer-events-none">Cetak</span>
                             </button>
                         </div>
                     </div>
@@ -605,7 +600,7 @@
             const overlay = document.getElementById('printModalOverlay');
             const frame = document.getElementById('printFrame');
             const loader = document.getElementById('printLoader');
-            const baseUrl = '{{ route("peserta.profil.print") }}';
+            const baseUrl = '{{ route('peserta.profil.print') }}';
 
             if (!modal || !frame || !loader) return;
 

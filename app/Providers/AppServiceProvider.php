@@ -33,17 +33,17 @@ class AppServiceProvider extends ServiceProvider
         View::composer('partials.navbar', function ($view) {
             if (Auth::check() && Auth::user()->role === 'peserta' && Auth::user()->peserta) {
                 $pesertaId = Auth::user()->peserta->id;
-                
+
                 $harianRevisions = Laporan::where('peserta_id', $pesertaId)
                     ->where('status', 'Revisi')
                     ->latest('tanggal_laporan')
                     ->get();
-                    
+
                 $akhirRevision = LaporanAkhir::where('peserta_id', $pesertaId)
                     ->where('status', 'Revisi')
                     ->latest()
                     ->first();
-                    
+
                 $view->with('navbarNotifications', [
                     'harian' => $harianRevisions,
                     'akhir' => $akhirRevision,

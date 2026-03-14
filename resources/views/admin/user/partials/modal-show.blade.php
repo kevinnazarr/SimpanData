@@ -65,83 +65,122 @@
     </div>
 
     @if($user->peserta && $user->peserta->is_lengkap)
-    <div class="space-y-4">
-        <h5 class="flex items-center gap-2 text-lg font-bold text-gray-800">
-            <i class='text-indigo-600 bx bx-user-circle'></i>
-            Informasi Profil Peserta
-        </h5>
-
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500">
-                        <i class='text-lg text-white bx bx-user'></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500">Nama Lengkap</p>
-                        <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->nama }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
-                        <i class='text-lg text-white bx bx-envelope'></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500">Email</p>
-                        <p class="font-semibold text-gray-800 truncate">{{ $user->email }}</p>
+    <div class="space-y-6">
+        <div>
+            <h5 class="flex items-center gap-2 mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">
+                <i class='text-indigo-600 bx bx-graduation'></i>
+                Informasi Akademik & Identitas
+            </h5>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 shadow-sm">
+                            <i class='text-lg text-white bx bx-id-card'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase">NIM / NIS</p>
+                            <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->nim_nis ?: '-' }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500">
-                        <i class='text-lg text-white bx bx-phone'></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500">No. Telepon</p>
-                        <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->no_telepon ?: 'Tidak ada' }}</p>
+                <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-sm">
+                            <i class='text-lg text-white bx bx-building-house'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase">Asal Sekolah/Univ</p>
+                            <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->asal_sekolah_universitas }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500">
-                        <i class='text-lg text-white bx bx-briefcase-alt'></i>
+                <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm">
+                            <i class='text-lg text-white bx bx-book-bookmark'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase">Jurusan</p>
+                            <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->jurusan }}</p>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500">Jenis Kegiatan</p>
-                        <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->jenis_kegiatan }}</p>
+                </div>
+
+                <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 shadow-sm">
+                            <i class='text-lg text-white bx bx-phone'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase">No. Telepon</p>
+                            <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->no_telepon ?: '-' }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-            <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500">
-                        <i class='text-lg text-white bx bx-time'></i>
+        <div>
+            <h5 class="flex items-center gap-2 mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">
+                <i class='text-indigo-600 bx bx-briefcase'></i>
+                Detail Program & Tugas
+            </h5>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-indigo-50 hover:bg-indigo-100 border-indigo-100 col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 shadow-indigo-200 shadow-lg shrink-0">
+                            <i class='text-2xl text-white bx bx-task'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-indigo-600 uppercase">Nama Tugas / Project</p>
+                            <p class="text-lg font-bold text-gray-900 leading-tight">{{ $user->peserta->tugas ?: 'Belum ditentukan' }}</p>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500">Status</p>
-                        <p class="font-semibold text-gray-800">{{ $user->peserta->status }}</p>
+                </div>
+
+                <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 shadow-sm">
+                            <i class='text-lg text-white bx bx-category'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase">Jenis Kegiatan</p>
+                            <p class="font-semibold text-gray-800 truncate">{{ $user->peserta->jenis_kegiatan }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 shadow-sm">
+                            <i class='text-lg text-white bx bx-calendar'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase">Periode</p>
+                            <p class="font-semibold text-gray-800 text-sm">
+                                {{ $user->peserta->tanggal_mulai->format('d M Y') }} - {{ $user->peserta->tanggal_selesai->format('d M Y') }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div>
+            <h5 class="flex items-center gap-2 mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">
+                <i class='text-indigo-600 bx bx-map'></i>
+                Informasi Alamat
+            </h5>
             <div class="p-4 transition-colors border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500">
-                        <i class='text-lg text-white bx bx-id-card'></i>
+                <div class="flex items-start gap-3">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800 shadow-sm shrink-0">
+                        <i class='text-lg text-white bx bx-map-alt'></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500">ID Peserta</p>
-                        <p class="font-semibold text-gray-800">{{ str_pad($user->peserta->id, 4, '0', STR_PAD_LEFT) }}</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase">Alamat Lengkap</p>
+                        <p class="font-semibold text-gray-800 whitespace-pre-line leading-relaxed">{{ $user->peserta->alamat ?: 'Alamat belum diisi' }}</p>
                     </div>
                 </div>
             </div>

@@ -17,9 +17,6 @@
                     <p class="text-xs text-gray-500 font-medium">Lengkapi aspek kriteria untuk kalkulasi nilai akhir</p>
                 </div>
             </div>
-            <a href="{{ route('admin.penilaian.index') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50">
-                <i class='bx bx-arrow-back'></i> Kembali
-            </a>
         </div>
 
         @if ($errors->any())
@@ -112,7 +109,7 @@
                             <i class='bx bxs-star text-xl'></i>
                         </div>
                         <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1 leading-none">Score</p>
-                        
+
                         @if (isset($penilaian))
                             <div class="flex items-end gap-0.5 mb-1.5">
                                 <span class="text-4xl font-bold text-indigo-600 leading-none">{{ round($penilaian->nilai_akhir) }}</span>
@@ -269,7 +266,7 @@
         cursor: pointer;
         box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4), 0 2px 4px -2px rgba(79, 70, 229, 0.3);
         transition: all 0.2s ease;
-        margin-top: 0px; 
+        margin-top: 0px;
     }
 
     input[type="range"].custom-slider:active::-webkit-slider-thumb {
@@ -337,7 +334,7 @@
         const slider = document.getElementById('range-' + id);
         const val = slider.value;
         document.getElementById('label-' + id).textContent = val;
-        
+
         const percentage = (val - slider.min) / (slider.max - slider.min) * 100;
         slider.style.background = `linear-gradient(to right, #4f46e5 ${percentage}%, #e2e8f0 ${percentage}%)`;
     }
